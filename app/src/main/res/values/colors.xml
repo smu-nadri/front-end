@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#AFB42B</color>
+    <color name="colorPrimary_light">#C0CA33</color>
+    <color name="colorPrimary_dark">#827717</color>
+    <color name="colorAccent">#36CACACA</color>
+    <color name="colorTail">#dddddd</color>
+    <color name="colorTailSunday">#DD95AF</color>
+    <color name="colorTailSaturday">#8CB1D1</color>
+    <color name="colorSunday">#D81B60</color>
+    <color name="colorSaturday">#1B80D8</color>
+    <color name="colorToDay">#C5D61A</color>
+
+    <color name="colorSecondary">#FBC02D</color>
+    <color name="colorSecondary_variant">#FFC107</color>
+    <color name="colorOnSecondary">#DCE775</color>
+
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/goou0/AndroidStudioProjects/Nadri4edit1/app/src/main/res/drawable/bg_round.xml" value="0.1" />
+        <entry key="..\:/Users/goou0/AndroidStudioProjects/Nadri4edit1/app/src/main/res/layout/activity_main.xml" value="0.24122137404580152" />
+        <entry key="..\:/Users/goou0/AndroidStudioProjects/Nadri4edit1/app/src/main/res/layout/album_layout.xml" value="0.23541666666666666" />
+        <entry key="..\:/Users/goou0/AndroidStudioProjects/Nadri4edit1/app/src/main/res/layout/album_of_the_day.xml" value="0.21979166666666666" />
+        <entry key="..\:/Users/goou0/AndroidStudioProjects/Nadri4edit1/app/src/main/res/layout/album_view.xml" value="0.2" />
+        <entry key="..\:/Users/goou0/AndroidStudioProjects/Nadri4edit1/app/src/main/res/layout/calender_item.xml" value="0.23541666666666666" />
+        <entry key="..\:/Users/goou0/AndroidStudioProjects/Nadri4edit1/app/src/main/res/layout/item_layout.xml" value="0.23541666666666666" />
+        <entry key="..\:/Users/goou0/AndroidStudioProjects/Nadri4edit1/app/src/main/res/layout/page_of_the_day.xml" value="0.23541666666666666" />
+        <entry key="..\:/Users/goou0/AndroidStudioProjects/Nadri4edit1/app/src/main/res/layout/photos_in_the_gallery.xml" value="0.25" />
+        <entry key="..\:/Users/goou0/AndroidStudioProjects/Nadri4edit1/app/src/main/res/layout/photos_item.xml" value="0.2" />
+        <entry key="..\:/Users/goou0/AndroidStudioProjects/Nadri4edit1/app/src/main/res/layout/photos_item1.xml" value="0.246875" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

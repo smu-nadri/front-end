@@ -1,0 +1,10 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.Nadri4edit1" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorOnSecondary</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorOnPrimary">@color/white</item>
+    </style>
+</resources>

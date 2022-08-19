@@ -1,0 +1,180 @@
+package com.example.nadri4_edit1;
+
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.os.Build;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+
+public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.CalenderViewHolder> {
+
+    ArrayList<Date> dateList;
+
+    public CalendarAdapter(ArrayList<Date> dateList) {
+        this.dateList = dateList;
+    }
+
+    @NonNull
+    @Override
+    public CalenderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+
+        View view = inflater.inflate(R.layout.calender_item, parent, false);
+
+        return new CalenderViewHolder(view);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void onBindViewHolder(@NonNull CalenderViewHolder holder, int position) {
+
+        //날짜 변수에 담기
+        Date monthDate = dateList.get(position);
+
+        //달력 초기화 ==> Date클래스에서 deprecated되어 대체된 메서드들 사용하기 위해 설정!!
+        Calendar dateCalendar = Calendar.getInstance();
+        
+        dateCalendar.setTime(monthDate);
+
+        //텍스트 색상 지정(토요일, 일요일)
+        if( (position + 1) % 7 == 0){   //토요일이면
+            holder.tvDate.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.colorSaturday));    //colorSaturday
+        }
+        else if (position == 0 || position % 7 == 0) {  //일요일이면
+            holder.tvDate.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.colorSunday));    //colorSunday
+        }//Color.parseColor("#D81B60")
+
+        /*if(toDay.equals(CalendarUtil.selectedDate)){
+            holder.tvDate.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.colorToDay));
+        }*/
+
+        //현재 년, 월, 일
+        int currentDay = CalendarUtil.selectedDate.get(Calendar.DAY_OF_MONTH);
+        int currentMonth = CalendarUtil.selectedDate.get(Calendar.MONTH)+1;
+        int currentYear = CalendarUtil.selectedDate.get(Calendar.YEAR);
+
+        //넘어온 데이터
+        int tailDay = dateCalendar.get(Calendar.DAY_OF_MONTH);
+        int tailMonth = dateCalendar.get(Calendar.MONTH)+1;
+        int tailYear = dateCalendar.get(Calendar.YEAR);
+
+        //비교해서 년,월이 같으면 진하게, 아니면 연하게 변경
+        if(tailMonth == currentMonth && tailYear == currentYear){
+            holder.tvDate.setTypeface(null, Typeface.BOLD);     //볼드체 설정
+        }
+        else {
+            if( (position + 1) % 7 == 0){   //토요일이면
+                holder.tvDate.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.colorTailSaturday));    //colorSaturday
+            }
+            else if (position == 0 || position % 7 == 0) {
+                holder.tvDate.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.colorTailSunday));    //colorSunday
+            }//Color.parseColor("#D81B60")
+            else {
+                holder.tvDate.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.colorTail));    //회색으로 흐리게!
+            }
+        }
+
+        //Log.d("오늘", monthDate.getTime() + ": 비교 :" + CalendarUtil.selectedDate.getTimeInMillis());
+        //Log.d("날짜", monthDate.getDate() + ", " + monthDate.getMonth() + ", " + monthDate.getYear() + " : 오늘 : " + CalendarUtil.selectedDate.get(Calendar.DAY_OF_MONTH) + " , " + CalendarUtil.selectedDate.get(Calendar.MONTH) + ", " + CalendarUtil.selectedDate.get(Calendar.YEAR));
+
+        //오늘 날짜 초록불!
+        LocalDate toDay = LocalDate.now();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd"); //LocalDate포맷에 맞춰줌
+        String dateNow = simpleDateFormat.format(monthDate.getTime());
+        //String toDay = simpleDateFormat.format(String.valueOf(TD));   => LocalDate자체의 포맷이 yyyy-MM-dd라서 포맷해줄 필요 없음
+        //String toDay = simpleDateFormat.format(CalendarUtil.selectedDate.getTimeInMillis());  //포맷은 잘 먹는데 selectedDate가 페이지 바뀌면 월도 바뀌는 애라 소용X
+
+        //Log.d("stringTEST", dateNow + ": 비교 :" + toDay);
+
+        if(dateNow.equals(String.valueOf(toDay))) {
+            //일까지 똑같으면 색상 표시 --???
+            holder.tvDate.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.colorToDay));
+            //holder.tvDate.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.colorToDay));
+            //holder.tvDate.setBackgroundResource(R.drawable.bg_round);   //배경 동그라미 생성
+        }
+        
+        //날짜 변수에 담기
+        int dayNum = dateCalendar.get(Calendar.DAY_OF_MONTH);
+
+        holder.tvDate.setText(String.valueOf(dayNum));
+
+        /*if(date == null){
+            //날짜 적용
+            holder.tvDate.setText("");
+        }
+        else {
+            holder.tvDate.setText(String.valueOf(date.getDayOfMonth()));
+
+            //오늘 날짜 색 바꾸기
+            if(date.equals(CalendarUtil.selectedDate)){
+                holder.parentView.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.colorAccent));
+            }
+        }*/
+
+        //날짜 클릭 이벤트
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                //클릭 이후 기능 구현
+                Toast.makeText(holder.itemView.getContext(), "클릭", Toast.LENGTH_SHORT).show();
+
+                Context context = view.getContext();
+                Intent selectDay = new Intent(context, AlbumLayout.class);
+                //Intent intent = new Intent(holder.itemView.getContext(), PageList.class);
+
+                //넘길 데이터 : 클릭한 날짜 보내기 - day값만 보내면 됨
+                int iDay = dateCalendar.get(dateCalendar.DAY_OF_MONTH);
+                //Log.d("확인", String.valueOf(iDay));
+                selectDay.putExtra("SelectedDATE", iDay);
+
+                //전송
+                ((MainActivity)context).startActivity(selectDay);
+
+                /*
+                int iYear = date.getYear();
+                int iMonth = date.getMonthValue();
+                int iDay = date.getDayOfMonth();
+
+                String yearMonthDay = iYear + "년 " + iMonth + "월 " + iDay + "일";
+                Toast.makeText(holder.itemView.getContext(), yearMonthDay, Toast.LENGTH_SHORT).show();*/
+            }
+        });
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return dateList.size();
+    }
+
+    class CalenderViewHolder extends RecyclerView.ViewHolder {
+        TextView tvDate;
+        View parentView;
+
+        public CalenderViewHolder(@NonNull View itemView) {
+            super(itemView);
+            tvDate = itemView.findViewById(R.id.tvCalendarDate);
+            parentView = itemView.findViewById(R.id.parentView);
+        }
+    }
+
+}

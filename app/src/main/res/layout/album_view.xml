@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="68dp"
+        android:padding="10dp"
+        android:orientation="horizontal">
+
+        <!--현재-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/tvCurrentYear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="2022"
+                android:textStyle="bold"
+                android:textSize="15dp" />
+            <TextView
+                android:id="@+id/tvCurrentMonth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:text="5월"
+                android:textStyle="bold"
+                android:textSize="25dp" />
+        </LinearLayout>
+
+        <!-- TextView 사이에 넣어주므로써 간격을 넖혀 우측정렬이 될 수 있게 만든다 -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/btnSettings"
+            android:background="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+"
+            android:textSize="20dp"
+            android:layout_gravity="right"/>
+
+    </LinearLayout>
+
+
+    <!--요일+달력뷰-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="15dp"
+        android:background="#ffffff"
+        android:orientation="vertical"
+        android:layout_gravity="center">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </ScrollView>
+
+
+    </LinearLayout>
+
+
+
+</LinearLayout>
