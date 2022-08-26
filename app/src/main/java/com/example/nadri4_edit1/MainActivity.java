@@ -6,10 +6,12 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
@@ -25,6 +27,8 @@ import java.util.Date;
 public class MainActivity extends AppCompatActivity {
     TextView currentYear, currentMonth;   //년, 월 텍스트뷰
     TextView btnPrev, btnNext, btnSettings;
+
+    ImageButton imgbtn_album;
 
     RecyclerView recyclerView;
 
@@ -47,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
         btnPrev = (TextView) findViewById(R.id.tvPrev);
         btnNext = (TextView) findViewById(R.id.tvNext);
         btnSettings = (TextView) findViewById(R.id.btnSettings);
+
+        imgbtn_album = (ImageButton) findViewById(R.id.album_button);
+
         recyclerView = (RecyclerView) findViewById(R.id.rvCalender);
 
 
@@ -85,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //이후 버튼 이벤트
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -92,6 +100,15 @@ public class MainActivity extends AppCompatActivity {
                 //CalendarUtil.selectedDate = CalendarUtil.selectedDate.plusMonths(1);
                 CalendarUtil.selectedDate.add(Calendar.MONTH, +1);   //+1
                 setMonthView();
+            }
+        });
+
+        //이미지버튼(앨범버튼) 이벤트 -> 앨범뷰로 이동
+        imgbtn_album.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent viewIntent = new Intent(getApplicationContext(), AlbumView.class);
+                startActivity(viewIntent);
             }
         });
 

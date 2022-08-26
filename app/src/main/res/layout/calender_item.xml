@@ -16,6 +16,8 @@
         android:textSize="15dp"
         android:textColor="#676d6e"
         android:textStyle="bold"/>
+
+
     <View
         android:layout_width="wrap_content"
         android:layout_height="60dp"/>

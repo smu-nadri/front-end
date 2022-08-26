@@ -18,7 +18,12 @@
         android:theme="@style/Theme.Nadri4edit1">
         <activity
             android:name=".AlbumLayout"
-            android:exported="false" />
+            android:exported="true" />
+        <activity
+            android:name=".AlbumView"
+            android:exported="true"/>
+        <activity android:name=".SearchView"
+            android:exported="true"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">
