@@ -2,9 +2,11 @@ package com.example.nadri4_edit1;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -14,6 +16,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.time.LocalDate;
@@ -25,12 +28,13 @@ import java.util.Date;
 
 
 public class MainActivity extends AppCompatActivity {
-    TextView currentYear, currentMonth;   //년, 월 텍스트뷰
+    static TextView currentYear;
+    static TextView currentMonth;   //년, 월 텍스트뷰
     TextView btnPrev, btnNext, btnSettings;
 
     ImageButton imgbtn_album;
 
-    RecyclerView recyclerView;
+    static RecyclerView recyclerView;
 
     public static Context context;
 
@@ -42,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, MODE_PRIVATE);
 
         context = this; //컨텍스트 지정
 
@@ -67,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });*/
+        ReqServer.reqGetAlbums(MainActivity.this);
 
 
         //현재날짜
@@ -114,6 +121,12 @@ public class MainActivity extends AppCompatActivity {
 
     }   //onCreate()
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        ReqServer.reqGetAlbums(this);
+    }
+
     //날짜 타입 설정(2022   05)
     @RequiresApi(api = Build.VERSION_CODES.O)
     private String dateFormat(Calendar calendar){  //2022년 5월
@@ -131,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
 
     //년도
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private String selectedYear(Calendar calendar){  //2022년 5월
+    private static String selectedYear(Calendar calendar){  //2022년 5월
 
         //년월 포맷
         /*DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy   MM");
@@ -145,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
 
     //월
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private String selectedMonth(Calendar calendar){  //2022년 5월
+    private static String selectedMonth(Calendar calendar){  //2022년 5월
 
         //년월 포맷
         /*DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy   MM");
@@ -168,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
 
     //화면 설정
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void setMonthView(){
+    protected static void setMonthView(){
         //텍스트뷰 셋팅
         currentYear.setText(selectedYear(CalendarUtil.selectedDate));
         currentMonth.setText(selectedMonth(CalendarUtil.selectedDate));
@@ -177,10 +190,10 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<Date> dateList = daysInMonthArray();
 
         //어댑터 데이터 적용
-        CalendarAdapter adapter = new CalendarAdapter(dateList);
+        CalendarAdapter adapter = new CalendarAdapter(dateList, context);
 
         //레이아웃 설정(열 = 7)
-        RecyclerView.LayoutManager manager = new GridLayoutManager(getApplicationContext(), 7);
+        RecyclerView.LayoutManager manager = new GridLayoutManager(context, 7);
 
         //레이아웃 적용
         recyclerView.setLayoutManager(manager);
@@ -192,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
 
     //날짜 생성
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private ArrayList<Date>daysInMonthArray(){
+    private static ArrayList<Date>daysInMonthArray(){
 
         ArrayList<Date> dateList = new ArrayList<>();
 
