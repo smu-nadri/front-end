@@ -2,6 +2,7 @@ package com.example.nadri4_edit1;
 
 import android.Manifest;
 import android.content.ClipData;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -25,14 +26,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 
 public class AlbumLayout extends AppCompatActivity {
-
-    //이미지 정보를 담는 리스트
-    ArrayList<JSONObject> photoList = new ArrayList<>();
-    ArrayList<JSONObject> deletedList = new ArrayList<>();
 
     static RecyclerView recyclerView;  //이미지를 보여주는 뷰
     static MultiImageAdapter adapter;
@@ -59,8 +55,7 @@ public class AlbumLayout extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("HWA", "btnSave photoList: " + photoList);
-                ReqServer.reqPostPages(AlbumLayout.this, photoList, deletedList);
+                ReqServer.reqPostPages(AlbumLayout.this);
             }
         });
 
@@ -68,13 +63,26 @@ public class AlbumLayout extends AppCompatActivity {
         Intent getDateIntent = getIntent();
         int iDay = getDateIntent.getIntExtra("SelectedDATE",-1);
         //화면 설정
-        setView(iDay);
+        String title;
+        if (iDay == -1){
+            title = getDateIntent.getStringExtra("title");
+            ReqServer.stitle = title;
+            tvPageDate.setText(title);
+        }
+        else {
+            setView(iDay);
+            String tMonth, tDay;
+            if(CalendarUtil.selectedDate.get(Calendar.MONTH) + 1 < 10) tMonth = "0" + (CalendarUtil.selectedDate.get(Calendar.MONTH) + 1);
+            else tMonth = String.valueOf(CalendarUtil.selectedDate.get(Calendar.MONTH) + 1);
+            if(iDay < 10) tDay = "0" + iDay;
+            else tDay = String.valueOf(iDay);
+
+            ReqServer.stitle = CalendarUtil.selectedDate.get(Calendar.YEAR) + "-" + tMonth + "-" + tDay;
+        }
 
         //기존에 저장된 사진들 불러오기
-        Log.d("HWA", "reqGetPages uriList: " + photoList);
         try {
-            ReqServer.sDate = CalendarUtil.selectedDate.get(Calendar.YEAR) + "-" + (CalendarUtil.selectedDate.get(Calendar.MONTH)+1) + "-" + iDay;
-            ReqServer.reqGetPages(AlbumLayout.this, photoList);
+            ReqServer.reqGetPages(AlbumLayout.this);
         } catch (Exception e) {
             e.printStackTrace();
             Log.d("HWA", e + "");
@@ -114,6 +122,12 @@ public class AlbumLayout extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ReqServer.album = new JSONObject();
+    }
+
     //기존에 저장된 앨범 레이아웃이 있다면 불러와서 보여줘야 함...
     /*..{내용}..*/
 
@@ -122,6 +136,8 @@ public class AlbumLayout extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        int takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+        ContentResolver resolver = this.getContentResolver();
 
         if(data == null){
             Toast.makeText(this, "이미지를 선택하지 않았습니다.", Toast.LENGTH_SHORT).show();
@@ -130,26 +146,12 @@ public class AlbumLayout extends AppCompatActivity {
             if(data.getClipData() == null){
                 Log.d("single choice: ", String.valueOf(data.getData()));
                 Uri imageUri = data.getData();
+                resolver.takePersistableUriPermission(imageUri, takeFlags);
                 try {
-                    photoList.add(new JSONObject().put("uri", imageUri));
+                    ReqServer.photoList.add(new JSONObject().put("uri", imageUri));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-                //adapter = new MultiImageAdapter(uriList, getApplicationContext());
-                adapter = new MultiImageAdapter(photoList, getApplicationContext());
-
-                //레이아웃 설정(열 = 2)
-                RecyclerView.LayoutManager manager = new GridLayoutManager(getApplicationContext(), 2);
-                //recyclerView.LayoutManager(new GridLayoutManager(this, 2));
-
-                //레이아웃 적용
-                recyclerView.setLayoutManager(manager);
-
-                //어댑터 적용
-                recyclerView.setAdapter(adapter);
-
-                //recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true));
             }//이미지를 하나만 선택
             else{
                 ClipData clipData = data.getClipData();
@@ -157,28 +159,30 @@ public class AlbumLayout extends AppCompatActivity {
 
                 for(int i=0; i< clipData.getItemCount(); i++){
                     Uri imageUri = clipData.getItemAt(i).getUri();  //선택한 이미지들의 uri를 가져온다.
+                    resolver.takePersistableUriPermission(imageUri, takeFlags);
                     try {
-                        photoList.add(new JSONObject().put("uri", imageUri));
+                        ReqServer.photoList.add(new JSONObject().put("uri", imageUri));
                     } catch (JSONException e) {
                         Log.e("HWA", "photoList add JSONException : " + e);
                     }
                 }
-
-                //adapter = new MultiImageAdapter(uriList, getApplicationContext());
-                adapter = new MultiImageAdapter(photoList, getApplicationContext());
-                //레이아웃 설정(열 = 2)
-                RecyclerView.LayoutManager manager = new GridLayoutManager(getApplicationContext(), 2);
-                //recyclerView.LayoutManager(new GridLayoutManager(this, 2));
-
-                //레이아웃 적용
-                recyclerView.setLayoutManager(manager);
-
-                //어댑터 적용
-                recyclerView.setAdapter(adapter);
-
-                //리사이클러뷰 수직 스크롤 적용
-                //recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true));
             }//이미지를 여러장 선택
+
+            //adapter = new MultiImageAdapter(uriList, getApplicationContext());
+            adapter = new MultiImageAdapter(ReqServer.photoList, getApplicationContext());
+
+            //레이아웃 설정(열 = 2)
+            RecyclerView.LayoutManager manager = new GridLayoutManager(getApplicationContext(), 2);
+            //recyclerView.LayoutManager(new GridLayoutManager(this, 2));
+
+            //레이아웃 적용
+            recyclerView.setLayoutManager(manager);
+
+            //어댑터 적용
+            recyclerView.setAdapter(adapter);
+
+            //리사이클러뷰 수직 스크롤 적용
+            //recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true));
         }//이미지 선택함
     }
 
