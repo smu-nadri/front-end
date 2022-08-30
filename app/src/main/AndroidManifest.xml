@@ -22,7 +22,11 @@
         <activity
             android:name=".AlbumView"
             android:exported="true"/>
-        <activity android:name=".SearchView"
+        <activity
+            android:name=".MonthActivity"
+            android:exported="true"/>
+        <activity
+            android:name=".SearchView"
             android:exported="true"/>
         <activity
             android:name=".MainActivity"
