@@ -5,10 +5,12 @@ import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,18 +32,90 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReqServer {
-    public static String sDate;
+
+    //앨범 정보를 담는 리스트
+    static ArrayList<JSONObject> dateAlbumList = new ArrayList<>();
+    static ArrayList<JSONObject> customAlbumList = new ArrayList<>();
+    static ArrayList<JSONObject> yearAlbumList = new ArrayList<>();
+    static ArrayList<JSONObject> monthAlbumList = new ArrayList<>();
+
+    //사진 정보를 담는 리스트
+    static ArrayList<JSONObject> photoList = new ArrayList<>();
+    static ArrayList<JSONObject> deletedList = new ArrayList<>();
+
+    public static String stitle;
+    public static JSONObject album = new JSONObject();
+
+
     Context c;
 
     public ReqServer(Context context) {
         c = context;
     }
 
+    //앨범 리스트 불러오기
+    public static void reqGetAlbums(Context context){
+        String android_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+        String url = context.getString(R.string.testIpAddress) + android_id;
+        Log.d("HWA", "GET Url: " + url);
+
+        final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.d("HWA", "GET Response: " + response);
+                try {
+                    //앨범 리스트 초기화
+                    dateAlbumList.clear();
+                    customAlbumList.clear();
+                    yearAlbumList.clear();
+                    monthAlbumList.clear();
+
+                    //각 앨범 정보를 배열리스트에 넣기
+                    JSONArray resArr = response.getJSONArray("dateAlbums");
+                    for(int i = 0; i < resArr.length(); i++){
+                        dateAlbumList.add(resArr.getJSONObject(i).getJSONObject("_id"));
+                    }
+
+                    resArr = response.getJSONArray("customAlbums");
+                    for(int i = 0; i < resArr.length(); i++){
+                        customAlbumList.add(resArr.getJSONObject(i).getJSONObject("_id"));
+                    }
+
+                    resArr = response.getJSONArray("yearAlbums");
+                    for(int i = 0; i < resArr.length(); i++){
+                        yearAlbumList.add(resArr.getJSONObject(i));
+                    }
+
+                    resArr = response.getJSONArray("monthAlbums");
+                    for(int i = 0; i < resArr.length(); i++){
+                        monthAlbumList.add(resArr.getJSONObject(i));
+                    }
+
+                    //달력 화면 설정
+                    MainActivity.setMonthView();
+
+                } catch (JSONException e) {
+                    Log.e("HWA", "GET onResponse 에러: " + e);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("HWA", "GET Response 에러: " + error);
+                Toast.makeText(context.getApplicationContext(), "응답 실패", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        requestQueue.add(jsonObjectRequest);
+    }
+
     //페이지 정보 요청하기
-    public static void reqGetPages(Context context, ArrayList<JSONObject> photoList){
+    public static void reqGetPages(Context context){
         //android_id 가져와서 ip 주소랑 합치기
         String android_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-        String url = context.getString(R.string.testIpAddress) + android_id + "/" + sDate;
+        String url = context.getString(R.string.testIpAddress) + android_id + "/" + stitle;
         Log.d("HWA", "GET Url: " + url);
 
         //요청 만들기
@@ -49,6 +123,7 @@ public class ReqServer {
             @Override
             public void onResponse(JSONArray response) {
                 Log.d("HWA", "GET Response" + response);
+                photoList.clear();
                 for(int i = 0; i< response.length(); i++){
                     try {
                         Log.d("HWA", "GET Response Uri: " + String.valueOf(response.getJSONObject(i)));
@@ -85,9 +160,9 @@ public class ReqServer {
 
     //작성한 페이지 보내기
     @SuppressLint("RestrictedApi")
-    public static void reqPostPages(Context context, ArrayList<JSONObject> photoList, ArrayList<JSONObject> deletedList){
+    public static void reqPostPages(Context context){
         String android_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-        String url = context.getString(R.string.testIpAddress) + android_id;
+        String url = context.getString(R.string.testIpAddress) + android_id  + "/" + stitle;
         Log.d("HWA", "POST Url: " + url);
 
         //서버로 보낼 Json
@@ -95,6 +170,9 @@ public class ReqServer {
         JSONArray reqJsonArr = new JSONArray();
 
         try{
+            //앨범 정보 reqJson에 넣기
+            reqJson.put("album", album);
+
             //삭제할 리스트 reqJson에 넣기
             reqJson.put("deletedList", deletedList);
 
@@ -142,7 +220,7 @@ public class ReqServer {
 
                 //페이지 정보
                 JSONObject pages = new JSONObject();
-                pages.put("page", sDate);
+                pages.put("page", stitle);
                 pages.put("pageOrder", 1); //여기 수정해야함
                 pages.put("layoutOrder", i);
                 photoJson.put("pages", pages);
@@ -150,12 +228,6 @@ public class ReqServer {
                 //리스트 reqJsonArr에 사진 photoJson 넣기
                 Log.d("HWA", "photoJson " + i + ": " + photoJson);
                 reqJsonArr.put(photoJson);
-                /*
-                String timeData = exif.getAttribute(ExifInterface.TAG_DATETIME);
-                String lat = exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE);
-                String lng = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);
-                Log.d("HWA", "timeData: "+ timeData + " lat:" + lat + " lng: " + lng);
-                */
             }
 
             //추가 및 수정할 리스트 reqJson에 넣기
