@@ -4,11 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,6 +18,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+
+import org.json.JSONException;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -26,9 +32,11 @@ import java.util.Date;
 public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.CalenderViewHolder> {
 
     ArrayList<Date> dateList;
+    private Context mContext = null;
 
-    public CalendarAdapter(ArrayList<Date> dateList) {
+    public CalendarAdapter(ArrayList<Date> dateList, Context context) {
         this.dateList = dateList;
+        mContext = context;
     }
 
     @NonNull
@@ -50,7 +58,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
         //달력 초기화 ==> Date클래스에서 deprecated되어 대체된 메서드들 사용하기 위해 설정!!
         Calendar dateCalendar = Calendar.getInstance();
-        
+
         dateCalendar.setTime(monthDate);
 
         //텍스트 색상 지정(토요일, 일요일)
@@ -109,12 +117,32 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             //holder.tvDate.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.colorToDay));
             //holder.tvDate.setBackgroundResource(R.drawable.bg_round);   //배경 동그라미 생성
         }
-        
+
         //날짜 변수에 담기
         int dayNum = dateCalendar.get(Calendar.DAY_OF_MONTH);
 
         holder.tvDate.setText(String.valueOf(dayNum));
 
+        //제목 만들고 썸네일 적용하기
+        String title, tMonth, tDay;
+        if(tailMonth < 10) tMonth = "0" + tailMonth;
+        else tMonth = String.valueOf(tailMonth);
+        if(dayNum < 10) tDay = "0" + dayNum;
+        else tDay = String.valueOf(dayNum);
+
+        title = tailYear + "-" + tMonth + "-" + tDay;
+        ReqServer.dateAlbumList.forEach(item -> {
+            try {
+                String tmp = item.getString("title");
+                if(tmp.equals(title)){
+                    Uri imageUri = Uri.parse(item.getString("thumbnail"));
+                    holder.ivThumb.setClipToOutline(true);
+                    Glide.with(mContext).load(imageUri).into(holder.ivThumb);
+                }
+            } catch (JSONException e) {
+                Log.e("HWA", "달력 썸네일 적용 에러 " + e);
+            }
+        });
         /*if(date == null){
             //날짜 적용
             holder.tvDate.setText("");
@@ -146,6 +174,31 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
                 //Log.d("확인", String.valueOf(iDay));
                 selectDay.putExtra("SelectedDATE", iDay);
 
+                //선택한 앨범 정보를 서버 데이터에 셋팅하기
+                String title, tMonth, tDay;
+                if(tailMonth < 10) tMonth = "0" + tailMonth;
+                else tMonth = String.valueOf(tailMonth);
+                if(dayNum < 10) tDay = "0" + iDay;
+                else tDay = String.valueOf(iDay);
+
+                title = tailYear + "-" + tMonth + "-" + tDay;
+
+                try {
+                    ReqServer.album.put("title", title);
+                    ReqServer.album.put("type", "dateAlbum");
+                    ReqServer.dateAlbumList.forEach(item -> {
+                        try {
+                            if(item.getString("title").equals(title)){
+                                ReqServer.album = item;
+                            };
+                        } catch (Exception e) {
+                            Log.e("HWA", "albumList Error: " + e);
+                        }
+                    });
+                } catch (Exception e) {
+                    Log.e("HWA", "albumList Error: " + e);
+                }
+
                 //전송
                 ((MainActivity)context).startActivity(selectDay);
 
@@ -169,11 +222,13 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     class CalenderViewHolder extends RecyclerView.ViewHolder {
         TextView tvDate;
         View parentView;
+        ImageView ivThumb;
 
         public CalenderViewHolder(@NonNull View itemView) {
             super(itemView);
             tvDate = itemView.findViewById(R.id.tvCalendarDate);
             parentView = itemView.findViewById(R.id.parentView);
+            ivThumb = itemView.findViewById(R.id.ivAlbumThumb);
         }
     }
 

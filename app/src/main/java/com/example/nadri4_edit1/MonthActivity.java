@@ -1,53 +1,41 @@
 package com.example.nadri4_edit1;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.media.Image;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-
-import com.example.nadri4_edit1.GridAdapter;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.json.JSONObject;
+import org.json.JSONException;
 
-import java.util.ArrayList;
+public class MonthActivity extends AppCompatActivity {
 
-public class AlbumView extends AppCompatActivity {
 
-    ImageView folder1, folder2, folder3;
     ImageButton imgbtn_calendar;
     GridLayout testFolderLayout;
     GridView gridView;
 
     String src;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.album_view);
+        setContentView(R.layout.monthalbum_view);
 
         //xml변수 연결
-        folder1 = (ImageView) findViewById(R.id.imageView1);
-        folder2 = (ImageView) findViewById(R.id.imageView2);
-        folder3 = (ImageView) findViewById(R.id.imageView3);
-
-        gridView = (GridView) findViewById(R.id.gvYearAlbum);
+        gridView = (GridView) findViewById(R.id.gvMonthAlbum);
 
         imgbtn_calendar = (ImageButton) findViewById(R.id.calendar_button);
 
         testFolderLayout = (GridLayout) findViewById(R.id.testFolderLayout);
-
-        folder1.setClipToOutline(true);
-        folder2.setClipToOutline(true);
-        folder3.setClipToOutline(true);
 
         //이미지버튼(앨범버튼) 이벤트 -> 앨범뷰로 이동
         imgbtn_calendar.setOnClickListener(new View.OnClickListener() {
@@ -58,9 +46,21 @@ public class AlbumView extends AppCompatActivity {
             }
         });
 
-        GridAdapter gAdapter = new GridAdapter(this);
-        gAdapter.setItem(ReqServer.yearAlbumList);
-        gridView.setAdapter(gAdapter);
+        //선택한 년도 저장
+        Intent intent = getIntent();
+        String year = intent.getStringExtra("year");
 
+        //선택한 년도에 해당하는 달 찾아서 어댑터에 추가
+        GridAdapter gAdapter = new GridAdapter(this);
+        ReqServer.monthAlbumList.forEach(item -> {
+            try {
+                if(item.getString("title").contains(year)){
+                    gAdapter.addItem(item);
+                };
+            } catch (JSONException e) {
+                Log.e("HWA", "MonthActivity Error: " + e);
+            }
+        });
+        gridView.setAdapter(gAdapter);
     }
 }
