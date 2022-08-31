@@ -17,19 +17,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Nadri4edit1">
         <activity
-            android:name=".AlbumLayout"
+            android:name=".AlbumPageActivity"
             android:exported="true" />
         <activity
-            android:name=".AlbumView"
+            android:name=".AlbumMainActivity"
             android:exported="true"/>
         <activity
             android:name=".MonthActivity"
             android:exported="true"/>
         <activity
-            android:name=".SearchView"
+            android:name=".SearchActivity"
             android:exported="true"/>
         <activity
-            android:name=".MainActivity"
+            android:name=".CalendarMainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

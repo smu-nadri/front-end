@@ -52,7 +52,7 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
 
         //context에서 LayoutInflater 객체를 얻는다.
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.album_layout_item, parent, false);
+        View view = inflater.inflate(R.layout.album_page_item, parent, false);
         MultiImageAdapter.ViewHolder viewHolder = new MultiImageAdapter.ViewHolder(view);
 
         return viewHolder;
