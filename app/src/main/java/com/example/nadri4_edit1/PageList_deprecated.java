@@ -5,7 +5,6 @@ import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,14 +22,9 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
 public class PageList_deprecated extends Activity {
     TextView tvPageDate;
@@ -129,7 +123,7 @@ public class PageList_deprecated extends Activity {
         //이미지를 하나라도 선택할 경우
         else{
 
-            Intent intent = new Intent(getApplicationContext(), AlbumLayout.class);
+            Intent intent = new Intent(getApplicationContext(), AlbumPageActivity.class);
             //이미지 하나만 선택
             if(data.getClipData() == null){
                 Log.e("single choice: ", String.valueOf(data.getData()));

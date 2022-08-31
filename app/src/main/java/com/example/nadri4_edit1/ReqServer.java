@@ -93,7 +93,7 @@ public class ReqServer {
                     }
 
                     //달력 화면 설정
-                    MainActivity.setMonthView();
+                    CalendarMainActivity.setMonthView();
 
                 } catch (JSONException e) {
                     Log.e("HWA", "GET onResponse 에러: " + e);
@@ -134,17 +134,17 @@ public class ReqServer {
                 }
 
                 //AlbumLayout.adapter = new MultiImageAdapter(uriList, AlbumLayout.recyclerView.getContext());
-                AlbumLayout.adapter = new MultiImageAdapter(photoList, AlbumLayout.recyclerView.getContext());
+                AlbumPageActivity.adapter = new MultiImageAdapter(photoList, AlbumPageActivity.recyclerView.getContext());
 
                 //레이아웃 설정(열 = 2)
-                RecyclerView.LayoutManager manager = new GridLayoutManager(AlbumLayout.recyclerView.getContext(), 2);
+                RecyclerView.LayoutManager manager = new GridLayoutManager(AlbumPageActivity.recyclerView.getContext(), 2);
                 //recyclerView.LayoutManager(new GridLayoutManager(this, 2));
 
                 //레이아웃 적용
-                AlbumLayout.recyclerView.setLayoutManager(manager);
+                AlbumPageActivity.recyclerView.setLayoutManager(manager);
 
                 //어댑터 적용
-                AlbumLayout.recyclerView.setAdapter(AlbumLayout.adapter);
+                AlbumPageActivity.recyclerView.setAdapter(AlbumPageActivity.adapter);
             }
         }, new Response.ErrorListener() {
             @Override

@@ -28,7 +28,7 @@ import org.json.JSONObject;
 
 import java.util.Calendar;
 
-public class AlbumLayout extends AppCompatActivity {
+public class AlbumPageActivity extends AppCompatActivity {
 
     static RecyclerView recyclerView;  //이미지를 보여주는 뷰
     static MultiImageAdapter adapter;
@@ -40,7 +40,7 @@ public class AlbumLayout extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.album_layout);
+        setContentView(R.layout.album_page_layout);
 
         ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, MODE_PRIVATE);
 
@@ -55,7 +55,7 @@ public class AlbumLayout extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ReqServer.reqPostPages(AlbumLayout.this);
+                ReqServer.reqPostPages(AlbumPageActivity.this);
             }
         });
 
@@ -82,7 +82,7 @@ public class AlbumLayout extends AppCompatActivity {
 
         //기존에 저장된 사진들 불러오기
         try {
-            ReqServer.reqGetPages(AlbumLayout.this);
+            ReqServer.reqGetPages(AlbumPageActivity.this);
         } catch (Exception e) {
             e.printStackTrace();
             Log.d("HWA", e + "");

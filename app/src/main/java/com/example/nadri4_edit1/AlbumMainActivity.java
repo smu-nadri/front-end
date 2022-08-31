@@ -1,26 +1,17 @@
 package com.example.nadri4_edit1;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-
-import com.example.nadri4_edit1.GridAdapter;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-
-public class AlbumView extends AppCompatActivity {
+public class AlbumMainActivity extends AppCompatActivity {
 
     ImageView folder1, folder2, folder3;
     ImageButton imgbtn_calendar;
@@ -32,7 +23,7 @@ public class AlbumView extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.album_view);
+        setContentView(R.layout.album_main_layout);
 
         //xml변수 연결
         folder1 = (ImageView) findViewById(R.id.imageView1);
@@ -53,7 +44,7 @@ public class AlbumView extends AppCompatActivity {
         imgbtn_calendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent viewIntent = new Intent(getApplicationContext(), MainActivity.class);
+                Intent viewIntent = new Intent(getApplicationContext(), CalendarMainActivity.class);
                 startActivity(viewIntent);
             }
         });

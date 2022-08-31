@@ -16,18 +16,12 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import org.json.JSONObject;
-import org.w3c.dom.Text;
-
-import java.time.LocalDate;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
 
-public class MainActivity extends AppCompatActivity {
+public class CalendarMainActivity extends AppCompatActivity {
     static TextView currentYear;
     static TextView currentMonth;   //년, 월 텍스트뷰
     TextView btnPrev, btnNext, btnSettings;
@@ -45,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.calendar_layout);
 
         ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, MODE_PRIVATE);
 
@@ -73,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });*/
-        ReqServer.reqGetAlbums(MainActivity.this);
+        ReqServer.reqGetAlbums(CalendarMainActivity.this);
 
 
         //현재날짜
@@ -114,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
         imgbtn_album.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent viewIntent = new Intent(getApplicationContext(), AlbumView.class);
+                Intent viewIntent = new Intent(getApplicationContext(), AlbumMainActivity.class);
                 startActivity(viewIntent);
             }
         });

@@ -56,7 +56,7 @@ public class GridAdapter extends BaseAdapter {
         try {
             if(view == null){
                 LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(R.layout.album_view_item, viewGroup, false);
+                view = inflater.inflate(R.layout.album_main_item, viewGroup, false);
             }
 
             ImageView iv = (ImageView) view.findViewById(R.id.ivAlbum);
@@ -87,7 +87,7 @@ public class GridAdapter extends BaseAdapter {
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent viewIntent = new Intent(context, AlbumLayout.class);
+                        Intent viewIntent = new Intent(context, AlbumPageActivity.class);
                         viewIntent.putExtra("title", title);
                         context.startActivity(viewIntent);
                     }
