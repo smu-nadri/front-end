@@ -14,7 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class AlbumMainActivity extends AppCompatActivity {
 
     ImageView folder1, folder2, folder3;
-    ImageButton imgbtn_calendar;
+    ImageButton imgbtn_calendar, imgbtn_search_a;
     GridLayout testFolderLayout;
     GridView gridView;
 
@@ -33,6 +33,7 @@ public class AlbumMainActivity extends AppCompatActivity {
         gridView = (GridView) findViewById(R.id.gvYearAlbum);
 
         imgbtn_calendar = (ImageButton) findViewById(R.id.calendar_button);
+        imgbtn_search_a = (ImageButton) findViewById(R.id.a_search_button);
 
         testFolderLayout = (GridLayout) findViewById(R.id.testFolderLayout);
 
@@ -45,6 +46,15 @@ public class AlbumMainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent viewIntent = new Intent(getApplicationContext(), CalendarMainActivity.class);
+                startActivity(viewIntent);
+            }
+        });
+
+        //이미지버튼(검색버튼) 이벤트 -> 검색뷰로 이동
+        imgbtn_search_a.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent viewIntent = new Intent(getApplicationContext(), SearchActivity.class);
                 startActivity(viewIntent);
             }
         });

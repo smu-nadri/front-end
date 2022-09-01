@@ -26,7 +26,7 @@ public class CalendarMainActivity extends AppCompatActivity {
     static TextView currentMonth;   //년, 월 텍스트뷰
     TextView btnPrev, btnNext, btnSettings;
 
-    ImageButton imgbtn_album;
+    ImageButton imgbtn_album, imgbtn_search_c;
 
     static RecyclerView recyclerView;
 
@@ -53,6 +53,7 @@ public class CalendarMainActivity extends AppCompatActivity {
         btnSettings = (TextView) findViewById(R.id.btnSettings);
 
         imgbtn_album = (ImageButton) findViewById(R.id.album_button);
+        imgbtn_search_c = (ImageButton) findViewById(R.id.c_search_button);
 
         recyclerView = (RecyclerView) findViewById(R.id.rvCalender);
 
@@ -109,6 +110,15 @@ public class CalendarMainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent viewIntent = new Intent(getApplicationContext(), AlbumMainActivity.class);
+                startActivity(viewIntent);
+            }
+        });
+
+        //이미지버튼(검색버튼) 이벤트 -> 검색뷰로 이동
+        imgbtn_search_c.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent viewIntent = new Intent(getApplicationContext(), SearchActivity.class);
                 startActivity(viewIntent);
             }
         });
