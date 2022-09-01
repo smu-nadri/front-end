@@ -16,17 +16,17 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="20dp"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/tvCurrentYear"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="68dp"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="앨범"
-                android:textSize="30dp"
+                android:textSize="23dp"
                 android:textStyle="bold" />
 
         </LinearLayout>
@@ -36,6 +36,15 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_weight="1"/>
+        <ImageButton
+            android:id="@+id/a_search_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="7dp"
+            app:srcCompat="@drawable/search_icon3" />
+        <View
+            android:layout_width="10dp"
+            android:layout_height="0dp"/>
 
         <ImageButton
             android:id="@+id/calendar_button"
@@ -81,82 +90,85 @@
 
             <GridLayout
                 android:id="@+id/testFolderLayout"
-                android:columnCount="3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp">
+                android:layout_marginTop="10dp"
+                android:columnCount="3">
 
                 <LinearLayout
-                    android:layout_columnWeight="1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
+                    android:layout_columnWeight="1"
                     android:background="@drawable/round_square_background"
+                    android:orientation="vertical"
                     android:padding="8dp">
 
                     <ImageView
                         android:id="@+id/imageView1"
-                        android:layout_column="0"
-                        android:layout_gravity="top"
                         android:layout_width="match_parent"
                         android:layout_height="110dp"
+                        android:layout_column="0"
+                        android:layout_gravity="top"
                         android:background="@drawable/round_square_background"
                         android:scaleType="centerCrop"
                         app:srcCompat="@drawable/renoir07" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="\?"/>
+                        android:text="\?" />
 
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_columnWeight="1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/round_square_background"
-                    android:padding="8dp"
+                    android:layout_columnWeight="1"
                     android:layout_marginLeft="12dp"
-                    android:layout_marginRight="12dp">
+                    android:layout_marginRight="12dp"
+                    android:background="@drawable/round_square_background"
+                    android:orientation="vertical"
+                    android:padding="8dp">
 
                     <ImageView
                         android:id="@+id/imageView2"
-                        android:layout_column="1"
-                        android:layout_gravity="top"
                         android:layout_width="match_parent"
                         android:layout_height="110dp"
+                        android:layout_column="1"
+                        android:layout_gravity="top"
                         android:background="@drawable/round_square_background"
                         android:scaleType="centerCrop"
                         app:srcCompat="@drawable/gomurea4" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="모두보기"/>
+                        android:text="모두보기" />
 
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_columnWeight="1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
+                    android:layout_columnWeight="1"
                     android:background="@drawable/round_square_background"
+                    android:orientation="vertical"
                     android:padding="8dp">
 
                     <ImageView
                         android:id="@+id/imageView3"
-                        android:layout_column="2"
-                        android:layout_gravity="top"
                         android:layout_width="match_parent"
                         android:layout_height="110dp"
+                        android:layout_column="2"
+                        android:layout_gravity="top"
                         android:background="@drawable/round_square_background"
                         android:scaleType="centerCrop"
                         app:srcCompat="@drawable/img4" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="이번달"/>
+                        android:text="이번달" />
 
                 </LinearLayout>
 
@@ -167,42 +179,44 @@
             android:id="@+id/customAlbum"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="20dp"
+            android:orientation="vertical">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="마이앨범" />
+
             <GridView
                 android:id="@+id/gvCustomAlbum"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:numColumns="3"
                 android:layout_marginTop="10dp"
-                android:verticalSpacing="12dp"
-                android:horizontalSpacing="12dp">
-            </GridView>
+                android:horizontalSpacing="12dp"
+                android:numColumns="3"
+                android:verticalSpacing="12dp"></GridView>
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/dateAlbum"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="20dp"
+            android:orientation="vertical">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="달력앨범" />
+
             <GridView
                 android:id="@+id/gvYearAlbum"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:numColumns="3"
                 android:layout_marginTop="10dp"
-                android:verticalSpacing="12dp"
-                android:horizontalSpacing="12dp">
-            </GridView>
+                android:horizontalSpacing="12dp"
+                android:numColumns="3"
+                android:verticalSpacing="12dp"></GridView>
         </LinearLayout>
 
     </LinearLayout>
