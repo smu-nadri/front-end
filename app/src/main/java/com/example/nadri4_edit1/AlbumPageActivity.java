@@ -122,10 +122,14 @@ public class AlbumPageActivity extends AppCompatActivity {
         });
     }
 
+    //페이지 화면을 나갈 때 데이터 비워주기
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        ReqServer.album = new JSONObject();
+        ReqServer.photoList.clear();
+        ReqServer.album.remove("title");
+        ReqServer.album.remove("thumbnail");
+        ReqServer.album.remove("type");
     }
 
     //기존에 저장된 앨범 레이아웃이 있다면 불러와서 보여줘야 함...
