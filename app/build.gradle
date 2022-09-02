@@ -29,6 +29,7 @@ android {
 
 dependencies {
 
+    implementation 'com.google.mlkit:image-labeling:17.0.7'     //mlkit API
     implementation 'com.github.bumptech.glide:glide:4.11.0'     //글라이드: 시스템 갤러리 접근 후 디코딩을 위한 이미지 로딩 프레임워크
     implementation 'com.android.volley:volley:1.2.1'            //서버 관련
     implementation 'com.google.code.gson:gson:2.9.0'            //서버 관련

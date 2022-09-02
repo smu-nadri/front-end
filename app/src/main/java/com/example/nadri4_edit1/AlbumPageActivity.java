@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,10 +24,21 @@ import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.label.ImageLabel;
+import com.google.mlkit.vision.label.ImageLabeler;
+import com.google.mlkit.vision.label.ImageLabeling;
+import com.google.mlkit.vision.label.defaults.ImageLabelerOptions;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class AlbumPageActivity extends AppCompatActivity {
 
@@ -80,13 +92,16 @@ public class AlbumPageActivity extends AppCompatActivity {
             ReqServer.stitle = CalendarUtil.selectedDate.get(Calendar.YEAR) + "-" + tMonth + "-" + tDay;
         }
 
+        //레이아웃 설정(열 = 2)
+        RecyclerView.LayoutManager manager = new GridLayoutManager(AlbumPageActivity.recyclerView.getContext(), 2);
+        //recyclerView.LayoutManager(new GridLayoutManager(this, 2));
+
+        //레이아웃 적용
+        recyclerView.setLayoutManager(manager);
+
+
         //기존에 저장된 사진들 불러오기
-        try {
-            ReqServer.reqGetPages(AlbumPageActivity.this);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.d("HWA", e + "");
-        }
+        ReqServer.reqGetPages(AlbumPageActivity.this);
 
 
         /*Intent getImageIntent = getIntent();
@@ -122,10 +137,14 @@ public class AlbumPageActivity extends AppCompatActivity {
         });
     }
 
+    //페이지 화면을 나갈 때 데이터 비워주기
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        ReqServer.album = new JSONObject();
+        ReqServer.photoList.clear();
+        ReqServer.album.remove("title");
+        ReqServer.album.remove("thumbnail");
+        ReqServer.album.remove("type");
     }
 
     //기존에 저장된 앨범 레이아웃이 있다면 불러와서 보여줘야 함...
@@ -147,11 +166,8 @@ public class AlbumPageActivity extends AppCompatActivity {
                 Log.d("single choice: ", String.valueOf(data.getData()));
                 Uri imageUri = data.getData();
                 resolver.takePersistableUriPermission(imageUri, takeFlags);
-                try {
-                    ReqServer.photoList.add(new JSONObject().put("uri", imageUri));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+
+                setUriTags(imageUri);
             }//이미지를 하나만 선택
             else{
                 ClipData clipData = data.getClipData();
@@ -159,30 +175,12 @@ public class AlbumPageActivity extends AppCompatActivity {
 
                 for(int i=0; i< clipData.getItemCount(); i++){
                     Uri imageUri = clipData.getItemAt(i).getUri();  //선택한 이미지들의 uri를 가져온다.
-                    resolver.takePersistableUriPermission(imageUri, takeFlags);
-                    try {
-                        ReqServer.photoList.add(new JSONObject().put("uri", imageUri));
-                    } catch (JSONException e) {
-                        Log.e("HWA", "photoList add JSONException : " + e);
-                    }
+                    resolver.takePersistableUriPermission(imageUri, takeFlags); //uri 권한 부여
+
+                    setUriTags(imageUri);
                 }
             }//이미지를 여러장 선택
 
-            //adapter = new MultiImageAdapter(uriList, getApplicationContext());
-            adapter = new MultiImageAdapter(ReqServer.photoList, getApplicationContext());
-
-            //레이아웃 설정(열 = 2)
-            RecyclerView.LayoutManager manager = new GridLayoutManager(getApplicationContext(), 2);
-            //recyclerView.LayoutManager(new GridLayoutManager(this, 2));
-
-            //레이아웃 적용
-            recyclerView.setLayoutManager(manager);
-
-            //어댑터 적용
-            recyclerView.setAdapter(adapter);
-
-            //리사이클러뷰 수직 스크롤 적용
-            //recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true));
         }//이미지 선택함
     }
 
@@ -226,5 +224,62 @@ public class AlbumPageActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void setView(int day){
         tvPageDate.setText(dateFormat(CalendarUtil.selectedDate, day));
+    }
+
+    //수정해야됨
+    protected void setAdapterUpdated(){
+        adapter = new MultiImageAdapter(ReqServer.photoList, AlbumPageActivity.recyclerView.getContext());
+
+        //어댑터 적용\
+        recyclerView.setAdapter(AlbumPageActivity.adapter);
+    }
+
+    protected void setUriTags(Uri imageUri){
+        JSONObject imageInfo = new JSONObject();    //사진 한 장의 uri와 태그들을 담을 변수
+        ArrayList<Integer> tagsIndex = new ArrayList<Integer>();    //사진 한 장의 태그들
+        try {
+            imageInfo.put("uri", imageUri); //uri 데이터 넣기
+
+            //태그 불러오기
+            InputImage image;
+            image = InputImage.fromFilePath(this, imageUri);    //uri -> InputImage 변환
+            ImageLabelerOptions options = new ImageLabelerOptions.Builder() //옵션 설정
+                    .setConfidenceThreshold(0.6f)   //정확도 최솟값
+                    .build();
+            ImageLabeler labeler = ImageLabeling.getClient(options);
+            labeler.process(image)
+                    .addOnSuccessListener(new OnSuccessListener<List<ImageLabel>>() {
+                        @Override
+                        public void onSuccess(List<ImageLabel> labels) {
+                            try {
+                                if (!labels.isEmpty()) {
+                                    float confidence = labels.get(0).getConfidence();
+                                    for (ImageLabel label : labels) {   //차이가 15% 이하인 태그 5개까지만 넣기
+                                        Log.d("HWA", "label: " + label.getIndex() + " " + label.getText());
+                                        if (tagsIndex.size() > 5) break;
+                                        else if (confidence - label.getConfidence() > 0.15f)
+                                            break;
+                                        else tagsIndex.add(label.getIndex());
+                                    }
+                                    imageInfo.put("tags", tagsIndex);   //태그들 넣기
+                                }
+                                ReqServer.photoList.add(imageInfo); //어뎁터에 들어갈 리스트에 사진 정보 넣기
+                                setAdapterUpdated(); //어뎁터 설정
+                            } catch(Exception e) {
+                                ReqServer.photoList.add(imageInfo);
+                                setAdapterUpdated();
+                            }
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() { //중간에 에러나면 uri만 넣기
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            ReqServer.photoList.add(imageInfo);
+                            setAdapterUpdated();
+                        }
+                    });
+        } catch (Exception e) {
+            Log.e("HWA", "setUriTags Exception : " + e);
+        }
     }
 }
