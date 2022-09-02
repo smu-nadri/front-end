@@ -33,6 +33,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     ArrayList<Date> dateList;
     private Context mContext = null;
 
+    //변수 선언
     public CalendarAdapter(ArrayList<Date> dateList, Context context) {
         this.dateList = dateList;
         mContext = context;
@@ -40,6 +41,8 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
     @NonNull
     @Override
+    //화면을 연결하는 뷰홀더
+    //달력 화면에서 보여줄 R.layout.*_item 설정
     public CalenderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
@@ -50,6 +53,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
+    //데이터를 연결하는 뷰홀더
     public void onBindViewHolder(@NonNull CalenderViewHolder holder, int position) {
 
         //날짜 변수에 담기
@@ -57,7 +61,6 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
         //달력 초기화 ==> Date클래스에서 deprecated되어 대체된 메서드들 사용하기 위해 설정!!
         Calendar dateCalendar = Calendar.getInstance();
-
         dateCalendar.setTime(monthDate);
 
         //텍스트 색상 지정(토요일, 일요일)
@@ -67,10 +70,6 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         else if (position == 0 || position % 7 == 0) {  //일요일이면
             holder.tvDate.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.colorSunday));    //colorSunday
         }//Color.parseColor("#D81B60")
-
-        /*if(toDay.equals(CalendarUtil.selectedDate)){
-            holder.tvDate.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.colorToDay));
-        }*/
 
         //현재 년, 월, 일
         int currentDay = CalendarUtil.selectedDate.get(Calendar.DAY_OF_MONTH);
@@ -98,20 +97,14 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             }
         }
 
-        //Log.d("오늘", monthDate.getTime() + ": 비교 :" + CalendarUtil.selectedDate.getTimeInMillis());
-        //Log.d("날짜", monthDate.getDate() + ", " + monthDate.getMonth() + ", " + monthDate.getYear() + " : 오늘 : " + CalendarUtil.selectedDate.get(Calendar.DAY_OF_MONTH) + " , " + CalendarUtil.selectedDate.get(Calendar.MONTH) + ", " + CalendarUtil.selectedDate.get(Calendar.YEAR));
-
-        //오늘 날짜 초록불!
+        //오늘 날짜만 초록불 들어오게!
         LocalDate toDay = LocalDate.now();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd"); //LocalDate포맷에 맞춰줌
         String dateNow = simpleDateFormat.format(monthDate.getTime());
         //String toDay = simpleDateFormat.format(String.valueOf(TD));   => LocalDate자체의 포맷이 yyyy-MM-dd라서 포맷해줄 필요 없음
         //String toDay = simpleDateFormat.format(CalendarUtil.selectedDate.getTimeInMillis());  //포맷은 잘 먹는데 selectedDate가 페이지 바뀌면 월도 바뀌는 애라 소용X
-
-        //Log.d("stringTEST", dateNow + ": 비교 :" + toDay);
-
         if(dateNow.equals(String.valueOf(toDay))) {
-            //일까지 똑같으면 색상 표시 --???
+            //date 똑같으면 색상 표시
             holder.tvDate.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.colorToDay));
             //holder.tvDate.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.colorToDay));
             //holder.tvDate.setBackgroundResource(R.drawable.bg_round);   //배경 동그라미 생성
@@ -142,25 +135,11 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
                 Log.e("HWA", "달력 썸네일 적용 에러 " + e);
             }
         });
-        /*if(date == null){
-            //날짜 적용
-            holder.tvDate.setText("");
-        }
-        else {
-            holder.tvDate.setText(String.valueOf(date.getDayOfMonth()));
-
-            //오늘 날짜 색 바꾸기
-            if(date.equals(CalendarUtil.selectedDate)){
-                holder.parentView.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.colorAccent));
-            }
-        }*/
 
         //날짜 클릭 이벤트
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-
                 //클릭 이후 기능 구현
                 Toast.makeText(holder.itemView.getContext(), "클릭", Toast.LENGTH_SHORT).show();
 
@@ -200,20 +179,13 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
                 //전송
                 ((CalendarMainActivity)context).startActivity(selectDay);
-
-                /*
-                int iYear = date.getYear();
-                int iMonth = date.getMonthValue();
-                int iDay = date.getDayOfMonth();
-
-                String yearMonthDay = iYear + "년 " + iMonth + "월 " + iDay + "일";
-                Toast.makeText(holder.itemView.getContext(), yearMonthDay, Toast.LENGTH_SHORT).show();*/
             }
         });
 
     }
 
     @Override
+    //달력 화면에 보일 item 설정
     public int getItemCount() {
         return dateList.size();
     }
