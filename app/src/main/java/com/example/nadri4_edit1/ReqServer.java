@@ -216,6 +216,8 @@ public class ReqServer {
                     }
                     if(photoList.get(i).has("comment"))
                         photoJson.put("comment", photoList.get(i).get("comment"));
+                    if(photoList.get(i).has("tags"))
+                        photoJson.put("tags", new JSONArray(photoList.get(i).getString("tags")));
                 }
 
                 //페이지 정보

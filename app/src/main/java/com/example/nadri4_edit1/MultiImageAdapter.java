@@ -12,13 +12,17 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.exifinterface.media.ExifInterface;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.ViewHolder> {
@@ -60,15 +64,26 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        //이미지 셋팅하기
         Uri imageUri = null;
         try {
             imageUri = Uri.parse(mData.get(position).getString("uri"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+            InputStream inputStream = mContext.getContentResolver().openInputStream(imageUri);
+            ExifInterface exif = new ExifInterface(inputStream);
 
-        //bitmap변환 라이브러리인 Glide사용
-        Glide.with(mContext).load(imageUri).into(holder.image);
+            //기본 썸네일이 있으면 가져오고 없으면 만들기
+            if(exif.hasThumbnail()){
+                //bitmap변환 라이브러리인 Glide사용
+                Glide.with(mContext).load(exif.getThumbnailBytes()).into(holder.image);
+            }
+            else {
+                //썸네일 만드는 작업 추가해야됨!!!
+                Glide.with(mContext).load(imageUri).into(holder.image);
+            }
+
+        } catch (Exception e) {
+            Log.e("HWA", "onBindViewHolder Get Uri Thumbnail Error: " + e);
+        }
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,13 +92,31 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
             }
         });
 
+        //코멘트 셋팅하기
         JSONObject imageObject = mData.get(holder.getBindingAdapterPosition());
-        if(imageObject.has("comment")) {
-            try {
+        try {
+            if(imageObject.has("comment")) {
                 holder.comment.setText(imageObject.getString("comment"));
-            } catch (JSONException e) {
-                Log.e("MultiImageAdapter", "get set comment error: " + e);
             }
+            else {
+                if(imageObject.has("tags")){
+                    InputStream inputS = mContext.getResources().openRawResource(R.raw.tagmap);
+                    byte[] buffer = new byte[inputS.available()];
+                    inputS.read(buffer);
+                    inputS.close();
+                    String json = new String(buffer, "UTF-8");
+                    JSONArray tagMap = new JSONArray(json);
+
+                    JSONArray tags = new JSONArray(imageObject.getString("tags"));
+                    String comment = "";
+                    for(int i = 0; i < tags.length(); i++){
+                        comment += "#" + tagMap.getJSONObject(tags.getInt(i)).get("tag_ko1") + " ";
+                    }
+                    holder.comment.setText(comment);
+                }
+            }
+        } catch (JSONException | IOException e) {
+            Log.e("MultiImageAdapter", "get set comment error: " + e);
         }
 
         holder.comment.addTextChangedListener(new TextWatcher() {
