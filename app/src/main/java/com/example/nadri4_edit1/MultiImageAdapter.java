@@ -100,22 +100,15 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
             }
             else {
                 if(imageObject.has("tags")){
-                    InputStream inputS = mContext.getResources().openRawResource(R.raw.tagmap);
-                    byte[] buffer = new byte[inputS.available()];
-                    inputS.read(buffer);
-                    inputS.close();
-                    String json = new String(buffer, "UTF-8");
-                    JSONArray tagMap = new JSONArray(json);
-
                     JSONArray tags = new JSONArray(imageObject.getString("tags"));
                     String comment = "";
                     for(int i = 0; i < tags.length(); i++){
-                        comment += "#" + tagMap.getJSONObject(tags.getInt(i)).get("tag_ko1") + " ";
+                        comment += "#" + tags.getJSONObject(i).getString("tag_ko1") + " ";
                     }
                     holder.comment.setText(comment);
                 }
             }
-        } catch (JSONException | IOException e) {
+        } catch (JSONException e) {
             Log.e("MultiImageAdapter", "get set comment error: " + e);
         }
 

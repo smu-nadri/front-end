@@ -32,10 +32,12 @@ import com.google.mlkit.vision.label.ImageLabeler;
 import com.google.mlkit.vision.label.ImageLabeling;
 import com.google.mlkit.vision.label.defaults.ImageLabelerOptions;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -236,7 +238,7 @@ public class AlbumPageActivity extends AppCompatActivity {
 
     protected void setUriTags(Uri imageUri){
         JSONObject imageInfo = new JSONObject();    //사진 한 장의 uri와 태그들을 담을 변수
-        ArrayList<Integer> tagsIndex = new ArrayList<Integer>();    //사진 한 장의 태그들
+        ArrayList<JSONObject> tagsIndex = new ArrayList<>();    //사진 한 장의 태그들
         try {
             imageInfo.put("uri", imageUri); //uri 데이터 넣기
 
@@ -253,13 +255,20 @@ public class AlbumPageActivity extends AppCompatActivity {
                         public void onSuccess(List<ImageLabel> labels) {
                             try {
                                 if (!labels.isEmpty()) {
+                                    InputStream inputS = getResources().openRawResource(R.raw.tagmap);
+                                    byte[] buffer = new byte[inputS.available()];
+                                    inputS.read(buffer);
+                                    inputS.close();
+                                    String json = new String(buffer, "UTF-8");
+                                    JSONArray tagMap = new JSONArray(json);
+
                                     float confidence = labels.get(0).getConfidence();
                                     for (ImageLabel label : labels) {   //차이가 15% 이하인 태그 5개까지만 넣기
                                         Log.d("HWA", "label: " + label.getIndex() + " " + label.getText());
                                         if (tagsIndex.size() > 5) break;
                                         else if (confidence - label.getConfidence() > 0.15f)
                                             break;
-                                        else tagsIndex.add(label.getIndex());
+                                        else tagsIndex.add(tagMap.getJSONObject(label.getIndex()));
                                     }
                                     imageInfo.put("tags", tagsIndex);   //태그들 넣기
                                 }
