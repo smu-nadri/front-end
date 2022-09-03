@@ -175,6 +175,7 @@
             </GridLayout>
         </LinearLayout>
 
+        <!--마이앨범-->
         <LinearLayout
             android:id="@+id/customAlbum"
             android:layout_width="match_parent"
@@ -197,6 +198,7 @@
                 android:verticalSpacing="12dp"></GridView>
         </LinearLayout>
 
+        <!--달력앨범-->
         <LinearLayout
             android:id="@+id/dateAlbum"
             android:layout_width="match_parent"
@@ -220,6 +222,5 @@
         </LinearLayout>
 
     </LinearLayout>
-
 
 </LinearLayout>
