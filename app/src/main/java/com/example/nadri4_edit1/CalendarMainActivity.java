@@ -118,7 +118,7 @@ public class CalendarMainActivity extends AppCompatActivity {
         imgbtn_search_c.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent viewIntent = new Intent(getApplicationContext(), SearchActivity.class);
+                Intent viewIntent = new Intent(getApplicationContext(), SearchMainActivity.class);
                 startActivity(viewIntent);
             }
         });

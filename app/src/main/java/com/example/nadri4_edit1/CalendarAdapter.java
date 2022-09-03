@@ -136,7 +136,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
                 if(tmp.equals(title)){
                     Uri imageUri = Uri.parse(item.getString("thumbnail"));
                     holder.ivThumb.setClipToOutline(true);
-                    Glide.with(mContext).load(imageUri).into(holder.ivThumb);
+                    Glide.with(mContext).load(imageUri).thumbnail(0.1f).into(holder.ivThumb);
                 }
             } catch (JSONException e) {
                 Log.e("HWA", "달력 썸네일 적용 에러 " + e);
