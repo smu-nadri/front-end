@@ -16,7 +16,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
+            android:layout_marginLeft="15dp"
             android:orientation="vertical">
             <TextView
                 android:id="@+id/tvCurrentYear"
@@ -61,7 +61,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginTop="7dp"
-            android:layout_marginRight="5dp"
+            android:layout_marginRight="15dp"
             android:background="@color/colorBackground"
             app:srcCompat="@drawable/magnify"/>
 
@@ -88,7 +88,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:paddingLeft="8dp"
+                android:paddingLeft="10dp"
                 android:text="일"
                 android:textColor="#CC0000"
                 android:textSize="12dp" />
@@ -97,7 +97,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:paddingLeft="8dp"
+                android:paddingLeft="10dp"
                 android:text="월"
                 android:textColor="#3C3C3C"
                 android:textSize="12dp" />
@@ -107,7 +107,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:paddingLeft="8dp"
+                android:paddingLeft="10dp"
                 android:text="화"
                 android:textColor="#3C3C3C"
                 android:textSize="12dp" />
@@ -117,7 +117,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:paddingLeft="8dp"
+                android:paddingLeft="10dp"
                 android:text="수"
                 android:textColor="#3C3C3C"
                 android:textSize="12dp" />
@@ -127,7 +127,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:paddingLeft="8dp"
+                android:paddingLeft="10dp"
                 android:text="목"
                 android:textColor="#3C3C3C"
                 android:textSize="12dp" />
@@ -137,7 +137,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:paddingLeft="8dp"
+                android:paddingLeft="10dp"
                 android:text="금"
                 android:textColor="#3C3C3C"
                 android:textSize="12dp" />
@@ -147,7 +147,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:paddingLeft="8dp"
+                android:paddingLeft="10dp"
                 android:text="토"
                 android:textColor="#0065D1"
                 android:textSize="12dp" />
