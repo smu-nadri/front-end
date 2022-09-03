@@ -24,7 +24,7 @@ import java.util.Date;
 public class CalendarMainActivity extends AppCompatActivity {
     static TextView currentYear;
     static TextView currentMonth;   //년, 월 텍스트뷰
-    TextView btnPrev, btnNext, btnSettings;
+    TextView btnPrev, btnNext;
 
     ImageButton imgbtn_album, imgbtn_search_c;
 
@@ -50,7 +50,6 @@ public class CalendarMainActivity extends AppCompatActivity {
         currentMonth = (TextView) findViewById(R.id.tvCurrentMonth);
         btnPrev = (TextView) findViewById(R.id.tvPrev);
         btnNext = (TextView) findViewById(R.id.tvNext);
-        btnSettings = (TextView) findViewById(R.id.btnSettings);
 
         imgbtn_album = (ImageButton) findViewById(R.id.album_button);
         imgbtn_search_c = (ImageButton) findViewById(R.id.c_search_button);
