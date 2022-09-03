@@ -59,15 +59,6 @@ public class CalendarMainActivity extends AppCompatActivity {
 
 
         Log.d("GOO", "well come");
-        //서버테스트 - 구버전 - deprecated
-        /*btnSettings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d("GOO", "hwa");
-                ReqServer.request(MainActivity.this, 0);
-
-            }
-        });*/
         ReqServer.reqGetAlbums(CalendarMainActivity.this);
 
 
@@ -174,15 +165,6 @@ public class CalendarMainActivity extends AppCompatActivity {
         return selectedM;
     }
 
-    //날짜 타입 설정(2022년 05월 23일)
-    /*@RequiresApi(api = Build.VERSION_CODES.O)
-    private String dateFormatTextView(LocalDate date){  //2022년 5월
-        //년월 포맷
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년  MM월");
-        return date.format(formatter);
-    }*/
-
-
     //화면 설정
     @RequiresApi(api = Build.VERSION_CODES.O)
     protected static void setMonthView(){
@@ -216,54 +198,62 @@ public class CalendarMainActivity extends AppCompatActivity {
         //날짜 복사해서 변수 생성
         Calendar monthCalendar = (Calendar) CalendarUtil.selectedDate.clone();
 
-        //1일로 셋팅 (5월 1일)
+        int monthTest = monthCalendar.get(Calendar.MONTH);
+
+        //1일로 셋팅 (n월 1일)
         monthCalendar.set(Calendar.DAY_OF_MONTH, 1);
 
-        //요일 가져와서 -1 (일요일=1, 월요일=2)
+        //요일 가져와서 -1 (일요일=0, 월요일=1, ~, 토요일=6)
         int firstDayOfMonth = monthCalendar.get(Calendar.DAY_OF_WEEK)-1;
 
-        //날짜 셋팅(-5일 전)
+        //날짜 셋팅(매달 첫 주의 일요일 날짜, 매달 1일이 몇요일인지(몇칸 떨어져 있는지 n=1~n))
         monthCalendar.add(Calendar.DAY_OF_MONTH, -firstDayOfMonth);
 
-        //42전까지 반복
-        while(dateList.size() < 42){
-            //리스트에 날짜 등록
-            dateList.add(monthCalendar.getTime());
+        //날짜 화면에 출력
+        //setCalendarDate(monthCalendar.get(Calendar.MONTH) + 1);
 
-            //1일씩 늘린 날짜로 변경한다. (5월 1일->5월 2일->5월 3일)
-            monthCalendar.add(Calendar.DAY_OF_MONTH, 1);
+
+        //함수사용
+        int lastDay = getLastDayOfMonth(monthTest);
+
+        //int size = firstDayOfMonth + monthCalendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+        int size = firstDayOfMonth + lastDay;
+        int size2 = (size+size/7);
+        int monthT = monthCalendar.get(Calendar.MONTH);
+        Log.d("WEEK: ", "결과" + firstDayOfMonth+", " + lastDay + ", " + size + ", " + size2);
+
+        if(size<=35) {
+            while (dateList.size() < 35) {
+                //리스트에 날짜 등록
+                dateList.add(monthCalendar.getTime());
+
+                //1일씩 늘린 날짜로 변경한다. (5월 1일->5월 2일->5월 3일)
+                monthCalendar.add(Calendar.DAY_OF_MONTH, 1);
+            }
         }
+        else{
+            while (dateList.size() < 42){
+                //리스트에 날짜 등록
+                dateList.add(monthCalendar.getTime());
 
-        /*
-        YearMonth yearMonth = YearMonth.from(date);
-
-        //해당 월 마지막 날짜 가져오기
-        int lastDay = yearMonth.lengthOfMonth();
-
-        //해당 월 첫 번째 날짜 가져오기
-        LocalDate firstDay = CalendarUtil.selectedDate.withDayOfMonth(1);
-
-        //첫 번째 날 요일 가져오기
-        int dayOfWeek = firstDay.getDayOfWeek().getValue();
-
-        //날짜 생성
-        for(int i = 1; i < 42; i++){
-            if(i <= dayOfWeek || i > lastDay+dayOfWeek){
-                dateList.add(null);
+                //1일씩 늘린 날짜로 변경한다. (5월 1일->5월 2일->5월 3일)
+                monthCalendar.add(Calendar.DAY_OF_MONTH, 1);
             }
-            else {
-                dateList.add(LocalDate.of(CalendarUtil.selectedDate.getYear(), CalendarUtil.selectedDate.getMonth(), i - dayOfWeek));
-            }
-        }*/
-
+        }
         return dateList;
     }
 
-    //인터페이스 구현!(날짜 어댑터에서 넘겨준 날짜를 받는다.)
-    /*@RequiresApi(api = Build.VERSION_CODES.O)
-    @Override
-    public void onItemClick(String dateText) {
-        String date = dateFormatTextView(selectedDate) + "  " + dateText + "일";
-        Toast.makeText(context, "클릭: "+ date, Toast.LENGTH_SHORT).show();
-    }*/
+    private static int getLastDayOfMonth(int month){
+        ArrayList<Date> dateList = new ArrayList<>();
+
+        //날짜 복사해서 변수 생성
+        Calendar monthCalendar = (Calendar) CalendarUtil.selectedDate.clone();
+
+        monthCalendar.set(Calendar.MONTH, month);
+        Log.d("WEEK", "함수"+month + ", " + monthCalendar.get(Calendar.MONTH));
+
+        int lastDay = monthCalendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+
+        return lastDay;
+    }
 }
