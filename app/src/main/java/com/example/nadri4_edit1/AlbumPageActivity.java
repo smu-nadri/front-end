@@ -13,6 +13,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,7 +48,7 @@ public class AlbumPageActivity extends AppCompatActivity {
     static RecyclerView recyclerView;  //이미지를 보여주는 뷰
     static MultiImageAdapter adapter;
 
-    Button btnGetImage, btnSave;
+    ImageButton btnGetImage, btnSave;
     TextView tvPageDate;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -60,9 +61,9 @@ public class AlbumPageActivity extends AppCompatActivity {
 
         //xml연결
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        btnGetImage = (Button) findViewById(R.id.btnGetImage);
+        btnGetImage = (ImageButton) findViewById(R.id.btnGetImage);
         tvPageDate = (TextView) findViewById(R.id.tvPageDate);
-        btnSave = (Button) findViewById(R.id.btnSave);
+        btnSave = (ImageButton) findViewById(R.id.btnSave);
 
         //서버로 사진 정보 전송하기
         btnSave.setOnClickListener(new View.OnClickListener() {
