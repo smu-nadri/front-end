@@ -43,6 +43,13 @@ public class ReqServer {
     static ArrayList<JSONObject> photoList = new ArrayList<>();
     static ArrayList<JSONObject> deletedList = new ArrayList<>();
 
+    //태그 정보를 담는 리스트
+    static ArrayList<JSONObject> tagList = new ArrayList<JSONObject>();
+
+    //검색 결과를 담는 리스트
+    static ArrayList<JSONObject> sAlbumList = new ArrayList<>();
+    static ArrayList<JSONObject> sPhotoList = new ArrayList<>();
+
     public static String stitle;
     public static JSONObject album = new JSONObject();
 
@@ -57,13 +64,13 @@ public class ReqServer {
     public static void reqGetAlbums(Context context){
         String android_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
         String url = context.getString(R.string.testIpAddress) + android_id;
-        Log.d("HWA", "GET Url: " + url);
+        Log.d("GET", "reqGetAlbums Url: " + url);
 
         final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onResponse(JSONObject response) {
-                Log.d("HWA", "GET Response: " + response);
+                Log.d("GET", "reqGetAlbums onResponse: " + response);
                 try {
                     //앨범 리스트 초기화
                     dateAlbumList.clear();
@@ -96,13 +103,13 @@ public class ReqServer {
                     CalendarMainActivity.setMonthView();
 
                 } catch (JSONException e) {
-                    Log.e("HWA", "GET onResponse 에러: " + e);
+                    Log.e("GET", "reqGetAlbums onResponse 에러: " + e);
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("HWA", "GET Response 에러: " + error);
+                Log.e("GET", "reqGetAlbums Response 에러: " + error);
                 Toast.makeText(context.getApplicationContext(), "응답 실패", Toast.LENGTH_SHORT).show();
             }
         });
@@ -116,40 +123,35 @@ public class ReqServer {
         //android_id 가져와서 ip 주소랑 합치기
         String android_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
         String url = context.getString(R.string.testIpAddress) + android_id + "/" + stitle;
-        Log.d("HWA", "GET Url: " + url);
+        Log.d("GET", "reqGetPages Url: " + url);
 
         //요청 만들기
         final JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
-                Log.d("HWA", "GET Response" + response);
-                photoList.clear();
+
+                photoList.clear();  //기존의 데이터 지우기
                 for(int i = 0; i< response.length(); i++){
                     try {
-                        Log.d("HWA", "GET Response Uri: " + String.valueOf(response.getJSONObject(i)));
+                        Log.d("GET", "reqGetPages Response Uri: " + String.valueOf(response.getJSONObject(i)));
                         photoList.add(response.getJSONObject(i));
                     } catch (JSONException e) {
-                        Log.e("HWA", "GET onResponse JSONException : " + e);
+                        Log.e("GET", "reqGetPages onResponse JSONException : " + e);
                     }
                 }
 
-                //AlbumLayout.adapter = new MultiImageAdapter(uriList, AlbumLayout.recyclerView.getContext());
-                AlbumPageActivity.adapter = new MultiImageAdapter(photoList, AlbumPageActivity.recyclerView.getContext());
-
-                //레이아웃 설정(열 = 2)
-                RecyclerView.LayoutManager manager = new GridLayoutManager(AlbumPageActivity.recyclerView.getContext(), 2);
-                //recyclerView.LayoutManager(new GridLayoutManager(this, 2));
-
                 //레이아웃 적용
+                RecyclerView.LayoutManager manager = new GridLayoutManager(AlbumPageActivity.recyclerView.getContext(), 2);
                 AlbumPageActivity.recyclerView.setLayoutManager(manager);
 
                 //어댑터 적용
+                AlbumPageActivity.adapter = new MultiImageAdapter(photoList, AlbumPageActivity.recyclerView.getContext());
                 AlbumPageActivity.recyclerView.setAdapter(AlbumPageActivity.adapter);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("HWA", "GET Response 에러: " + error);
+                Log.e("GET", "reqGetPages Response 에러: " + error);
             }
         });
 
@@ -163,7 +165,7 @@ public class ReqServer {
     public static void reqPostPages(Context context){
         String android_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
         String url = context.getString(R.string.testIpAddress) + android_id  + "/" + stitle;
-        Log.d("HWA", "POST Url: " + url);
+        Log.d("POST", "reqPostPages Url: " + url);
 
         //서버로 보낼 Json
         JSONObject reqJson = new JSONObject();
@@ -188,6 +190,8 @@ public class ReqServer {
                         photoJson.put("location", photoList.get(i).get("location"));
                     if(photoList.get(i).has("comment"))
                         photoJson.put("comment", photoList.get(i).get("comment"));
+                    if(photoList.get(i).has("tag"))
+                        photoJson.put("tag", photoList.get(i).get("tag"));
                 }
                 else{ //추가할 경우
                     photoJson.put("uri", photoList.get(i).get("uri"));
@@ -214,8 +218,12 @@ public class ReqServer {
 
                         photoJson.put("location", location);
                     }
+
+                    //코멘트
                     if(photoList.get(i).has("comment"))
                         photoJson.put("comment", photoList.get(i).get("comment"));
+
+                    //태그
                     if(photoList.get(i).has("tags"))
                         photoJson.put("tags", new JSONArray(photoList.get(i).getString("tags")));
                 }
@@ -228,40 +236,159 @@ public class ReqServer {
                 photoJson.put("pages", pages);
 
                 //리스트 reqJsonArr에 사진 photoJson 넣기
-                Log.d("HWA", "photoJson " + i + ": " + photoJson);
+                Log.d("POST", "reqPostPages photoJson " + i + ": " + photoJson);
                 reqJsonArr.put(photoJson);
             }
 
             //추가 및 수정할 리스트 reqJson에 넣기
             reqJson.put("photos", reqJsonArr);
-            Log.d("HWA", "reqJson: " + reqJson);
         } catch (Exception e) {
-            Log.e("HWA", "POST 에러: " + e);
+            Log.e("POST", "reqPostPages Set reqJson 에러: " + e);
             Toast.makeText(context.getApplicationContext(), "전송 실패", Toast.LENGTH_SHORT).show();
         }
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, reqJson, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                Log.d("HWA", "POST 응답: " + response);
-                photoList.clear();
-                deletedList.clear();
+
                 try {
                     JSONArray resJsonArr = response.getJSONArray("resJson");
+                    //기존의 데이터 지우기
+                    photoList.clear();
+                    deletedList.clear();
+
                     for(int i = 0; i < resJsonArr.length(); i++){
                         photoList.add(resJsonArr.getJSONObject(i));
                     }
+
+                    Log.d("HWA", "POST 응답: " + photoList);
+                    Toast.makeText(context.getApplicationContext(), "전송 성공!", Toast.LENGTH_SHORT).show();
                 } catch (JSONException e) {
-                    Log.e("HWA", "POST onResponse JSONException :" + e);
+                    Log.e("POST", "POST onResponse JSONException :" + e);
                 }
-                Log.d("HWA", "POST 응답: " + photoList);
-                Toast.makeText(context.getApplicationContext(), "전송 성공!", Toast.LENGTH_SHORT).show();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("HWA", "POST Response 에러: " + error);
+                Log.e("POST", "reqPostPages Response 에러: " + error);
                 Toast.makeText(context.getApplicationContext(), "전송 실패", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        requestQueue.add(jsonObjectRequest);
+    }
+
+
+    //검색화면 셋팅을 위한 태그 목록 가져오기
+    public static void reqGetTagList(Context context){
+        String android_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+        String url = context.getString(R.string.testIpAddress) + android_id  + "/search/taglist";
+        Log.d("GET", "reqGetTagList Url: " + url);
+
+        final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.d("GET", "reqGetTagList Response: " + response);
+                try {
+                    JSONArray resArr = response.getJSONArray("tagList");
+
+                    tagList.clear();
+                    for(int i = 0; i < resArr.length(); i++){
+                        tagList.add(resArr.getJSONObject(i).getJSONObject("tag"));
+                    }
+
+                    TagGvAdapter gAdapter = new TagGvAdapter(context);
+                    gAdapter.setItem(ReqServer.tagList);
+                    SearchMainActivity.gridView.setAdapter(gAdapter);
+
+                } catch (JSONException e) {
+                    Log.e("GET", "reqGetTagList onResponse 에러: " + e);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("GET", "reqGetTagList Response 에러: " + error);
+                Toast.makeText(context.getApplicationContext(), "응답 실패", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        requestQueue.add(jsonObjectRequest);
+    }
+
+    //태그 페이지 정보 요청하기
+    public static void reqGetTagPage(Context context, Integer tagIndex){
+        //android_id 가져와서 ip 주소랑 합치기
+        String android_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+        String url = context.getString(R.string.testIpAddress) + android_id + "/search/" + tagIndex;
+        Log.d("GETA", "reqGetTagPage Url: " + url);
+
+        //요청 만들기
+        final JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                Log.d("GET", "reqGetTagPage Response" + response);
+                photoList.clear();
+                for(int i = 0; i< response.length(); i++){
+                    try {
+                        Log.d("GET", "reqGetTagPage Response Uri: " + String.valueOf(response.getJSONObject(i)));
+                        photoList.add(response.getJSONObject(i));
+                    } catch (JSONException e) {
+                        Log.e("GET", "reqGetTagPage onResponse JSONException : " + e);
+                    }
+                }
+
+                SearchPageActivity.adapter = new MultiImageAdapter(photoList, SearchPageActivity.recyclerView.getContext());
+                SearchPageActivity.recyclerView.setAdapter(SearchPageActivity.adapter);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("GET", "reqGetTagPage Response 에러: " + error);
+            }
+        });
+
+        //큐에 넣어 서버로 응답 전송
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        requestQueue.add(jsonArrayRequest);
+    }
+
+    //검색하기
+    public static void reqGetQuery(Context context, String query){
+        String android_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+        String url = context.getString(R.string.testIpAddress) + android_id  + "/search?query=" + query;
+        Log.d("GET", "reqGetQuery Url: " + url);
+
+        final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.d("GET", "reqGetQuery Response: " + response);
+                try {
+                    JSONArray resArr = response.getJSONArray("tagResult");
+
+                    sAlbumList.clear();
+                    sPhotoList.clear();
+
+                    for(int i = 0; i < resArr.length(); i++){
+                        sPhotoList.add(resArr.getJSONObject(i));
+                    }
+
+                    PhotoGvAdapter gAdapter = new PhotoGvAdapter(context);
+                    gAdapter.setItem(ReqServer.sPhotoList);
+                    SearchResultActivity.gvResultPhoto.setAdapter(gAdapter);
+                } catch (JSONException e) {
+                    Log.e("GET", "reqGetQuery onResponse 에러: " + e);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("GET", "reqGetQuery Response 에러: " + error);
+                Toast.makeText(context.getApplicationContext(), "응답 실패", Toast.LENGTH_SHORT).show();
             }
         });
 
