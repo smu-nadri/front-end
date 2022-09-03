@@ -79,7 +79,7 @@ public class AlbumMainActivity extends AppCompatActivity {
         });
 
         //처음 화면 셋팅
-        DateAlbumAdapter gAdapter = new DateAlbumAdapter(this);
+        AlbumGvAdapter gAdapter = new AlbumGvAdapter(this);
         gAdapter.setItem(ReqServer.yearAlbumList);
         gvYearAlbum.setAdapter(gAdapter);
 

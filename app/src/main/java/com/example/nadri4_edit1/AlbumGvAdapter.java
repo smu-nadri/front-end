@@ -13,19 +13,21 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class GridAdapter extends BaseAdapter {
+public class AlbumGvAdapter extends BaseAdapter {
 
     Context context;
     private ArrayList<JSONObject> gList = new ArrayList<JSONObject>();
 
-    public GridAdapter(Context c){
+    //생성자
+    public AlbumGvAdapter(Context c){
         context = c;
     }
-    public GridAdapter(Context c, ArrayList<JSONObject> items){
+    public AlbumGvAdapter(Context c, ArrayList<JSONObject> items){
         context = c;
         gList = items;
     }
@@ -65,8 +67,6 @@ public class GridAdapter extends BaseAdapter {
             Uri imageUri = Uri.parse(gList.get(i).getString("thumbnail"));
             String title = gList.get(i).getString("title");
 
-            Log.d("HWA", "앨범리스트 테스트 " + imageUri + " " + title + " " + i);
-
             Glide.with(context).load(imageUri).into(iv);
             iv.setClipToOutline(true);
 
@@ -77,13 +77,13 @@ public class GridAdapter extends BaseAdapter {
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent viewIntent = new Intent(context, MonthActivity.class);
+                        Intent viewIntent = new Intent(context, MonthAlbumActivity.class);
                         viewIntent.putExtra("year", title);
                         context.startActivity(viewIntent);
                     }
                 });
             }
-            else { //마이앨범, 달별앨범 -> 사진리스트 이동
+            else { //마이앨범, 달별앨범 -> 사진페이지로 이동
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -93,8 +93,8 @@ public class GridAdapter extends BaseAdapter {
                     }
                 });
             }
-        } catch (Exception e) {
-            Log.e("HWA", "GridAdapter Error: " + e);
+        } catch (JSONException e) {
+            Log.e("GridAdapter", "Error: " + e);
         }
 
         return view;

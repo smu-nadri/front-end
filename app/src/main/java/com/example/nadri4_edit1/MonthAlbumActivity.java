@@ -15,11 +15,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import org.json.JSONException;
 
-public class MonthActivity extends AppCompatActivity {
+public class MonthAlbumActivity extends AppCompatActivity {
 
 
     ImageButton imgbtn_calendar;
-    GridLayout testFolderLayout;
+    GridLayout glNadriAlbum;
     GridView gridView;
 
     String src;
@@ -32,10 +32,8 @@ public class MonthActivity extends AppCompatActivity {
 
         //xml변수 연결
         gridView = (GridView) findViewById(R.id.gvMonthAlbum);
-
         imgbtn_calendar = (ImageButton) findViewById(R.id.calendar_button);
-
-        testFolderLayout = (GridLayout) findViewById(R.id.testFolderLayout);
+        glNadriAlbum = (GridLayout) findViewById(R.id.glNadriAlbum);
 
         //이미지버튼(앨범버튼) 이벤트 -> 앨범뷰로 이동
         imgbtn_calendar.setOnClickListener(new View.OnClickListener() {
@@ -50,15 +48,15 @@ public class MonthActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String year = intent.getStringExtra("year");
 
-        //선택한 년도에 해당하는 달 찾아서 어댑터에 추가
-        GridAdapter gAdapter = new GridAdapter(this);
+        //선택한 년도의 월별 앨범을 찾아서 어댑터에 추가해 화면 설정
+        AlbumGvAdapter gAdapter = new AlbumGvAdapter(this);
         ReqServer.monthAlbumList.forEach(item -> {
             try {
                 if(item.getString("title").contains(year)){
                     gAdapter.addItem(item);
                 };
             } catch (JSONException e) {
-                Log.e("HWA", "MonthActivity Error: " + e);
+                Log.e("MonthActivity", "Error: " + e);
             }
         });
         gridView.setAdapter(gAdapter);
