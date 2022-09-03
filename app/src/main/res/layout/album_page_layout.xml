@@ -5,53 +5,55 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".AlbumPageActivity"
-    android:background="@color/white"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="68dp"
+        android:orientation="horizontal"
+        android:padding="15dp">
 
         <TextView
             android:id="@+id/tvPageDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="15dp"
+            android:layout_marginTop="5dp"
             android:text="2022  05  24"
-            android:textSize="20dp" />
+            android:textSize="23dp"
+            android:textStyle="bold"/>
         <!-- TextView 사이에 넣어주므로써 간격을 넖혀 우측정렬이 될 수 있게 만든다 -->
         <View
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_weight="1"/>
-        <Button
+        <ImageButton
             android:id="@+id/btnGetImage"
-            android:background="@color/white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="15dp"
-            android:text="+"
-            android:textSize="20dp"
-            android:layout_gravity="right"/>
+            android:layout_marginRight="20dp"
+            android:background="@color/colorBackground"
+            app:srcCompat="@drawable/imageplus"/>
 
-        <Button
+        <ImageButton
             android:id="@+id/btnSave"
-            android:background="@color/white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="15dp"
-            android:text=">"
-            android:rotation="90"
-            android:textSize="20dp"
-            android:layout_gravity="right"/>
+            android:background="@color/colorBackground"
+            app:srcCompat="@drawable/save"/>
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:background="@color/black"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="3"
-        android:padding="15dp"
+        android:padding="10dp"
         android:orientation="vertical">
 
         <androidx.recyclerview.widget.RecyclerView
@@ -61,37 +63,5 @@
             android:scrollbars="vertical"
             android:scrollbarFadeDuration="0"/>
     </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.2"
-        android:orientation="horizontal"
-        android:gravity="center">
-
-        <RadioGroup
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/rdoPage1"
-                android:layout_width="30dp"
-                android:layout_height="20dp"
-                android:checked="true"/>
-            <RadioButton
-                android:id="@+id/rdoPage2"
-                android:layout_width="30dp"
-                android:layout_height="20dp"/>
-            <RadioButton
-                android:id="@+id/rdoPage3"
-                android:layout_width="30dp"
-                android:layout_height="20dp"/>
-        </RadioGroup>
-
-
-    </LinearLayout>
-
 
 </LinearLayout>
