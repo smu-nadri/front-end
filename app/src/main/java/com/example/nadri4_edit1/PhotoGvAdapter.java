@@ -64,7 +64,7 @@ public class PhotoGvAdapter extends BaseAdapter {
 
             //이미지 셋팅
             Uri imageUri = Uri.parse(gList.get(i).getString("uri"));
-            Glide.with(context).load(imageUri).into(iv);
+            Glide.with(context).load(imageUri).thumbnail(0.1f).into(iv);
             iv.setClipToOutline(true);
 
             view.setOnClickListener(new View.OnClickListener() {

@@ -67,7 +67,7 @@ public class AlbumGvAdapter extends BaseAdapter {
             Uri imageUri = Uri.parse(gList.get(i).getString("thumbnail"));
             String title = gList.get(i).getString("title");
 
-            Glide.with(context).load(imageUri).into(iv);
+            Glide.with(context).load(imageUri).thumbnail(0.1f).into(iv);
             iv.setClipToOutline(true);
 
             tv.setText(title);
