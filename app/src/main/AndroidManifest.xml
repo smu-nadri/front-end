@@ -23,10 +23,16 @@
             android:name=".AlbumMainActivity"
             android:exported="true"/>
         <activity
-            android:name=".MonthActivity"
+            android:name=".MonthAlbumActivity"
             android:exported="true"/>
         <activity
-            android:name=".SearchActivity"
+            android:name=".SearchMainActivity"
+            android:exported="true"/>
+        <activity
+            android:name=".SearchResultActivity"
+            android:exported="true"/>
+        <activity
+            android:name=".SearchPageActivity"
             android:exported="true"/>
         <activity
             android:name=".CalendarMainActivity"
