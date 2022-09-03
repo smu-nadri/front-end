@@ -36,6 +36,7 @@ public class SearchResultActivity extends AppCompatActivity {
             public boolean onQueryTextSubmit(String query) {
                 //서버로 검색 전송
                 ReqServer.reqGetQuery(getApplicationContext(), query);
+                searchView.clearFocus();
                 return false;
             }
 
