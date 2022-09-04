@@ -14,7 +14,7 @@ public class SearchResultActivity extends AppCompatActivity {
 
     SearchView searchView;
     static GridView gvResultAlbum, gvResultPhoto;
-    LinearLayout resultAlbum, resultPhoto;
+    static LinearLayout resultAlbum, resultPhoto;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
