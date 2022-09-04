@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -50,7 +51,10 @@ public class ReqServer {
     static ArrayList<JSONObject> sAlbumList = new ArrayList<>();
     static ArrayList<JSONObject> sPhotoList = new ArrayList<>();
 
+    //해당 앨범 제목의 페이지 가져올 때 쓰는 변수
     public static String stitle;
+
+    //앨범 정보(앨범제목, 타입, 썸네일)
     public static JSONObject album = new JSONObject();
 
 
@@ -368,15 +372,23 @@ public class ReqServer {
             public void onResponse(JSONObject response) {
                 Log.d("GET", "reqGetQuery Response: " + response);
                 try {
-                    JSONArray resArr = response.getJSONArray("tagResult");
-
+                    JSONArray resArr = response.getJSONArray("albumResult");
                     sAlbumList.clear();
-                    sPhotoList.clear();
-
+                    SearchResultActivity.resultAlbum.setVisibility(View.GONE);  //없으면 표시 안하기
                     for(int i = 0; i < resArr.length(); i++){
                         sPhotoList.add(resArr.getJSONObject(i));
+                        SearchResultActivity.resultAlbum.setVisibility(View.VISIBLE);   //있으면 표시
                     }
 
+                    resArr = response.getJSONArray("photoResult");
+                    sPhotoList.clear();
+                    SearchResultActivity.resultPhoto.setVisibility(View.GONE);  //없으면 표시 안하기
+                    for(int i = 0; i < resArr.length(); i++){
+                        sPhotoList.add(resArr.getJSONObject(i));
+                        SearchResultActivity.resultPhoto.setVisibility(View.VISIBLE);   //있으면 표시
+                    }
+
+                    //화면 설정
                     PhotoGvAdapter gAdapter = new PhotoGvAdapter(context);
                     gAdapter.setItem(ReqServer.sPhotoList);
                     SearchResultActivity.gvResultPhoto.setAdapter(gAdapter);
