@@ -65,6 +65,10 @@ public class AlbumPageActivity extends AppCompatActivity {
         tvPageDate = (TextView) findViewById(R.id.tvPageDate);
         btnSave = (ImageButton) findViewById(R.id.btnSave);
 
+        //인텐트
+        Intent getDateIntent = getIntent();
+        int iDay = getDateIntent.getIntExtra("SelectedDATE",-1);
+
         //서버로 사진 정보 전송하기
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,8 +78,10 @@ public class AlbumPageActivity extends AppCompatActivity {
                 }
                 else {
                     try {
-                        ReqServer.album.put("title", tvPageDate.getText().toString());
-                        ReqServer.album.put("type", "customAlbum");
+                        if(getDateIntent.getBooleanExtra("customAlbum", false)) {
+                            ReqServer.album.put("title", tvPageDate.getText().toString());
+                            ReqServer.album.put("type", "customAlbum");
+                        }
                         ReqServer.reqPostPages(AlbumPageActivity.this);
                     } catch (JSONException e) {
                         Log.e("AlbumPageActivity", "btnSave JSONException: " + e);
@@ -83,10 +89,6 @@ public class AlbumPageActivity extends AppCompatActivity {
                 }
             }
         });
-
-        //인텐트
-        Intent getDateIntent = getIntent();
-        int iDay = getDateIntent.getIntExtra("SelectedDATE",-1);
 
         //화면 설정
         String title;   //제목 설정
