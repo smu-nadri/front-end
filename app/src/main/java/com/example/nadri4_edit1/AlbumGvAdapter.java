@@ -3,6 +3,7 @@ package com.example.nadri4_edit1;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.RequiresApi;
 
 import com.bumptech.glide.Glide;
 
@@ -67,7 +70,7 @@ public class AlbumGvAdapter extends BaseAdapter {
             Uri imageUri = Uri.parse(gList.get(i).getString("thumbnail"));
             String title = gList.get(i).getString("title");
 
-            Glide.with(context).load(imageUri).into(iv);
+            Glide.with(context).load(imageUri).thumbnail(0.1f).into(iv);
             iv.setClipToOutline(true);
 
             tv.setText(title);
@@ -83,12 +86,35 @@ public class AlbumGvAdapter extends BaseAdapter {
                     }
                 });
             }
-            else { //마이앨범, 달별앨범 -> 사진페이지로 이동
+            else if(viewGroup.getId() == R.id.gvMonthAlbum) { //달별앨범 -> 사진페이지로 이동
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         Intent viewIntent = new Intent(context, AlbumPageActivity.class);
                         viewIntent.putExtra("title", title);
+                        context.startActivity(viewIntent);
+                    }
+                });
+            }
+            else {  //마이앨범 -> 사진페이지로 이동
+                view.setOnClickListener(new View.OnClickListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.N)
+                    @Override
+                    public void onClick(View view) {
+                        Log.d("AlbumGvAdapter", "아니 뭔데: " + ReqServer.customAlbumList);
+                        ReqServer.customAlbumList.forEach(item -> {
+                            try {
+                                if(item.getString("title").equals(title)){
+                                    ReqServer.album = new JSONObject(String.valueOf(item));
+                                };
+                            } catch (Exception e) {
+                                Log.e("AlbumGvAdapter", "customAlbumList Error: " + e);
+                            }
+                        });
+
+                        Intent viewIntent = new Intent(context, AlbumPageActivity.class);
+                        viewIntent.putExtra("title", title);
+                        viewIntent.putExtra("customAlbum", true);
                         context.startActivity(viewIntent);
                     }
                 });

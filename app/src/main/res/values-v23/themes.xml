@@ -1,5 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+
     <style name="Theme.Nadri4edit1" parent="Theme.AppCompat.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <!--상단바-->
@@ -7,7 +8,7 @@
         <item name="colorOnPrimary">@color/white</item>
         <!--상태바-->
         <item name="colorPrimaryDark">@color/colorBackground</item>
-        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:windowLightStatusBar">true</item>
         <!--하단바-->
         <item name="android:navigationBarColor">@color/colorBackground</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>

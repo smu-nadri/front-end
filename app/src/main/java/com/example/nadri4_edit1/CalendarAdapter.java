@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -173,29 +174,29 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
                 //Log.d("확인", String.valueOf(iDay));
                 selectDay.putExtra("SelectedDATE", iDay);
 
-                //선택한 앨범 정보를 서버 데이터에 셋팅하기
+                //2022-01-01 형식으로 만들기
                 String title, tMonth, tDay;
                 if(tailMonth < 10) tMonth = "0" + tailMonth;
                 else tMonth = String.valueOf(tailMonth);
                 if(dayNum < 10) tDay = "0" + iDay;
                 else tDay = String.valueOf(iDay);
-
                 title = tailYear + "-" + tMonth + "-" + tDay;
 
+                //선택한 앨범 정보를 서버 데이터에 셋팅하기
                 try {
                     ReqServer.album.put("title", title);
                     ReqServer.album.put("type", "dateAlbum");
                     ReqServer.dateAlbumList.forEach(item -> {
                         try {
                             if(item.getString("title").equals(title)){
-                                ReqServer.album = item;
+                                ReqServer.album = new JSONObject(String.valueOf(item));
                             };
                         } catch (Exception e) {
-                            Log.e("HWA", "albumList Error: " + e);
+                            Log.e("CalendarAdapter", "dateAlbumList Error: " + e);
                         }
                     });
                 } catch (Exception e) {
-                    Log.e("HWA", "albumList Error: " + e);
+                    Log.e("alendarAdapter", "dateAlbumList Error: " + e);
                 }
 
                 //전송
