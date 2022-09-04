@@ -233,11 +233,10 @@ public class ReqServer {
                 }
 
                 //페이지 정보
-                JSONObject pages = new JSONObject();
-                pages.put("page", stitle);
-                pages.put("pageOrder", 1); //여기 수정해야함
-                pages.put("layoutOrder", i);
-                photoJson.put("pages", pages);
+                JSONObject page = new JSONObject();
+                page.put("pageOrder", 1); //여기 수정해야함
+                page.put("layoutOrder", i);
+                photoJson.put("page", page);
 
                 //리스트 reqJsonArr에 사진 photoJson 넣기
                 Log.d("POST", "reqPostPages photoJson " + i + ": " + photoJson);
