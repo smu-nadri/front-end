@@ -57,7 +57,7 @@
             android:layout_height="0dp"/>
 
         <ImageButton
-            android:id="@+id/btnSettings"
+            android:id="@+id/btnGetImage"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@color/colorBackground"
