@@ -69,7 +69,18 @@ public class AlbumPageActivity extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ReqServer.reqPostPages(AlbumPageActivity.this);
+                if(tvPageDate.getText().toString().isEmpty()){
+                    Toast.makeText(getApplicationContext(), "제목을 입력해주세요.", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    try {
+                        ReqServer.album.put("title", tvPageDate.getText().toString());
+                        ReqServer.album.put("type", "customAlbum");
+                        ReqServer.reqPostPages(AlbumPageActivity.this);
+                    } catch (JSONException e) {
+                        Log.e("AlbumPageActivity", "btnSave JSONException: " + e);
+                    }
+                }
             }
         });
 
@@ -80,9 +91,18 @@ public class AlbumPageActivity extends AppCompatActivity {
         //화면 설정
         String title;   //제목 설정
         if (iDay == -1){    //마이앨범이거나 월별앨범일 경우
-            title = getDateIntent.getStringExtra("title");
-            ReqServer.stitle = title;
-            tvPageDate.setText(title);
+            if(getDateIntent.getBooleanExtra("customAlbum", false)){    //마이앨범
+                title = getDateIntent.getStringExtra("title");
+                ReqServer.stitle = title;
+                tvPageDate.setText(title);
+                tvPageDate.setEnabled(true);
+            }
+            else {  //월별 앨범
+                title = getDateIntent.getStringExtra("title");
+                ReqServer.stitle = title;
+                tvPageDate.setText(title);
+                tvPageDate.setEnabled(false);
+            }
         }
         else {  //캘린더에서 날짜를 선택한 경우
             setView(iDay);
@@ -122,6 +142,7 @@ public class AlbumPageActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.d("AlbumGvAdapter", "파괴중: " + ReqServer.customAlbumList);
         ReqServer.photoList.clear();
         ReqServer.album.remove("title");
         ReqServer.album.remove("thumbnail");
@@ -181,7 +202,7 @@ public class AlbumPageActivity extends AppCompatActivity {
     }
 
     //어댑터 업데이트 해주기
-    protected void setAdapterUpdated(){
+    protected static void setAdapterUpdated(){
         //수정할 수 있을 듯
         adapter = new MultiImageAdapter(ReqServer.photoList, AlbumPageActivity.recyclerView.getContext());
 
