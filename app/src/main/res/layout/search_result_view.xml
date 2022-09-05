@@ -54,7 +54,7 @@
                 android:text="앨범" />
 
             <GridView
-                android:id="@+id/gvResultAlubm"
+                android:id="@+id/gvResultAlbum"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"

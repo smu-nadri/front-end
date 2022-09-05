@@ -56,6 +56,7 @@ public class AlbumGvAdapter extends BaseAdapter {
 
     public void setItem(ArrayList<JSONObject> items) { gList = items; }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         try {
@@ -96,12 +97,11 @@ public class AlbumGvAdapter extends BaseAdapter {
                     }
                 });
             }
-            else {  //마이앨범 -> 사진페이지로 이동
+            else if(viewGroup.getId() == R.id.gvCustomAlbum) {  //마이앨범 -> 사진페이지로 이동
                 view.setOnClickListener(new View.OnClickListener() {
-                    @RequiresApi(api = Build.VERSION_CODES.N)
                     @Override
                     public void onClick(View view) {
-                        Log.d("AlbumGvAdapter", "아니 뭔데: " + ReqServer.customAlbumList);
+                        //클릭한 앨범 정보를 서버 데이터에 넣기
                         ReqServer.customAlbumList.forEach(item -> {
                             try {
                                 if(item.getString("title").equals(title)){
@@ -119,8 +119,48 @@ public class AlbumGvAdapter extends BaseAdapter {
                     }
                 });
             }
+            else if(viewGroup.getId() == R.id.gvResultAlbum){   //앨범 검색 결과 -> 페이지로 이동
+                if(gList.get(i).getString("type").equals("customAlbum")) { //마이 앨범이면
+                    view.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            //클릭한 앨범 정보를 서버 데이터에 넣기
+                            try {
+                                ReqServer.album = new JSONObject(gList.get(i).toString());
+
+                                Intent viewIntent = new Intent(context, AlbumPageActivity.class);
+                                viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                viewIntent.putExtra("title", title);
+                                viewIntent.putExtra("customAlbum", true);
+                                context.startActivity(viewIntent);
+                            } catch (JSONException e) {
+                                Log.e("AlbumGvAdapter", "ResultAlbumList Error: " + e);
+                            }
+                        }
+                    });
+                }
+                else {  //달력 앨범이면
+                    view.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            //클릭한 앨범 정보를 서버 데이터에 넣기
+                            try {
+                                ReqServer.album = new JSONObject(gList.get(i).toString());
+
+                                Intent viewIntent = new Intent(context, AlbumPageActivity.class);
+                                viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                viewIntent.putExtra("SelectedDATE", Integer.parseInt(title.substring(8)));
+                                context.startActivity(viewIntent);
+                            } catch (JSONException e) {
+                                Log.e("AlbumGvAdapter", "ResultPhotoList Error: " + e);
+                            }
+                        }
+                    });
+                }
+
+            }
         } catch (JSONException e) {
-            Log.e("GridAdapter", "Error: " + e);
+            Log.e("AlbumGvAdapter", "Error: " + e);
         }
 
         return view;
