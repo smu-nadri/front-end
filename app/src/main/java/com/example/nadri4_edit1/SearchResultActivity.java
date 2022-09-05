@@ -22,7 +22,7 @@ public class SearchResultActivity extends AppCompatActivity {
         setContentView(R.layout.search_result_view);
 
         searchView = (SearchView) findViewById(R.id.searchView);
-        gvResultAlbum = (GridView) findViewById(R.id.gvResultAlubm);
+        gvResultAlbum = (GridView) findViewById(R.id.gvResultAlbum);
         gvResultPhoto = (GridView) findViewById(R.id.gvResultPhoto);
         resultAlbum = (LinearLayout) findViewById(R.id.resultAlbum);
         resultPhoto = (LinearLayout) findViewById(R.id.resultPhoto);
@@ -56,9 +56,14 @@ public class SearchResultActivity extends AppCompatActivity {
         else
             resultPhoto.setVisibility(View.VISIBLE);
 
-        //화면 설정
-        TagGvAdapter gAdapter = new TagGvAdapter(this);
-        gAdapter.setItem(ReqServer.sPhotoList);
-        gvResultPhoto.setAdapter(gAdapter);
+        //앨범 결과 화면 설정
+        AlbumGvAdapter aAdapter = new AlbumGvAdapter(this);
+        aAdapter.setItem(ReqServer.sAlbumList);
+        gvResultAlbum.setAdapter(aAdapter);
+
+        //사진 결과 화면 설정
+        PhotoGvAdapter pAdapter = new PhotoGvAdapter(this);
+        pAdapter.setItem(ReqServer.sPhotoList);
+        gvResultPhoto.setAdapter(pAdapter);
     }
 }

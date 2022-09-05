@@ -69,26 +69,6 @@ public class AlbumPageActivity extends AppCompatActivity {
         Intent getDateIntent = getIntent();
         int iDay = getDateIntent.getIntExtra("SelectedDATE",-1);
 
-        //서버로 사진 정보 전송하기
-        btnSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(tvPageDate.getText().toString().isEmpty()){
-                    Toast.makeText(getApplicationContext(), "제목을 입력해주세요.", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    try {
-                        if(getDateIntent.getBooleanExtra("customAlbum", false)) {
-                            ReqServer.album.put("title", tvPageDate.getText().toString());
-                            ReqServer.album.put("type", "customAlbum");
-                        }
-                        ReqServer.reqPostPages(AlbumPageActivity.this);
-                    } catch (JSONException e) {
-                        Log.e("AlbumPageActivity", "btnSave JSONException: " + e);
-                    }
-                }
-            }
-        });
 
         //화면 설정
         String title;   //제목 설정
@@ -98,6 +78,13 @@ public class AlbumPageActivity extends AppCompatActivity {
                 ReqServer.stitle = title;
                 tvPageDate.setText(title);
                 tvPageDate.setEnabled(true);
+                if(getDateIntent.getBooleanExtra("getImage", false)){   //마이앨범 생성으로 넘어온 경우
+                    Intent intent = new Intent();
+                    intent.setType("image/*");
+                    intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                    intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+                    startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
+                }
             }
             else {  //월별 앨범
                 title = getDateIntent.getStringExtra("title");
@@ -123,6 +110,9 @@ public class AlbumPageActivity extends AppCompatActivity {
         //레이아웃 적용
         recyclerView.setLayoutManager(manager);
 
+        //어댑터 적용
+        setAdapterUpdated();
+
         //기존에 저장된 사진들 불러오기
         ReqServer.reqGetPages(AlbumPageActivity.this);
 
@@ -138,13 +128,33 @@ public class AlbumPageActivity extends AppCompatActivity {
                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
             }
         });
+
+        //서버로 사진 정보 전송하기
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(tvPageDate.getText().toString().isEmpty()){
+                    Toast.makeText(getApplicationContext(), "제목을 입력해주세요.", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    try {
+                        if(getDateIntent.getBooleanExtra("customAlbum", false)) {
+                            ReqServer.album.put("title", tvPageDate.getText().toString());
+                            ReqServer.album.put("type", "customAlbum");
+                        }
+                        ReqServer.reqPostPages(AlbumPageActivity.this);
+                    } catch (JSONException e) {
+                        Log.e("AlbumPageActivity", "btnSave JSONException: " + e);
+                    }
+                }
+            }
+        });
     }
 
     //페이지 화면을 나갈 때 데이터 비워주기
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d("AlbumGvAdapter", "파괴중: " + ReqServer.customAlbumList);
         ReqServer.photoList.clear();
         ReqServer.album.remove("title");
         ReqServer.album.remove("thumbnail");
