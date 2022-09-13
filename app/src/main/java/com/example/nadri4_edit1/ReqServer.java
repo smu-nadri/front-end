@@ -65,7 +65,7 @@ public class ReqServer {
     }
 
     //앨범 리스트 불러오기
-    public static void reqGetAlbums(Context context){
+    public static void reqGetAlbums(Context context, Integer mainCode){
         String android_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
         String url = context.getString(R.string.testIpAddress) + android_id;
         Log.d("GET", "reqGetAlbums Url: " + url);
@@ -103,8 +103,13 @@ public class ReqServer {
                         monthAlbumList.add(resArr.getJSONObject(i));
                     }
 
-                    //달력 화면 설정
-                    CalendarMainActivity.setMonthView();
+                    //화면 설정
+                    if(mainCode == 0){
+                        CalendarMainActivity.setMonthView();
+                    }
+                    else if(mainCode == 1){
+                        AlbumMainActivity.setAlbumMainView();
+                    }
 
                 } catch (JSONException e) {
                     Log.e("GET", "reqGetAlbums onResponse 에러: " + e);

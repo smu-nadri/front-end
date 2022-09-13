@@ -2,6 +2,7 @@ package com.example.nadri4_edit1;
 
 import android.content.ClipData;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -35,11 +36,17 @@ import java.util.List;
 
 public class AlbumMainActivity extends AppCompatActivity {
 
+    private static Context context;
+
     ImageView folder1, folder2, folder3;
     ImageButton imgbtn_calendar, imgbtn_search_a, btnGetImage;
     GridLayout glNadriAlbum;
-    GridView  gvCustomAlbum, gvYearAlbum;
+    static GridView  gvCustomAlbum;
+    static GridView gvYearAlbum;
     LinearLayout nadriAlbum, customAlbum, dateAlbum;
+
+    static AlbumGvAdapter cAdapter;
+    static AlbumGvAdapter yAdapter;
 
     String src;
 
@@ -47,6 +54,8 @@ public class AlbumMainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.album_main_layout);
+
+        context = this;
 
         //xml변수 연결
         folder1 = (ImageView) findViewById(R.id.imageView1);
@@ -114,19 +123,23 @@ public class AlbumMainActivity extends AppCompatActivity {
         });
 
         //처음 화면 셋팅
-        AlbumGvAdapter cAdapter = new AlbumGvAdapter(this);
-        cAdapter.setItem(ReqServer.customAlbumList);
-        gvCustomAlbum.setAdapter(cAdapter);
-
-        AlbumGvAdapter yAdapter = new AlbumGvAdapter(this);
-        yAdapter.setItem(ReqServer.yearAlbumList);
-        gvYearAlbum.setAdapter(yAdapter);
+        setAlbumMainView();
 
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        ReqServer.reqGetAlbums(this);
+        ReqServer.reqGetAlbums(this, 1);
+    }
+
+    protected static void setAlbumMainView() {
+        cAdapter = new AlbumGvAdapter(context);
+        cAdapter.setItem(ReqServer.customAlbumList);
+        gvCustomAlbum.setAdapter(cAdapter);
+
+        yAdapter = new AlbumGvAdapter(context);
+        yAdapter.setItem(ReqServer.yearAlbumList);
+        gvYearAlbum.setAdapter(yAdapter);
     }
 }

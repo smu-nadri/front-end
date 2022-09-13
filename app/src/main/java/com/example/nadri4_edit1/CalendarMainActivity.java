@@ -58,7 +58,7 @@ public class CalendarMainActivity extends AppCompatActivity {
 
 
         Log.d("GOO", "well come");
-        ReqServer.reqGetAlbums(CalendarMainActivity.this);
+        ReqServer.reqGetAlbums(CalendarMainActivity.this, 0);
 
 
         //현재날짜
@@ -118,7 +118,7 @@ public class CalendarMainActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
-        ReqServer.reqGetAlbums(this);
+        ReqServer.reqGetAlbums(this, 0);
     }
 
     //날짜 타입 설정(2022   05)
