@@ -139,6 +139,7 @@ public class AlbumPageActivity extends AppCompatActivity {
                 else {
                     try {
                         if(getDateIntent.getBooleanExtra("customAlbum", false)) {
+                            ReqServer.stitle = tvPageDate.getText().toString();
                             ReqServer.album.put("title", tvPageDate.getText().toString());
                             ReqServer.album.put("type", "customAlbum");
                         }
@@ -252,7 +253,7 @@ public class AlbumPageActivity extends AppCompatActivity {
                                     float confidence = labels.get(0).getConfidence();
                                     for (ImageLabel label : labels) {   //차이가 15% 이하인 태그 3개까지만 넣기
                                         Log.d("HWA", "label: " + label.getIndex() + " " + label.getText());
-                                        if (tagsIndex.size() > 3) break;
+                                        if (tagsIndex.size() >= 3) break;
                                         else if (confidence - label.getConfidence() > 0.15f)
                                             break;
                                         else tagsIndex.add(tagMap.getJSONObject(label.getIndex()));

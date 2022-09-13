@@ -9,7 +9,7 @@
     <ImageView
         android:id="@+id/ivPhoto"
         android:layout_width="match_parent"
-        android:layout_height="110dp"
+        android:layout_height="130dp"
         android:background="@drawable/round_none_stroke"
         android:scaleType="centerCrop"
         android:layout_gravity="center"/>
