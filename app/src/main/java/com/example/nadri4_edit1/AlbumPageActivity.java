@@ -13,7 +13,9 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,6 +53,10 @@ public class AlbumPageActivity extends AppCompatActivity {
     ImageButton btnGetImage, btnSave;
     TextView tvPageDate;
 
+    ImageView photo_big;
+    View photo_fore;
+    TextView photo_text;
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +70,10 @@ public class AlbumPageActivity extends AppCompatActivity {
         btnGetImage = (ImageButton) findViewById(R.id.btnGetImage);
         tvPageDate = (TextView) findViewById(R.id.tvPageDate);
         btnSave = (ImageButton) findViewById(R.id.btnSave);
+        //xml연결
+        photo_big = findViewById(R.id.imgView);
+        photo_fore = findViewById(R.id.photo_fore);
+        photo_text = findViewById(R.id.photo_text);
 
         //인텐트
         Intent getDateIntent = getIntent();

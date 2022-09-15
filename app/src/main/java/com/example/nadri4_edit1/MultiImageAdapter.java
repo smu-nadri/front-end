@@ -1,6 +1,8 @@
 package com.example.nadri4_edit1;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.drawable.shapes.OvalShape;
 import android.net.Uri;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -10,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.exifinterface.media.ExifInterface;
@@ -40,13 +44,22 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
 
         ImageView image;
         EditText comment;
+
+        //public ImageView photo_big;
+        //public View photo_fore;
+        //public TextView photo_text;
         ViewHolder(View itemView){
             super(itemView);
             //뷰 객체에 대한 참조
             image = itemView.findViewById(R.id.ivPhotos);
             comment = itemView.findViewById(R.id.edtComment);
+
+            //photo_big = itemView.findViewById(R.id.photo_big);
+            //photo_fore = itemView.findViewById(R.id.photo_fore);
+            //photo_text = itemView.findViewById(R.id.photo_text);
         }
     }
+
 
     @NonNull
     @Override
@@ -64,6 +77,7 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
         //이미지 셋팅하기
         Uri imageUri = null;
         try {
@@ -77,9 +91,45 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
             Log.e("MultiImageAdapter", "onBindViewHolder Get Uri Thumbnail Error: " + e);
         }
 
+
+        //클릭 이벤트
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Toast.makeText(holder.itemView.getContext(), "클릭", Toast.LENGTH_SHORT).show();
+
+                /*Context context = view.getContext();
+                Intent photo_data = new Intent(context, PhotoCustomDialog.class);
+                ((AlbumPageActivity)context).startActivity(photo_data);*/
+
+
+                //-------------
+                Context context = view.getContext();
+                Intent photo_data = new Intent(context, PhotoDataActivity.class);
+                photo_data.putExtra("photo_data", String.valueOf(mData.get(holder.getBindingAdapterPosition())));
+                ((AlbumPageActivity)context).startActivity(photo_data);
+
+                //-------------
+                /*ImageView photo_big = holder.itemView.findViewById(R.id.photo_big);
+                View photo_fore = holder.itemView.findViewById(R.id.photo_fore);
+                TextView photo_text = holder.itemView.findViewById(R.id.photo_text); //=> 안되나바... 클릭하는 순간 앱 꺼짐..
+
+                photo_big.setVisibility(View.VISIBLE);
+
+                // 클릭하면 사진 정보 보여주기
+                photo_big.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if(photo_fore.getVisibility() == View.INVISIBLE){
+                            photo_fore.setVisibility(View.VISIBLE);
+                            photo_text.setVisibility(View.VISIBLE);
+                        }
+                        else{
+                            photo_fore.setVisibility(View.INVISIBLE);
+                            photo_text.setVisibility(View.INVISIBLE);
+                        }
+                    }
+                });*/
 
             }
         });
