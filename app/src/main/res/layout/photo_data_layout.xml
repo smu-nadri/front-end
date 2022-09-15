@@ -61,19 +61,11 @@
         android:padding="15dp"
         android:orientation="vertical">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbars="vertical"
-            android:scrollbarFadeDuration="0"/>
-
         <ImageView
-            android:id="@+id/photo_big"
+            android:id="@+id/imgView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/renoir07"
-            android:visibility="invisible"/>
+            app:srcCompat="@drawable/renoir07" />
         <View
             android:id="@+id/photo_fore"
             android:layout_width="match_parent"
@@ -90,6 +82,5 @@
 
 
     </FrameLayout>
-
 
 </LinearLayout>

@@ -35,6 +35,12 @@
             android:name=".SearchPageActivity"
             android:exported="true"/>
         <activity
+            android:name=".PhotoDataActivity"
+            android:exported="true"/>
+        <activity
+            android:name=".PhotoCustomDialog"
+            android:exported="true"/>
+        <activity
             android:name=".CalendarMainActivity"
             android:exported="true">
             <intent-filter>
