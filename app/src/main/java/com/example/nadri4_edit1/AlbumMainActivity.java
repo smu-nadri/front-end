@@ -13,6 +13,7 @@ import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -36,6 +37,7 @@ import java.util.List;
 
 public class AlbumMainActivity extends AppCompatActivity {
 
+
     private static Context context;
 
     ImageView folder1, folder2, folder3;
@@ -43,7 +45,7 @@ public class AlbumMainActivity extends AppCompatActivity {
     GridLayout glNadriAlbum;
     static GridView  gvCustomAlbum;
     static GridView gvYearAlbum;
-    LinearLayout nadriAlbum, customAlbum, dateAlbum;
+    LinearLayout nadriAlbum, customAlbum, dateAlbum, highlight_album;
 
     static AlbumGvAdapter cAdapter;
     static AlbumGvAdapter yAdapter;
@@ -58,6 +60,7 @@ public class AlbumMainActivity extends AppCompatActivity {
         context = this;
 
         //xml변수 연결
+        highlight_album = (LinearLayout) findViewById(R.id.highlight_album);
         folder1 = (ImageView) findViewById(R.id.imageView1);
         folder2 = (ImageView) findViewById(R.id.imageView2);
         folder3 = (ImageView) findViewById(R.id.imageView3);
@@ -76,7 +79,19 @@ public class AlbumMainActivity extends AppCompatActivity {
         folder2.setClipToOutline(true);
         folder3.setClipToOutline(true);
 
-        //앨범리스트가 없으면 GONE으로 변경
+        //앨범 목록 가져오기
+        ReqServer.reqGetAlbums(AlbumMainActivity.this, 1);
+
+        //뷰페이저 이동 버튼
+        highlight_album.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent viewIntent = new Intent(getApplicationContext(), HighlightActivity.class);
+                startActivity(viewIntent);
+            }
+        });
+
+        /*//앨범리스트가 없으면 GONE으로 변경
         if(ReqServer.customAlbumList.isEmpty()) {
             customAlbum.setVisibility(View.GONE);
             if(ReqServer.dateAlbumList.isEmpty()){
@@ -90,7 +105,7 @@ public class AlbumMainActivity extends AppCompatActivity {
         }
         else {
             customAlbum.setVisibility(View.VISIBLE);
-        }
+        }*/
 
         //이미지버튼(앨범버튼) 이벤트 -> 앨범뷰로 이동
         imgbtn_calendar.setOnClickListener(new View.OnClickListener() {
