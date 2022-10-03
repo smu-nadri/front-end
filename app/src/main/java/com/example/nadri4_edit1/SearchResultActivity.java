@@ -10,6 +10,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 public class SearchResultActivity extends AppCompatActivity {
 
     SearchView searchView;
@@ -35,7 +38,11 @@ public class SearchResultActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 //서버로 검색 전송
-                ReqServer.reqGetQuery(getApplicationContext(), query);
+                try {
+                    ReqServer.reqGetQuery(getApplicationContext(), URLEncoder.encode(query,"utf-8"));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
                 searchView.clearFocus();
                 return false;
             }
