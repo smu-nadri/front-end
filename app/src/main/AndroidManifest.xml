@@ -20,7 +20,7 @@
             android:name=".AlbumPageActivity"
             android:exported="true" />
         <activity
-            android:name=".AlbumMainActivity"
+            android:name=".CalendarMainActivity"
             android:exported="true"/>
         <activity
             android:name=".MonthAlbumActivity"
@@ -41,7 +41,10 @@
             android:name=".PhotoCustomDialog"
             android:exported="true"/>
         <activity
-            android:name=".CalendarMainActivity"
+            android:name=".HighlightActivity"
+            android:exported="true"/>
+        <activity
+            android:name=".AlbumMainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

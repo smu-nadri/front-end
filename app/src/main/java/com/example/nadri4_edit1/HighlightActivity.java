@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -14,6 +15,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 
@@ -21,9 +24,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class PhotoDataActivity extends AppCompatActivity {
+public class HighlightActivity extends AppCompatActivity {
     static MultiImageAdapter adapter;
 
     FrameLayout photoLayout;
@@ -31,14 +38,20 @@ public class PhotoDataActivity extends AppCompatActivity {
     View photo_fore;
     TextView photo_text;
 
-    ImageButton btnGetImage, btnSave;
+    ImageButton btnGetImage, btnMenu;
     TextView tvPageDate;
+
+    //타이머!
+    int currentPage = 0;
+    Timer timer;
+    final long DELAY_MS = 500;      //작업 실행 전 딜레이시간(밀리초)
+    final long PERIOD_MS = 3000;    //연속 작업 실행 사이의 시간(밀리초)
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.photo_data_layout);
+        setContentView(R.layout.highlight_layout);
 
         //xml연결
         photoLayout = findViewById(R.id.photoLayout);
@@ -49,11 +62,17 @@ public class PhotoDataActivity extends AppCompatActivity {
         //xml연결
         btnGetImage = (ImageButton) findViewById(R.id.btnGetImage);
         tvPageDate = (TextView) findViewById(R.id.tvPageDate);
-        btnSave = (ImageButton) findViewById(R.id.btnSave);
+        btnMenu = (ImageButton) findViewById(R.id.btnMenu);
+
+        //어댑터 연결(뷰페이저)
+        ViewPager2 viewPager = findViewById(R.id.view_pager);
+        HighlightAdapter adapter = new HighlightAdapter(setTextList()); //어댑터 생성, 아이템리스트를 파라미터로 사용
+        viewPager.setAdapter(adapter);  //뷰페이저에 어댑터 등록!
+
 
 
         //인텐트 - 사진메타정보 통으로 가져옴
-        Intent intent = getIntent();
+        /*Intent intent = getIntent();
         String photo_data = intent.getStringExtra("photo_data");
 
         String title = null;
@@ -86,7 +105,7 @@ public class PhotoDataActivity extends AppCompatActivity {
 
             //array로 저장돼있어서 어케 불러와야할지 모르겠음
             tags_arr = photo_data_json.getJSONArray("tags");
-                    //{ _id, tag_en, tag_ko1, tag_ko2 }
+            //{ _id, tag_en, tag_ko1, tag_ko2 }
             for(int i=0; i<tags_arr.length(); i++){
                 tags_str = tags_str + "#" + tags_arr.getJSONObject(i).getString("tag_ko1") + " ";
                 //인덱스 진짜 어케..
@@ -102,7 +121,7 @@ public class PhotoDataActivity extends AppCompatActivity {
 
         } catch (JSONException e) {
             Log.d("검사 ", title + ", ");
-        }
+        }*/
 
 
 
@@ -115,7 +134,7 @@ public class PhotoDataActivity extends AppCompatActivity {
 
 
         // 클릭하면 사진 정보 보여주기
-        photo_big.setOnClickListener(new View.OnClickListener() {
+        /*photo_big.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -128,9 +147,26 @@ public class PhotoDataActivity extends AppCompatActivity {
                     photo_text.setVisibility(View.INVISIBLE);
                 }
             }
-        });
+        });*/
 
 
+    }
+
+    private List<String> setTextList() {
+
+        ArrayList<String> itemList = new ArrayList();
+        itemList.add("Page 1");
+        itemList.add("Page 2");
+        itemList.add("Page 3");
+        itemList.add("Page 4");
+        itemList.add("Page 5");
+        itemList.add("Page 6");
+        itemList.add("Page 7");
+        itemList.add("Page 8");
+        itemList.add("Page 9");
+        itemList.add("Page 10");
+
+        return itemList;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
