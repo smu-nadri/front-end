@@ -1,7 +1,10 @@
 package com.example.nadri4_edit1;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
@@ -12,6 +15,8 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -33,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReqServer {
+    public static String android_id;
 
     //앨범 정보를 담는 리스트
     static ArrayList<JSONObject> dateAlbumList = new ArrayList<>();
@@ -57,6 +63,8 @@ public class ReqServer {
     //앨범 정보(앨범제목, 타입, 썸네일) 보내기 위한 변수
     public static JSONObject album = new JSONObject();
 
+    //하이라이트 사진을 담는 리스트
+    public  static ArrayList<JSONObject> highlightList = new ArrayList<>();
 
     Context c;
 
@@ -66,8 +74,7 @@ public class ReqServer {
 
     //앨범 리스트 불러오기
     public static void reqGetAlbums(Context context, Integer mainCode){
-        String android_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-        String url = context.getString(R.string.testIpAddress) + android_id;
+        String url = context.getString(R.string.testIpAddress) + "/album/" + android_id;
         Log.d("GET", "reqGetAlbums Url: " + url);
 
         final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -130,8 +137,7 @@ public class ReqServer {
     //페이지 정보 요청하기
     public static void reqGetPages(Context context){
         //android_id 가져와서 ip 주소랑 합치기
-        String android_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-        String url = context.getString(R.string.testIpAddress) + android_id + "/" + stitle;
+        String url = context.getString(R.string.testIpAddress) + "/album/"  + stitle + "/" + android_id;
         Log.d("GET", "reqGetPages Url: " + url);
 
         //요청 만들기
@@ -172,8 +178,7 @@ public class ReqServer {
     //작성한 페이지 보내기
     @SuppressLint("RestrictedApi")
     public static void reqPostPages(Context context){
-        String android_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-        String url = context.getString(R.string.testIpAddress) + android_id  + "/" + stitle;
+        String url = context.getString(R.string.testIpAddress) + "/album/" + stitle  + "/" + android_id;
         Log.d("POST", "reqPostPages Url: " + url);
 
         //서버로 보낼 Json
@@ -190,6 +195,7 @@ public class ReqServer {
             //추가 및 수정할 사진 정보를 담은 photoJson 만들고 리스트 reqJsonArr에 넣기
             for(int i = 0; i < photoList.size(); i++){
                 JSONObject photoJson = new JSONObject();
+                photoJson.put("userId", android_id);
                 //수정할 경우
                 if(photoList.get(i).has("_id")) {
                     photoJson.put("_id", photoList.get(i).get("_id"));
@@ -222,8 +228,12 @@ public class ReqServer {
                         List<Address> addressList = gCoder.getFromLocation(latLong[0], latLong[1], 10);
                         location.put("lat", latLong[0]);
                         location.put("long", latLong[1]);
-                        if (!addressList.isEmpty())
+                        if (!addressList.isEmpty()) {
                             location.put("address", addressList.get(0).getAddressLine(0));
+                            location.put("admin", addressList.get(0).getAdminArea());
+                            location.put("locality", addressList.get(0).getLocality());
+                            location.put("thoroughfare", addressList.get(0).getThoroughfare());
+                        }
 
                         photoJson.put("location", location);
                     }
@@ -290,8 +300,7 @@ public class ReqServer {
 
     //검색화면 셋팅을 위한 태그 목록 가져오기
     public static void reqGetTagList(Context context){
-        String android_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-        String url = context.getString(R.string.testIpAddress) + android_id  + "/search/taglist";
+        String url = context.getString(R.string.testIpAddress) + "/search/taglist/" + android_id;
         Log.d("GET", "reqGetTagList Url: " + url);
 
         final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -330,8 +339,7 @@ public class ReqServer {
     //태그 페이지 정보 요청하기
     public static void reqGetTagPage(Context context, Integer tagIndex){
         //android_id 가져와서 ip 주소랑 합치기
-        String android_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-        String url = context.getString(R.string.testIpAddress) + android_id + "/search/" + tagIndex;
+        String url = context.getString(R.string.testIpAddress) + "/search/" + tagIndex + "/" + android_id;
         Log.d("GET", "reqGetTagPage Url: " + url);
 
         //요청 만들기
@@ -366,8 +374,7 @@ public class ReqServer {
 
     //검색하기
     public static void reqGetQuery(Context context, String query){
-        String android_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-        String url = context.getString(R.string.testIpAddress) + android_id  + "/search?query=" + query;
+        String url = context.getString(R.string.testIpAddress) + "/search/" + android_id + "?query=" + query;
         Log.d("GET", "reqGetQuery Url: " + url);
 
         final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -414,5 +421,53 @@ public class ReqServer {
 
         RequestQueue requestQueue = Volley.newRequestQueue(context);
         requestQueue.add(jsonObjectRequest);
+    }
+
+    //하이라이트 가져오기
+    public static void reqGetHighlight(Context context){
+        //android_id 가져와서 ip 주소랑 합치기
+        String url = context.getString(R.string.testIpAddress) + "/highlight/" + android_id;
+        Log.d("GET", "reqGetHighlight Url: " + url);
+
+        //요청 만들기
+        final JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+
+                highlightList.clear();  //기존의 데이터 지우기
+                for(int i = 0; i< response.length(); i++){
+                    try {
+                        Log.d("GET", "reqGetHighlight Response: " + String.valueOf(response.getJSONObject(i)));
+                        highlightList.add(response.getJSONObject(i));
+                    } catch (JSONException e) {
+                        Log.e("GET", "reqGetHighlight onResponse JSONException : " + e);
+                    }
+                }
+                if(!highlightList.isEmpty()){   //하이라이트가 있으면
+                    Intent intent = new Intent(context, CalendarMainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(context, InitApplication.HIGHLIGHT_NOTIFICATION_CHANNEL_ID)
+                            .setSmallIcon(R.drawable.ic_nadri_notice)
+                            .setContentTitle("오늘의 하이라이트!")
+                            .setContentText("하이라이트가 도착했어요! 확인해보실래요?")
+                            .setContentIntent(pendingIntent)
+                            .setAutoCancel(true);
+                    Notification notification = builder.build();
+
+                    NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+                    notificationManager.notify(InitApplication.HIGHLIGHT_NOTIFICATION_TAG, InitApplication.HIGHLIGHT, notification);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("GET", "reqGetHighlight Response 에러: " + error);
+            }
+        });
+
+        //큐에 넣어 서버로 응답 전송
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        requestQueue.add(jsonArrayRequest);
     }
 }
