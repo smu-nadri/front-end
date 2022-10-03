@@ -15,7 +15,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Nadri4edit1">
+        android:theme="@style/Theme.Nadri4edit1"
+        android:name=".InitApplication">
         <activity
             android:name=".AlbumPageActivity"
             android:exported="true" />
