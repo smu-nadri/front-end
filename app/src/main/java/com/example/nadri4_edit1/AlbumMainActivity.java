@@ -81,6 +81,7 @@ public class AlbumMainActivity extends AppCompatActivity {
 
         //앨범 목록 가져오기
         ReqServer.reqGetAlbums(AlbumMainActivity.this, 1);
+        ReqServer.reqGetHighlight(this);
 
         //뷰페이저 이동 버튼
         highlight_album.setOnClickListener(new View.OnClickListener() {

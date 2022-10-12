@@ -68,28 +68,5 @@
             android:scrollbars="vertical"
             android:scrollbarFadeDuration="0"/>
 
-        <ImageView
-            android:id="@+id/photo_big"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/renoir07"
-            android:visibility="invisible"/>
-        <View
-            android:id="@+id/photo_fore"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/blur_color"
-            android:visibility="invisible"/>
-        <TextView
-            android:id="@+id/photo_text"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="15dp"
-            android:text="사진 메타 정보"
-            android:visibility="invisible"/>
-
-
     </FrameLayout>
-
-
 </LinearLayout>

@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
@@ -30,8 +31,17 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import me.relex.circleindicator.CircleIndicator3;
+
 public class HighlightActivity extends AppCompatActivity {
     static MultiImageAdapter adapter;
+
+    ViewPager2 viewPager;
+    HighlightAdapter pagerAdapter;
+    //private FragmentStateAdapter pagerAdapter;
+    private int num_pager = ReqServer.highlightList.size();
+    private CircleIndicator3 cIndicator;
+
 
     FrameLayout photoLayout;
     ImageView photo_big;
@@ -65,106 +75,58 @@ public class HighlightActivity extends AppCompatActivity {
         btnMenu = (ImageButton) findViewById(R.id.btnMenu);
 
         //어댑터 연결(뷰페이저)
-        ViewPager2 viewPager = findViewById(R.id.view_pager);
-        HighlightAdapter adapter = new HighlightAdapter(setTextList()); //어댑터 생성, 아이템리스트를 파라미터로 사용
-        viewPager.setAdapter(adapter);  //뷰페이저에 어댑터 등록!
+        //뷰페이저 세팅
+        viewPager = findViewById(R.id.view_pager);
+        pagerAdapter = new HighlightAdapter(this, ReqServer.highlightList); //어댑터 생성, 아이템리스트를 파라미터로 사용
+        viewPager.setAdapter(pagerAdapter);  //뷰페이저에 어댑터 등록!
+        //viewPager.setOffscreenPageLimit(1);
 
-
-
-        //인텐트 - 사진메타정보 통으로 가져옴
-        /*Intent intent = getIntent();
-        String photo_data = intent.getStringExtra("photo_data");
-
-        String title = null;
-        String uri = null;
-        String location = null;
-        JSONArray tags_arr;
-        String tags_str = "";
-        String comment = null;
-
-        Log.d("PHOTO ", photo_data);
-
-        //사진 정보 가져와서 setText&append
-        //+) UI 정리하고싶은것 : 사진사이즈조절.......
-        try {
-            JSONObject photo_data_json = new JSONObject(photo_data);
-            photo_text.setText("사진 정보\n\n");
-
-            //달력앨범 타이틀 포맷 맞춰야함!!
-            title = photo_data_json.getJSONObject("album").getString("title");
-            tvPageDate.setText(title);
-
-            uri = photo_data_json.getString("uri");
-            //photo_big.setImageResource(Uri.parseUri(uri));
-            Glide.with(this).load(Uri.parse(uri)).into(photo_big);
-
-            //한글(location-address)만 가져오도록 함
-            //location = photo_data_json.getString("location"); //-> 좌표까지 가져옴
-            location = photo_data_json.getJSONObject("location").getString("address");
-            photo_text.append(" - 위치 : "+location+"\n");
-
-            //array로 저장돼있어서 어케 불러와야할지 모르겠음
-            tags_arr = photo_data_json.getJSONArray("tags");
-            //{ _id, tag_en, tag_ko1, tag_ko2 }
-            for(int i=0; i<tags_arr.length(); i++){
-                tags_str = tags_str + "#" + tags_arr.getJSONObject(i).getString("tag_ko1") + " ";
-                //인덱스 진짜 어케..
-            } //-> location처럼 해볼라했는데 안 되네..
-            photo_text.append(" - 태그 : " + tags_str + "\n");
-
-            //DB의 comment에 저장된 내용이 하나도 없을 땐 오류나는듯?
-            //DB comment에 "#태그"는 저장하지 않도록 할 수 있나?(태그까지 comment로 저장돼서 출력할 때 중복됨) 아님 append할 때 처리해야하는디 어케하지
-            //comment의 개행을 잘 처리해야 깔끔할듯
-            comment = photo_data_json.getString("comment");
-            photo_text.append(" - 내용 : "+comment+"\n");
-
-
-        } catch (JSONException e) {
-            Log.d("검사 ", title + ", ");
-        }*/
-
-
-
-
-        //보여줄 사진 선택
-
-
-        //사진 정보 가져오기
-
-
-
-        // 클릭하면 사진 정보 보여주기
-        /*photo_big.setOnClickListener(new View.OnClickListener() {
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback(){
             @Override
-            public void onClick(View view) {
-
-                if(photo_fore.getVisibility() == View.INVISIBLE){
-                    photo_fore.setVisibility(View.VISIBLE);
-                    photo_text.setVisibility(View.VISIBLE);
-                }
-                else{
-                    photo_fore.setVisibility(View.INVISIBLE);
-                    photo_text.setVisibility(View.INVISIBLE);
-                }
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                cIndicator.animatePageSelected(position%num_pager);
             }
-        });*/
+        });
+
+        //indicator
+        cIndicator = findViewById(R.id.indicator);
+        cIndicator.setViewPager(viewPager);
+        cIndicator.createIndicators(num_pager, 0);
+
+
+
 
 
     }
+    protected ArrayList<String> setPhotoList() {
+        ArrayList<String> itemList = new ArrayList<String>();
+        itemList.add("https://cdn.pixabay.com/photo/2019/12/26/10/44/horse-4720178_1280.jpg");
+        itemList.add("https://cdn.pixabay.com/photo/2020/11/04/15/29/coffee-beans-5712780_1280.jpg");
+        itemList.add("https://cdn.pixabay.com/photo/2020/11/10/01/34/pet-5728249_1280.jpg");
+        itemList.add("https://cdn.pixabay.com/photo/2020/12/21/19/05/window-5850628_1280.png");
+        itemList.add("https://cdn.pixabay.com/photo/2014/03/03/16/15/mosque-279015_1280.jpg");
 
-    private List<String> setTextList() {
+        /*ArrayList<String> itemList = new ArrayList<String>();
+        itemList.add(String.valueOf(R.drawable.renoir03));
+        itemList.add(String.valueOf(R.drawable.renoir07));
+        itemList.add(String.valueOf(R.drawable.renoir09));
+        itemList.add(String.valueOf(R.drawable.gomurea1));
+        itemList.add(String.valueOf(R.drawable.gomurea5));*/
 
-        ArrayList<String> itemList = new ArrayList();
-        itemList.add("Page 1");
-        itemList.add("Page 2");
-        itemList.add("Page 3");
-        itemList.add("Page 4");
-        itemList.add("Page 5");
-        itemList.add("Page 6");
-        itemList.add("Page 7");
-        itemList.add("Page 8");
-        itemList.add("Page 9");
-        itemList.add("Page 10");
+        /*ArrayList<String> itemList = new ArrayList<String>();
+        itemList.add(String.valueOf(Glide.with(this).load(this.getResources().getIdentifier("renoir03", "drawable", this.getPackageName()))));
+        itemList.add(String.valueOf(Glide.with(this).load(this.getResources().getIdentifier("renoir07", "drawable", this.getPackageName()))));
+        itemList.add(String.valueOf(Glide.with(this).load(this.getResources().getIdentifier("renoir09", "drawable", this.getPackageName()))));
+        itemList.add(String.valueOf(Glide.with(this).load(this.getResources().getIdentifier("renoir03", "drawable", this.getPackageName()))));
+        itemList.add(String.valueOf(Glide.with(this).load(this.getResources().getIdentifier("renoir09", "drawable", this.getPackageName()))));*/
+
+        /*String[] itemList = new String[5];
+        itemList[0] = "drawable://"+R.drawable.renoir03;
+        itemList[1] = "drawable://"+R.drawable.renoir07;
+        itemList[2] = "drawable://"+R.drawable.renoir09;
+        itemList[3] = "drawable://"+R.drawable.gomurea5;
+        itemList[4] = "drawable://"+R.drawable.gomurea1;*/
 
         return itemList;
     }
