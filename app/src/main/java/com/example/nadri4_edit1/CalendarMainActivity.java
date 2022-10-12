@@ -57,7 +57,6 @@ public class CalendarMainActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.rvCalender);
 
 
-        Log.d("GOO", "well come");
         ReqServer.reqGetAlbums(CalendarMainActivity.this, 0);
 
 
