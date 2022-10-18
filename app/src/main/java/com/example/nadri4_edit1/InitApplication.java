@@ -83,7 +83,7 @@ public class InitApplication extends Application {
         long delay = calculateDelay(HIGHLIGHT);
         //요청 만들기
         //하루 간격으로 마지막 15분 안에 실행, 딜레이는 처음에만 적용됨
-        PeriodicWorkRequest highlightWorkRequest = new PeriodicWorkRequest.Builder(HighlightWorker.class, 24, TimeUnit.HOURS,15, TimeUnit.MINUTES)
+        PeriodicWorkRequest highlightWorkRequest = new PeriodicWorkRequest.Builder(HighlightWorker.class, 24, TimeUnit.HOURS,1, TimeUnit.HOURS)
                 .setInitialDelay(delay, TimeUnit.SECONDS)
                 .build();
 
@@ -96,7 +96,7 @@ public class InitApplication extends Application {
     private void createDailyWorkRequest(){
         long delay = calculateDelay(DAILY);
         //요청 만들기
-        PeriodicWorkRequest dailyWorkRequest = new PeriodicWorkRequest.Builder(DailyAlertsWorker.class, 24, TimeUnit.HOURS,15, TimeUnit.MINUTES)
+        PeriodicWorkRequest dailyWorkRequest = new PeriodicWorkRequest.Builder(DailyAlertsWorker.class, 24, TimeUnit.HOURS,1, TimeUnit.HOURS)
                 .setInitialDelay(delay, TimeUnit.SECONDS)
                 .build();
 
