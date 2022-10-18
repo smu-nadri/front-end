@@ -99,7 +99,9 @@ public class AlbumPageActivity extends AppCompatActivity {
             else {  //월별 앨범
                 title = getDateIntent.getStringExtra("title");
                 ReqServer.stitle = title;
-                tvPageDate.setText(title);
+
+                String[] split_title = title.split("-");
+                tvPageDate.setText(split_title[0]+"년 "+split_title[1]+"월");
                 tvPageDate.setEnabled(false);
             }
         }

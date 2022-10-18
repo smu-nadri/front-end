@@ -78,6 +78,7 @@ public class AlbumGvAdapter extends BaseAdapter {
 
             //년별앨범 -> 달별앨범 이동
             if(viewGroup.getId() == R.id.gvYearAlbum) {
+                tv.setText(title+"년");
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -88,6 +89,8 @@ public class AlbumGvAdapter extends BaseAdapter {
                 });
             }
             else if(viewGroup.getId() == R.id.gvMonthAlbum) { //달별앨범 -> 사진페이지로 이동
+                String[] split_title = title.split("-");
+                tv.setText(split_title[1]+"월");
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -140,6 +143,8 @@ public class AlbumGvAdapter extends BaseAdapter {
                     });
                 }
                 else {  //달력 앨범이면
+                    String[] split_title = title.split("-");
+                    tv.setText(split_title[0]+"년 "+split_title[1]+"월 "+split_title[2]);
                     view.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {

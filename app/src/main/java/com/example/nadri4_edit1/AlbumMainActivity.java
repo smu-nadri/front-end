@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -29,10 +31,12 @@ import com.google.mlkit.vision.label.ImageLabeling;
 import com.google.mlkit.vision.label.defaults.ImageLabelerOptions;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class AlbumMainActivity extends AppCompatActivity {
@@ -45,13 +49,14 @@ public class AlbumMainActivity extends AppCompatActivity {
     GridLayout glNadriAlbum;
     static GridView  gvCustomAlbum;
     static GridView gvYearAlbum;
-    LinearLayout nadriAlbum, customAlbum, dateAlbum, highlight_album;
+    static LinearLayout nadriAlbum, customAlbum, dateAlbum, highlight_album, thismonth_album;
 
     static AlbumGvAdapter cAdapter;
     static AlbumGvAdapter yAdapter;
 
     String src;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +66,7 @@ public class AlbumMainActivity extends AppCompatActivity {
 
         //xml변수 연결
         highlight_album = (LinearLayout) findViewById(R.id.highlight_album);
+        thismonth_album = (LinearLayout) findViewById(R.id.thismonth_album);
         folder1 = (ImageView) findViewById(R.id.imageView1);
         folder2 = (ImageView) findViewById(R.id.imageView2);
         folder3 = (ImageView) findViewById(R.id.imageView3);
@@ -140,6 +146,7 @@ public class AlbumMainActivity extends AppCompatActivity {
 
         //처음 화면 셋팅
         setAlbumMainView();
+        setAlbumMainViewVisibility();
 
     }
 
@@ -157,5 +164,55 @@ public class AlbumMainActivity extends AppCompatActivity {
         yAdapter = new AlbumGvAdapter(context);
         yAdapter.setItem(ReqServer.yearAlbumList);
         gvYearAlbum.setAdapter(yAdapter);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    protected static void setAlbumMainViewVisibility(){
+        if(ReqServer.customAlbumList.isEmpty() && ReqServer.dateAlbumList.isEmpty()) {
+            //마이앨범도 달력앨범도 비어있으면
+            nadriAlbum.setVisibility(View.GONE);
+            customAlbum.setVisibility(View.GONE);
+            dateAlbum.setVisibility(View.GONE);
+        }
+        else if(ReqServer.customAlbumList.isEmpty()){
+            //마이앨범만 비어있으면
+            nadriAlbum.setVisibility(View.VISIBLE);
+            customAlbum.setVisibility(View.GONE);
+            dateAlbum.setVisibility(View.VISIBLE);
+        }
+        else if(ReqServer.dateAlbumList.isEmpty()){
+            //달력앨범만 비어있으면
+            nadriAlbum.setVisibility(View.VISIBLE);
+            customAlbum.setVisibility(View.VISIBLE);
+            dateAlbum.setVisibility(View.GONE);
+        }
+        else {
+            //둘 다 있으면
+            nadriAlbum.setVisibility(View.VISIBLE);
+            customAlbum.setVisibility(View.VISIBLE);
+            dateAlbum.setVisibility(View.VISIBLE);
+        }
+
+        //이번달 유무
+        thismonth_album.setVisibility(View.GONE);
+        ReqServer.monthAlbumList.forEach(item -> {
+            try {
+                Calendar today = Calendar.getInstance();
+                String ym = today.get(Calendar.YEAR) + "-" + today.get(Calendar.MONTH);
+                if(item.getString("title").contains(ym)){
+                    thismonth_album.setVisibility(View.VISIBLE);
+                };
+            } catch (JSONException e) {
+                Log.e("AlbumMainActivity", "Error: " + e);
+            }
+        });
+
+        //하이라이트 유무
+        if(ReqServer.highlightList.isEmpty()){
+            highlight_album.setVisibility(View.GONE);
+        }
+        else {
+            highlight_album.setVisibility(View.VISIBLE);
+        }
     }
 }
