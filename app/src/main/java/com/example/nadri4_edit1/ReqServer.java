@@ -64,6 +64,7 @@ public class ReqServer {
     public static JSONObject album = new JSONObject();
 
     //하이라이트 사진을 담는 리스트
+    public static String highlightTitle = new String();
     public  static ArrayList<JSONObject> highlightList = new ArrayList<>();
 
     Context c;
@@ -432,37 +433,47 @@ public class ReqServer {
         Log.d("GET", "reqGetHighlight Url: " + url);
 
         //요청 만들기
-        final JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+        final JsonObjectRequest jsonArrayRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray response) {
+            public void onResponse(JSONObject response) {
 
+                highlightTitle = "";
                 highlightList.clear();  //기존의 데이터 지우기
-                for(int i = 0; i< response.length(); i++){
-                    try {
-                        Log.d("GET", "reqGetHighlight Response: " + String.valueOf(response.getJSONObject(i)));
-                        highlightList.add(response.getJSONObject(i));
-                    } catch (JSONException e) {
-                        Log.e("GET", "reqGetHighlight onResponse JSONException : " + e);
+
+                try {
+                    highlightTitle = response.getString("title");
+                    JSONArray resArr = response.getJSONArray("resArr");
+
+                    Log.d("GET", "reqGetHighlight Response: title - " + highlightTitle);
+                    for(int i = 0; i< resArr.length(); i++){
+                        try {
+                            Log.d("GET", "reqGetHighlight Response: " + String.valueOf(resArr.getJSONObject(i)));
+                            highlightList.add(resArr.getJSONObject(i));
+                        } catch (JSONException e) {
+                            Log.e("GET", "reqGetHighlight onResponse JSONException : " + e);
+                        }
                     }
-                }
-                if(!highlightList.isEmpty()){   //하이라이트가 있으면
-                    //알림 설정
-                    Intent intent = new Intent(context, CalendarMainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    NotificationCompat.Builder builder = new NotificationCompat.Builder(context, InitApplication.HIGHLIGHT_NOTIFICATION_CHANNEL_ID)
-                            .setSmallIcon(R.drawable.ic_nadri_notice)
-                            .setContentTitle("오늘의 하이라이트!")
-                            .setContentText("하이라이트가 도착했어요! 확인해보실래요?")
-                            .setContentIntent(pendingIntent)
-                            .setAutoCancel(true);
-                    Notification notification = builder.build();
+                    if(!highlightList.isEmpty()){   //하이라이트가 있으면
+                        //알림 설정
+                        Intent intent = new Intent(context, CalendarMainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, InitApplication.HIGHLIGHT_NOTIFICATION_CHANNEL_ID)
+                                .setSmallIcon(R.drawable.ic_nadri_notice)
+                                .setContentTitle("오늘의 하이라이트!")
+                                .setContentText("하이라이트가 도착했어요! 확인해보실래요?")
+                                .setContentIntent(pendingIntent)
+                                .setAutoCancel(true);
+                        Notification notification = builder.build();
 
-                    NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-                    notificationManager.notify(InitApplication.HIGHLIGHT_NOTIFICATION_TAG, InitApplication.HIGHLIGHT, notification);
+                        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+                        notificationManager.notify(InitApplication.HIGHLIGHT_NOTIFICATION_TAG, InitApplication.HIGHLIGHT, notification);
 
-                    //포그라운드일 때
-                    AlbumMainActivity.highlight_album.setVisibility(View.VISIBLE);
+                        //포그라운드일 때
+                        AlbumMainActivity.highlight_album.setVisibility(View.VISIBLE);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
         }, new Response.ErrorListener() {
