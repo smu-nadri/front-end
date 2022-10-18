@@ -115,7 +115,9 @@ public class ReqServer {
                         CalendarMainActivity.setMonthView();
                     }
                     else if(mainCode == 1){
-                        AlbumMainActivity.setAlbumMainView();
+                        AlbumMainActivity.cAdapter.notifyDataSetChanged();
+                        AlbumMainActivity.yAdapter.notifyDataSetChanged();
+                        AlbumMainActivity.setAlbumMainViewVisibility();
                     }
 
                 } catch (JSONException e) {
@@ -444,6 +446,7 @@ public class ReqServer {
                     }
                 }
                 if(!highlightList.isEmpty()){   //하이라이트가 있으면
+                    //알림 설정
                     Intent intent = new Intent(context, CalendarMainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -457,6 +460,9 @@ public class ReqServer {
 
                     NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
                     notificationManager.notify(InitApplication.HIGHLIGHT_NOTIFICATION_TAG, InitApplication.HIGHLIGHT, notification);
+
+                    //포그라운드일 때
+                    AlbumMainActivity.highlight_album.setVisibility(View.VISIBLE);
                 }
             }
         }, new Response.ErrorListener() {
