@@ -186,7 +186,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
                 try {
                     ReqServer.album.put("title", title);
                     ReqServer.album.put("type", "dateAlbum");
-                    ReqServer.dateAlbumList.forEach(item -> {
+                    ReqServer.dateAlbumList.forEach(item -> {   //이미 만들어진 달력앨범이 있다면 셋팅
                         try {
                             if(item.getString("title").equals(title)){
                                 ReqServer.album = new JSONObject(String.valueOf(item));
@@ -196,7 +196,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
                         }
                     });
                 } catch (Exception e) {
-                    Log.e("alendarAdapter", "dateAlbumList Error: " + e);
+                    Log.e("CalendarAdapter", "dateAlbumList Error: " + e);
                 }
 
                 //전송
