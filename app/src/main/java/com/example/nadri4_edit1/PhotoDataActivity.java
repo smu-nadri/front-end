@@ -1,11 +1,17 @@
 package com.example.nadri4_edit1;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.ImageDecoder;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -13,6 +19,7 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
@@ -21,7 +28,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class PhotoDataActivity extends AppCompatActivity {
     static MultiImageAdapter adapter;
@@ -54,35 +68,56 @@ public class PhotoDataActivity extends AppCompatActivity {
 
         //인텐트 - 사진메타정보 통으로 가져옴
         Intent intent = getIntent();
-        String photo_data = intent.getStringExtra("photo_data");
+        Integer photo_data = intent.getIntExtra("photo_data", -1);
 
         String title = null;
         String uri = null;
+        Object datetime = null;
         String location = null;
         JSONArray tags_arr;
         String tags_str = "";
         String comment = null;
 
-        Log.d("PHOTO ", photo_data);
+        Log.d("PHOTO ", String.valueOf(photo_data));
 
         //사진 정보 가져와서 setText&append
         //+) UI 정리하고싶은것 : 사진사이즈조절.......
         try {
-            JSONObject photo_data_json = new JSONObject(photo_data);
+            JSONObject photo_data_json = ReqServer.photoList.get(photo_data);
             photo_text.setText("사진 정보\n\n");
 
             //달력앨범 타이틀 포맷 맞춰야함!!
-            title = photo_data_json.getJSONObject("album").getString("title");
-            tvPageDate.setText(title);
+            if(photo_data_json.has("album")) {
+                title = photo_data_json.getJSONObject("album").getString("title");
+                tvPageDate.setText(title);
+            }
 
             uri = photo_data_json.getString("uri");
             //photo_big.setImageResource(Uri.parseUri(uri));
             Glide.with(this).load(Uri.parse(uri)).into(photo_big);
 
+            if(photo_data_json.has("datetime")) {
+                Object time = photo_data_json.get("datetime");
+
+                if(time.getClass() == String.class) {
+                    datetime = ((String) time).substring(0, 10) + " " + ((String) time).substring(11, 19);
+                    photo_text.append(" - 날짜 : " + datetime + "\n");
+                }
+                else if(time.getClass() == Long.class) {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"));
+                    calendar.setTimeInMillis((Long) time);
+                    datetime = dateFormat.format(calendar.getTime());
+                    photo_text.append(" - 날짜 : " + datetime + "\n");
+                }
+            }
+
             //한글(location-address)만 가져오도록 함
             //location = photo_data_json.getString("location"); //-> 좌표까지 가져옴
-            location = photo_data_json.getJSONObject("location").getString("address");
-            photo_text.append(" - 위치 : "+location+"\n");
+            if(photo_data_json.has("location")) {
+                location = photo_data_json.getJSONObject("location").getString("address");
+                photo_text.append(" - 위치 : " + location + "\n");
+            }
 
             //array로 저장돼있어서 어케 불러와야할지 모르겠음
             tags_arr = photo_data_json.getJSONArray("tags");
@@ -99,9 +134,139 @@ public class PhotoDataActivity extends AppCompatActivity {
             comment = photo_data_json.getString("comment");
             photo_text.append(" - 내용 : "+comment+"\n");
 
+            if(photo_data_json.has("faces")) {
+                JSONArray faces = photo_data_json.getJSONArray("faces");
 
+                for(int i = 0; i < faces.length(); i++){
+                    JSONObject face = faces.getJSONObject(i);
+                    String label = face.getString("label");
+                    final int idx = i;
+                    String finalUri = uri;
+
+                    TextView tv = new TextView(this);
+                    FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(100, 50);
+                    params.setMargins(0, i*50, 0, 0);
+                    tv.setBackgroundColor(Color.BLACK);
+                    tv.setTextColor(Color.WHITE);
+                    tv.setLayoutParams(params);
+
+                    try{    //이름이 초기화 되지않았을 때
+                        Integer unknown = Integer.parseInt(label);
+                        tv.setText("?");
+                        tv.setOnClickListener(new View.OnClickListener() {
+                            @RequiresApi(api = Build.VERSION_CODES.P)
+                            @Override
+                            public void onClick(View view) {    //이름태그를 클릭하면
+                                View dialogView = (View) View.inflate(PhotoDataActivity.this, R.layout.face_edit_dialog, null);
+                                AlertDialog.Builder dlg = new AlertDialog.Builder(PhotoDataActivity.this);
+                                ImageView faceImg = (ImageView) dialogView.findViewById(R.id.faceImg);
+                                EditText faceName = (EditText) dialogView.findViewById(R.id.faceName);
+
+                                try {   //얼굴사진 잘라서 셋팅
+                                    Bitmap cropImg = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getContentResolver(), Uri.parse(finalUri)));
+                                    Rect faceBox = new Rect(face.getInt("left"), face.getInt("top"), face.getInt("right"), face.getInt("bottom"));
+                                    cropImg = Bitmap.createBitmap(cropImg, faceBox.left, faceBox.top, faceBox.width(), faceBox.height());
+                                    faceImg.setImageBitmap(cropImg);
+                                } catch (JSONException | IOException e) {
+                                    Log.e("HWA", "어라?" + e);
+                                }
+
+                                //대화상자 설정
+                                dlg.setTitle("이름 설정");
+                                dlg.setView(dialogView);
+                                dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() { //확인 버튼 누르면
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        try {
+                                            //이름 변경
+                                            String name = faceName.getText().toString();
+                                            face.put("label", name);
+                                            tv.setText(name);
+
+                                            //registered 업데이트
+                                            ArrayList<FaceRecognize.Recognition> registered = FaceRecognitionAPI.getRegistered();
+                                            for(int j = 0; j < registered.size(); j++){
+                                                if(registered.get(j).getLabel().equals(label)){
+                                                    registered.get(j).setLabel(name);
+                                                }
+                                            }
+
+                                            //현재 앨범에 동일한 얼굴이 있으면 업데이트
+                                            for(int j = 0; j < ReqServer.photoList.size(); j++){
+                                                if(ReqServer.photoList.get(j).has("faces")){
+                                                    JSONArray tmp = ReqServer.photoList.get(j).getJSONArray("faces");
+                                                    for(int k = 0; k < tmp.length(); k++){
+                                                        if(tmp.getJSONObject(k).getString("label").equals(label)){
+                                                            tmp.getJSONObject(k).put("label", name);
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                            //다른 사진들도 변경하기 위해 서버로 변경할 이름 전송 (8, 이름)
+                                            ReqServer.initFaceList.add(new JSONObject().put(label, name));
+
+                                            //어댑터 업데이트!
+                                            AlbumPageActivity.adapter.notifyDataSetChanged();
+                                        } catch (JSONException e) {
+                                            Log.d("HWA", "아악 " + idx);
+                                        }
+                                    }
+                                });
+                                dlg.setNegativeButton("취소", null);
+                                dlg.show();
+                            }
+                        });
+                    } catch (NumberFormatException e){  //이름이 초기화되어있을 때
+                        tv.setText(label);
+                        tv.setOnClickListener(new View.OnClickListener() {
+                            @RequiresApi(api = Build.VERSION_CODES.P)
+                            @Override
+                            public void onClick(View view) {    //이름태그를 클릭하면
+                                View dialogView = (View) View.inflate(PhotoDataActivity.this, R.layout.face_edit_dialog, null);
+                                AlertDialog.Builder dlg = new AlertDialog.Builder(PhotoDataActivity.this);
+                                ImageView faceImg = (ImageView) dialogView.findViewById(R.id.faceImg);
+                                EditText faceName = (EditText) dialogView.findViewById(R.id.faceName);
+
+                                try {   //얼굴사진 잘라서 셋팅
+                                    Bitmap cropImg = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getContentResolver(), Uri.parse(finalUri)));
+                                    Rect faceBox = new Rect(face.getInt("left"), face.getInt("top"),  face.getInt("right"), face.getInt("bottom"));
+                                    cropImg = Bitmap.createBitmap(cropImg, faceBox.left, faceBox.top, faceBox.width(), faceBox.height());
+                                    faceImg.setImageBitmap(cropImg);
+                                } catch (JSONException | IOException e) {
+                                    Log.e("HWA", "어라?" + e);
+                                }
+
+                                //대화상자 설정
+                                dlg.setTitle("이름 설정");
+                                dlg.setView(dialogView);
+                                dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() { //확인 버튼 누르면
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        try {
+                                            //이름 변경
+                                            String name = faceName.getText().toString();
+                                            face.put("label", name);
+                                            tv.setText(name);
+
+                                            //어댑터 업데이트!
+                                            AlbumPageActivity.adapter.notifyDataSetChanged();
+                                        } catch (JSONException e) {
+                                            Log.d("HWA", "아악 " + e);
+                                        }
+                                    }
+                                });
+                                dlg.setNegativeButton("취소", null);
+                                dlg.show();
+                            }
+                        });
+                    }
+                    //화면에 이름태그 추가
+                    photoLayout.addView(tv);
+                }
+            }
         } catch (JSONException e) {
-            Log.d("검사 ", title + ", ");
+            Log.e("검사 ", title + ", " + e);
         }
 
 

@@ -19,6 +19,12 @@ import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 import androidx.work.WorkQuery;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -57,6 +63,26 @@ public class InitApplication extends Application {
         //deleteWorkRequest();
 
         printWorkRequest();
+
+        //deleteFile("facelist.tmp");
+
+        try {
+            FileInputStream fis = openFileInput("facelist.tmp");
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            ArrayList<FaceRecognize.Recognition> loadFaces = (ArrayList<FaceRecognize.Recognition>) ois.readObject();
+            ois.close();
+
+            FaceRecognitionAPI.setRegistered(loadFaces);
+            int lastIdx = FaceRecognitionAPI.getRegistered().size() - 1;
+            int nextId = FaceRecognitionAPI.getRegistered().get(lastIdx).getId() + 1;
+            FaceRecognitionAPI.setFaceId(nextId);
+
+        } catch (FileNotFoundException e){
+            FaceRecognitionAPI.setFaceId(0);
+        }
+        catch (IOException | ClassNotFoundException e){
+            Log.e("InitApplication", String.valueOf(e));
+        }
     }
 
     private void createNotificationChannel(String id, CharSequence name, String description) {

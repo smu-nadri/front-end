@@ -28,6 +28,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.JsonArray;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,6 +50,7 @@ public class ReqServer {
     //사진 정보를 담는 리스트
     static ArrayList<JSONObject> photoList = new ArrayList<>();
     static ArrayList<JSONObject> deletedList = new ArrayList<>();
+    static ArrayList<JSONObject> initFaceList = new ArrayList<>();
 
     //태그 정보를 담는 리스트
     static ArrayList<JSONObject> tagList = new ArrayList<JSONObject>();
@@ -195,60 +197,45 @@ public class ReqServer {
             //삭제할 리스트 reqJson에 넣기
             reqJson.put("deletedList", deletedList);
 
+            //얼굴 리스트 reqJson에 넣기
+            JSONArray reqFaceArr = new JSONArray();
+            for(int i = 0; i < initFaceList.size(); i++) {
+                reqFaceArr.put(initFaceList.get(i));
+            }
+            reqJson.put("initFaceList", reqFaceArr);
+
             //추가 및 수정할 사진 정보를 담은 photoJson 만들고 리스트 reqJsonArr에 넣기
             for(int i = 0; i < photoList.size(); i++){
                 JSONObject photoJson = new JSONObject();
                 photoJson.put("userId", android_id);
-                //수정할 경우
-                if(photoList.get(i).has("_id")) {
+
+                if(photoList.get(i).has("_id"))
                     photoJson.put("_id", photoList.get(i).get("_id"));
-                    photoJson.put("uri", photoList.get(i).get("uri"));
+
+                photoJson.put("uri", photoList.get(i).get("uri"));
+
+                //날짜 정보
+                if (photoList.get(i).has("datetime"))
                     photoJson.put("datetime", photoList.get(i).get("datetime"));
-                    if(photoList.get(i).has("location"))
-                        photoJson.put("location", photoList.get(i).get("location"));
-                    if(photoList.get(i).has("comment"))
-                        photoJson.put("comment", photoList.get(i).get("comment"));
-                    if(photoList.get(i).has("tag"))
-                        photoJson.put("tag", photoList.get(i).get("tag"));
-                }
-                else{ //추가할 경우
-                    photoJson.put("uri", photoList.get(i).get("uri"));
 
-                    //사진 정보 가져오기
-                    InputStream inputStream = context.getContentResolver().openInputStream(Uri.parse(photoList.get(i).getString("uri")));
-                    ExifInterface exif = new ExifInterface(inputStream);
 
-                    //날짜 정보
-                    Long datetime = exif.getDateTime();
-                    photoJson.put("datetime", datetime);
+                //위치 정보
+                if (photoList.get(i).has("location"))
+                    photoJson.put("location", photoList.get(i).get("location"));
 
-                    //위치 정보
-                    double latLong[] = exif.getLatLong();
-                    //경도, 위도, 주소를 담을 Json
-                    JSONObject location = new JSONObject();
-                    if (latLong != null) {
-                        Geocoder gCoder = new Geocoder(context);
-                        List<Address> addressList = gCoder.getFromLocation(latLong[0], latLong[1], 10);
-                        location.put("lat", latLong[0]);
-                        location.put("long", latLong[1]);
-                        if (!addressList.isEmpty()) {
-                            location.put("address", addressList.get(0).getAddressLine(0));
-                            location.put("admin", addressList.get(0).getAdminArea());
-                            location.put("locality", addressList.get(0).getLocality());
-                            location.put("thoroughfare", addressList.get(0).getThoroughfare());
-                        }
 
-                        photoJson.put("location", location);
-                    }
+                //코멘트
+                if(photoList.get(i).has("comment"))
+                    photoJson.put("comment", photoList.get(i).get("comment"));
 
-                    //코멘트
-                    if(photoList.get(i).has("comment"))
-                        photoJson.put("comment", photoList.get(i).get("comment"));
+                //태그
+                if(photoList.get(i).has("tags"))
+                    photoJson.put("tags", photoList.get(i).get("tags"));
 
-                    //태그
-                    if(photoList.get(i).has("tags"))
-                        photoJson.put("tags", new JSONArray(photoList.get(i).getString("tags")));
-                }
+                //얼굴
+                if(photoList.get(i).has("faces"))
+                    photoJson.put("faces", photoList.get(i).get("faces"));
+
 
                 //페이지 정보
                 JSONObject page = new JSONObject();
@@ -263,6 +250,7 @@ public class ReqServer {
 
             //추가 및 수정할 리스트 reqJson에 넣기
             reqJson.put("photos", reqJsonArr);
+
         } catch (Exception e) {
             Log.e("POST", "reqPostPages Set reqJson 에러: " + e);
             Toast.makeText(context.getApplicationContext(), "전송 실패", Toast.LENGTH_SHORT).show();
@@ -277,6 +265,7 @@ public class ReqServer {
                     //기존의 데이터 지우기
                     photoList.clear();
                     deletedList.clear();
+                    initFaceList.clear();
 
                     for(int i = 0; i < resJsonArr.length(); i++){
                         photoList.add(resJsonArr.getJSONObject(i));

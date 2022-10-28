@@ -106,7 +106,7 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
                 //-------------
                 Context context = view.getContext();
                 Intent photo_data = new Intent(context, PhotoDataActivity.class);
-                photo_data.putExtra("photo_data", String.valueOf(mData.get(holder.getBindingAdapterPosition())));
+                photo_data.putExtra("photo_data", holder.getBindingAdapterPosition());
                 ((AlbumPageActivity)context).startActivity(photo_data);
 
                 //-------------
