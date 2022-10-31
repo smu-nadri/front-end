@@ -36,6 +36,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -67,8 +68,9 @@ public class AlbumPageActivity extends AppCompatActivity {
 
     static RecyclerView recyclerView;  //이미지를 보여주는 뷰
     static MultiImageAdapter adapter;
+    ItemTouchHelper helper;
 
-    ImageButton btnGetImage, btnSave;
+    ImageButton btnGetImage, btnSave, btnRemove;
     TextView tvPageDate;
 
     ImageView photo_big;
@@ -95,6 +97,7 @@ public class AlbumPageActivity extends AppCompatActivity {
         btnGetImage = (ImageButton) findViewById(R.id.btnGetImage);
         tvPageDate = (TextView) findViewById(R.id.tvPageDate);
         btnSave = (ImageButton) findViewById(R.id.btnSave);
+        btnRemove = (ImageButton) findViewById(R.id.btnRemove);
         //xml연결
         photo_big = findViewById(R.id.imgView);
         photo_fore = findViewById(R.id.photo_fore);
@@ -150,6 +153,10 @@ public class AlbumPageActivity extends AppCompatActivity {
         //어댑터 적용
         setAdapterUpdated();
 
+        //터치헬퍼 적용
+        helper = new ItemTouchHelper(new ItemTouchHelperCallback(adapter));
+        helper.attachToRecyclerView(recyclerView);
+
         //기존에 저장된 사진들 불러오기
         ReqServer.reqGetPages(AlbumPageActivity.this);
 
@@ -189,6 +196,30 @@ public class AlbumPageActivity extends AppCompatActivity {
                     } catch (JSONException | IOException e) {
                         Log.e("AlbumPageActivity", "btnSave JSONException: " + e);
                     }
+                }
+            }
+        });
+
+        btnRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    ArrayList<JSONObject> mData = adapter.getmData();
+                    int i = 0;
+                    while (mData.size() != 0 && i < mData.size()) {
+                        Log.d("HWA", "삭제버튼 " + i + " : "+ mData.size() + " :" + mData.get(i));
+                        if (mData.get(i).getBoolean("isChecked")) {
+                            if (mData.get(i).has("_id")) {
+                                ReqServer.deletedList.add(mData.get(i));
+                            }
+                            mData.remove(i);
+                            adapter.notifyDataSetChanged();
+                        } else {
+                            i++;
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -291,6 +322,9 @@ public class AlbumPageActivity extends AppCompatActivity {
     @SuppressLint("RestrictedApi")
     private void setUriExif(JSONObject imageInfo, Uri imageUri){
         try {
+            imageInfo.put("uri", imageUri); //uri 데이터 넣기
+            imageInfo.put("isChecked", false);
+
             InputStream inputStream = AlbumPageActivity.this.getContentResolver().openInputStream(imageUri);
             ExifInterface exif = new ExifInterface(inputStream);
 
@@ -334,8 +368,6 @@ public class AlbumPageActivity extends AppCompatActivity {
         JSONArray tagsIndex = new JSONArray();    //사진 한 장의 태그들
 
         try {
-            imageInfo.put("uri", imageUri); //uri 데이터 넣기
-
             //태그 불러오기
             InputImage image = InputImage.fromFilePath(this, imageUri);    //uri -> InputImage 변환
 

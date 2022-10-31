@@ -5,11 +5,7 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Address;
-import android.location.Geocoder;
-import android.net.Uri;
 import android.os.Build;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -17,7 +13,6 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import androidx.exifinterface.media.ExifInterface;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,15 +23,14 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.gson.JsonArray;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.PieEntry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
 
 public class ReqServer {
     public static String android_id;
@@ -154,7 +148,7 @@ public class ReqServer {
                 for(int i = 0; i< response.length(); i++){
                     try {
                         Log.d("GET", "reqGetPages Response Uri: " + String.valueOf(response.getJSONObject(i)));
-                        photoList.add(response.getJSONObject(i));
+                        photoList.add(response.getJSONObject(i).put("isChecked", false));
                     } catch (JSONException e) {
                         Log.e("GET", "reqGetPages onResponse JSONException : " + e);
                     }
@@ -195,7 +189,11 @@ public class ReqServer {
             reqJson.put("album", album);
 
             //삭제할 리스트 reqJson에 넣기
-            reqJson.put("deletedList", deletedList);
+            JSONArray reqDeleteArr = new JSONArray();
+            for(int i = 0; i < deletedList.size(); i++) {
+                reqDeleteArr.put(deletedList.get(i));
+            }
+            reqJson.put("deletedList", reqDeleteArr);
 
             //얼굴 리스트 reqJson에 넣기
             JSONArray reqFaceArr = new JSONArray();
@@ -238,10 +236,7 @@ public class ReqServer {
 
 
                 //페이지 정보
-                JSONObject page = new JSONObject();
-                page.put("pageOrder", 1); //여기 수정해야함
-                page.put("layoutOrder", i);
-                photoJson.put("page", page);
+                photoJson.put("layoutOrder", i);
 
                 //리스트 reqJsonArr에 사진 photoJson 넣기
                 Log.d("POST", "reqPostPages photoJson " + i + ": " + photoJson);

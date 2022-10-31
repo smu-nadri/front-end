@@ -10,8 +10,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,12 +31,20 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeSet;
 
-public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.ViewHolder> {
+public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.ViewHolder> implements ItemTouchHelperListener{
 
     private ArrayList<JSONObject> mData = null;
     private Context mContext = null;
 
+    private boolean isEdit = false;
+    private TreeSet<Integer> checkList = new TreeSet<>();
+
+    public ArrayList<JSONObject> getmData() {
+        return mData;
+    }
 
     public MultiImageAdapter(ArrayList<JSONObject> list, Context context) {
         mData = list;
@@ -44,6 +55,8 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
 
         ImageView image;
         EditText comment;
+        FrameLayout item;
+        CheckBox checkbox;
 
         //public ImageView photo_big;
         //public View photo_fore;
@@ -53,6 +66,8 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
             //뷰 객체에 대한 참조
             image = itemView.findViewById(R.id.ivPhotos);
             comment = itemView.findViewById(R.id.edtComment);
+            item = itemView.findViewById(R.id.pageItem);
+            checkbox = itemView.findViewById(R.id.checkbox);
 
             //photo_big = itemView.findViewById(R.id.photo_big);
             //photo_fore = itemView.findViewById(R.id.photo_fore);
@@ -60,6 +75,33 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
         }
     }
 
+    @Override
+    public boolean onItemMove(int from_position, int to_position) {
+        Log.d("HWA", "움직움직! " + from_position + " " + to_position);
+        //이동할 객체 저장
+        JSONObject person = mData.get(from_position);
+        //이동할 객체 삭제
+        mData.remove(from_position);
+        //이동하고 싶은 position에 추가
+        mData.add(to_position,person);
+
+        for(int i = 0; i < mData.size(); i++){
+            try {
+                Log.d("HWA", "mData : " + i + " " + mData.get(i).getString("uri"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        //Adapter에 데이터 이동알림
+        AlbumPageActivity.adapter.notifyItemMoved(from_position,to_position);
+        return true;
+    }
+
+    @Override
+    public void onItemSwipe(int position) {
+
+    }
 
     @NonNull
     @Override
@@ -176,6 +218,61 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
                 ;
             }
         });
+
+        holder.item.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                if(!isEdit){
+                    Log.d("HWA", "편집모드 진입!");
+                    isEdit = true;
+                    AlbumPageActivity.adapter.notifyDataSetChanged();
+                }
+                return true;
+            }
+        });
+
+        holder.item.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(isEdit){
+                    Log.d("HWA", "눌렀음! " + holder.getBindingAdapterPosition());
+                    int i = holder.getBindingAdapterPosition();
+                    try {
+                        if(mData.get(i).getBoolean("isChecked")) {
+                            Log.d("HWA", "true : ");
+                            mData.get(i).put("isChecked", false);
+                            holder.checkbox.setChecked(false);
+                            checkList.add(i);
+                        }
+                        else{
+                            Log.d("HWA", "false : ");
+                            mData.get(i).put("isChecked", true);
+                            holder.checkbox.setChecked(true);
+                            checkList.remove(i);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else {  //임시!
+                    Context context = view.getContext();
+                    Intent photo_data = new Intent(context, PhotoDataActivity.class);
+                    photo_data.putExtra("photo_data", holder.getBindingAdapterPosition());
+                    ((AlbumPageActivity)context).startActivity(photo_data);
+                }
+            }
+        });
+
+        if(isEdit){
+            Log.d("HWA", "편집모드입니다!");
+            holder.checkbox.setVisibility(View.VISIBLE);
+        }
+
+        try {
+            holder.checkbox.setChecked(mData.get(holder.getBindingAdapterPosition()).getBoolean("isChecked"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
