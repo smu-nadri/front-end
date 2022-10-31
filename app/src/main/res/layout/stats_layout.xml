@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="68dp"
+        android:padding="15dp"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/stats_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@color/colorBackground"
+            app:srcCompat="@drawable/calendar"/>
+
+        <!--현재-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvCurrentYear"
+                android:layout_width="wrap_content"
+                android:layout_height="68dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="차트"
+                android:textSize="23dp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- TextView 사이에 넣어주므로써 간격을 넖혀 우측정렬이 될 수 있게 만든다 -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <ImageButton
+            android:id="@+id/calendar_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@color/colorBackground"
+            app:srcCompat="@drawable/calendar"/>
+        <View
+            android:layout_width="10dp"
+            android:layout_height="0dp"/>
+
+        <ImageButton
+            android:id="@+id/a_search_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@color/colorBackground"
+            app:srcCompat="@drawable/magnify" />
+
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:background="@color/black"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="15dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginVertical="5dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="년도별"/>
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/yearChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginVertical="5dp">
+                <TextView
+                    android:id="@+id/mTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="월별"/>
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/monthChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginVertical="5dp">
+                <TextView
+                    android:id="@+id/dTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="요일별"/>
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/dayChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginVertical="5dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="태그"/>
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/tagChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginVertical="5dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="시군"/>
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/localChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginVertical="5dp">
+                <TextView
+                    android:id="@+id/tfTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="읍면동"/>
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/tfChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginVertical="5dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="사람"/>
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/faceChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
