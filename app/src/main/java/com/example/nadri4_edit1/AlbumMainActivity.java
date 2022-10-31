@@ -76,6 +76,14 @@ public class AlbumMainActivity extends AppCompatActivity {
         ReqServer.reqGetAlbums(AlbumMainActivity.this, 1);
         ReqServer.reqGetHighlight(this);    //하이라이트 테스트
 
+        all_album.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent viewIntent = new Intent(getApplicationContext(), AllPhotoActivity.class);
+                startActivity(viewIntent);
+            }
+        });
+
         //뷰페이저(하이라이트) 이동 버튼
         highlight_album.setOnClickListener(new View.OnClickListener() {
             @Override

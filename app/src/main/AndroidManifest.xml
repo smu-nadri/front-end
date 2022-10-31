@@ -22,6 +22,9 @@
             android:name=".AlbumPageActivity"
             android:exported="true" />
         <activity
+            android:name=".AllPhotoActivity"
+            android:exported="true" />
+        <activity
             android:name=".CalendarMainActivity"
             android:exported="true"/>
         <activity

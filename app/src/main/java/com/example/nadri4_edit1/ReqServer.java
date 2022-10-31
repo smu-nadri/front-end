@@ -36,6 +36,9 @@ import java.util.ArrayList;
 public class ReqServer {
     public static String android_id;
 
+    //모든 사진
+    static ArrayList<JSONObject> allList = new ArrayList<>();
+
     //모두보기, 하이라이트 썸네일
     static String allAlbumThumb = null;
     static String highAlbumThumb = null;
@@ -72,6 +75,43 @@ public class ReqServer {
 
     public ReqServer(Context context) {
         c = context;
+    }
+
+    //앨범 리스트 불러오기
+    public static void reqGetAll(Context context){
+        String url = context.getString(R.string.testIpAddress) + "/album/all/" + android_id;
+        Log.d("GET", "reqGetAll Url: " + url);
+
+        final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.d("GET", "reqGetAlbums onResponse: " + response);
+                try {
+                    //앨범 리스트 초기화
+                    allList.clear();
+
+                    //각 앨범 정보를 배열리스트에 넣기
+                    JSONArray resArr = response.getJSONArray("all");
+                    for(int i = 0; i < resArr.length(); i++){
+                        allList.add(resArr.getJSONObject(i));
+                    }
+
+                    AllPhotoActivity.aAdapter.notifyDataSetChanged();
+                } catch (JSONException e) {
+                    Log.e("GET", "reqGetAll onResponse 에러: " + e);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("GET", "reqGetAll Response 에러: " + error);
+                Toast.makeText(context.getApplicationContext(), "응답 실패", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        requestQueue.add(jsonObjectRequest);
     }
 
     //앨범 리스트 불러오기

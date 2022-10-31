@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="68dp"
+        android:padding="15dp"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/stats_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginRight="10dp"
+            android:background="@color/colorBackground"
+            app:srcCompat="@drawable/chart_box"/>
+
+        <!--현재-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvCurrentYear"
+                android:layout_width="wrap_content"
+                android:layout_height="68dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="모두보기"
+                android:textSize="23dp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- TextView 사이에 넣어주므로써 간격을 넖혀 우측정렬이 될 수 있게 만든다 -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <ImageButton
+            android:id="@+id/a_search_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@color/colorBackground"
+            app:srcCompat="@drawable/magnify" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:background="@color/black" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="20dp"
+        android:orientation="vertical">
+
+        <GridView
+            android:id="@+id/gvAllPhoto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:horizontalSpacing="12dp"
+            android:numColumns="3"
+            android:verticalSpacing="12dp">
+        </GridView>
+
+    </LinearLayout>
+
+</LinearLayout>
