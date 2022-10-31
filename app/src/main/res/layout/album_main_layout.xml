@@ -16,8 +16,9 @@
             android:id="@+id/stats_button"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:layout_marginRight="10dp"
             android:background="@color/colorBackground"
-            app:srcCompat="@drawable/calendar"/>
+            app:srcCompat="@drawable/chart_box"/>
 
         <!--현재-->
         <LinearLayout
@@ -59,16 +60,6 @@
             android:layout_height="40dp"
             android:background="@color/colorBackground"
             app:srcCompat="@drawable/magnify" />
-        <View
-            android:layout_width="10dp"
-            android:layout_height="0dp"/>
-
-        <ImageButton
-            android:id="@+id/btnGetImage"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@color/colorBackground"
-            app:srcCompat="@drawable/imageplus"/>
 
     </LinearLayout>
 
@@ -102,11 +93,41 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:columnCount="3">
+                android:columnCount="3"
+                android:rowCount="1">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:id="@+id/create_album"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_columnWeight="1"
+                    android:layout_rowWeight="1"
+                    android:background="@drawable/round_square_background"
+                    android:orientation="vertical"
+                    android:layout_marginRight="12dp"
+                    android:paddingTop="8dp"
+                    android:paddingRight="8dp"
+                    android:paddingBottom="3dp"
+                    android:paddingLeft="8dp"
+                    android:gravity="center">
+                    <ImageView
+                        android:layout_width="1dp"
+                        android:layout_height="1dp"
+                        android:layout_gravity="top"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="30dp"
+                        android:text="+" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/all_alubm"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
                     android:background="@drawable/round_square_background"
                     android:orientation="vertical"
                     android:layout_marginRight="12dp"
@@ -116,7 +137,7 @@
                     android:paddingLeft="8dp">
 
                     <ImageView
-                        android:id="@+id/imageView2"
+                        android:id="@+id/all_img"
                         android:layout_width="100dp"
                         android:layout_height="110dp"
                         android:layout_gravity="top"
@@ -132,37 +153,10 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/thismonth_album"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/round_square_background"
-                    android:orientation="vertical"
-                    android:layout_marginRight="12dp"
-                    android:paddingTop="8dp"
-                    android:paddingRight="8dp"
-                    android:paddingBottom="3dp"
-                    android:paddingLeft="8dp">
-
-                    <ImageView
-                        android:id="@+id/imageView3"
-                        android:layout_width="100dp"
-                        android:layout_height="110dp"
-                        android:layout_gravity="top"
-                        android:background="@drawable/round_square_background"
-                        android:scaleType="centerCrop"
-                        app:srcCompat="@drawable/img4" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="이번달" />
-
-                </LinearLayout>
-
-                <LinearLayout
                     android:id="@+id/highlight_album"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
                     android:background="@drawable/round_square_background"
                     android:orientation="vertical"
                     android:paddingTop="8dp"
@@ -171,7 +165,7 @@
                     android:paddingLeft="8dp">
 
                     <ImageView
-                        android:id="@+id/imageView1"
+                        android:id="@+id/highlight_img"
                         android:layout_width="100dp"
                         android:layout_height="110dp"
                         android:layout_gravity="top"
