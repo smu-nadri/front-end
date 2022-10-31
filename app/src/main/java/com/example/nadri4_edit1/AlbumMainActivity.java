@@ -45,7 +45,7 @@ public class AlbumMainActivity extends AppCompatActivity {
     private static Context context;
 
     ImageView folder1, folder2, folder3;
-    ImageButton imgbtn_calendar, imgbtn_search_a, btnGetImage;
+    ImageButton imgbtn_calendar, imgbtn_search_a, btnGetImage, stats_button;
     GridLayout glNadriAlbum;
     static GridView  gvCustomAlbum;
     static GridView gvYearAlbum;
@@ -74,6 +74,7 @@ public class AlbumMainActivity extends AppCompatActivity {
         gvYearAlbum = (GridView) findViewById(R.id.gvYearAlbum);
         imgbtn_calendar = (ImageButton) findViewById(R.id.calendar_button); //캘린더로 이동하는 버튼
         imgbtn_search_a = (ImageButton) findViewById(R.id.a_search_button); //검색으로 이동하는 버튼
+        stats_button = (ImageButton) findViewById(R.id.stats_button);
         btnGetImage = (ImageButton) findViewById(R.id.btnGetImage);
         glNadriAlbum = (GridLayout) findViewById(R.id.glNadriAlbum);
         nadriAlbum = (LinearLayout) findViewById(R.id.nadriAlbum);
@@ -140,6 +141,14 @@ public class AlbumMainActivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), AlbumPageActivity.class);
                 intent.putExtra("customAlbum", true);
                 intent.putExtra("getImage", true);
+                startActivity(intent);
+            }
+        });
+
+        stats_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), StatsActivity.class);
                 startActivity(intent);
             }
         });
