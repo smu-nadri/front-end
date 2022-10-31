@@ -49,7 +49,7 @@ public class HighlightActivity extends AppCompatActivity {
     TextView photo_text;
 
     ImageButton btnGetImage, btnMenu;
-    TextView tvPageDate;
+    static TextView tvPageDate;
 
     //타이머!
     int currentPage = 0;
@@ -94,57 +94,9 @@ public class HighlightActivity extends AppCompatActivity {
         cIndicator.setViewPager(viewPager);
         cIndicator.createIndicators(num_pager, 0);
 
+        tvPageDate.setText(ReqServer.highlightTitle);
 
 
 
-
-    }
-    protected ArrayList<String> setPhotoList() {
-        ArrayList<String> itemList = new ArrayList<String>();
-        itemList.add("https://cdn.pixabay.com/photo/2019/12/26/10/44/horse-4720178_1280.jpg");
-        itemList.add("https://cdn.pixabay.com/photo/2020/11/04/15/29/coffee-beans-5712780_1280.jpg");
-        itemList.add("https://cdn.pixabay.com/photo/2020/11/10/01/34/pet-5728249_1280.jpg");
-        itemList.add("https://cdn.pixabay.com/photo/2020/12/21/19/05/window-5850628_1280.png");
-        itemList.add("https://cdn.pixabay.com/photo/2014/03/03/16/15/mosque-279015_1280.jpg");
-
-        /*ArrayList<String> itemList = new ArrayList<String>();
-        itemList.add(String.valueOf(R.drawable.renoir03));
-        itemList.add(String.valueOf(R.drawable.renoir07));
-        itemList.add(String.valueOf(R.drawable.renoir09));
-        itemList.add(String.valueOf(R.drawable.gomurea1));
-        itemList.add(String.valueOf(R.drawable.gomurea5));*/
-
-        /*ArrayList<String> itemList = new ArrayList<String>();
-        itemList.add(String.valueOf(Glide.with(this).load(this.getResources().getIdentifier("renoir03", "drawable", this.getPackageName()))));
-        itemList.add(String.valueOf(Glide.with(this).load(this.getResources().getIdentifier("renoir07", "drawable", this.getPackageName()))));
-        itemList.add(String.valueOf(Glide.with(this).load(this.getResources().getIdentifier("renoir09", "drawable", this.getPackageName()))));
-        itemList.add(String.valueOf(Glide.with(this).load(this.getResources().getIdentifier("renoir03", "drawable", this.getPackageName()))));
-        itemList.add(String.valueOf(Glide.with(this).load(this.getResources().getIdentifier("renoir09", "drawable", this.getPackageName()))));*/
-
-        /*String[] itemList = new String[5];
-        itemList[0] = "drawable://"+R.drawable.renoir03;
-        itemList[1] = "drawable://"+R.drawable.renoir07;
-        itemList[2] = "drawable://"+R.drawable.renoir09;
-        itemList[3] = "drawable://"+R.drawable.gomurea5;
-        itemList[4] = "drawable://"+R.drawable.gomurea1;*/
-
-        return itemList;
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private String dateFormat(Calendar calendar, int day){  //2022년 5월
-
-        //년월 포맷
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH)+1;
-
-        String date = year + "년  " + month + "월  " + day + "일 ";
-
-        return date;
-    }
-    //제목 설정
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void setView(int day){
-        tvPageDate.setText(dateFormat(CalendarUtil.selectedDate, day));
     }
 }

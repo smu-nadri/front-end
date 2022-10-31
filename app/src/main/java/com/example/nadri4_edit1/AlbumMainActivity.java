@@ -11,6 +11,7 @@ import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -25,7 +26,7 @@ public class AlbumMainActivity extends AppCompatActivity {
     private static Context context;
 
     ImageButton imgbtn_calendar, imgbtn_search_a, stats_button; //캘린더 버튼, 검색버튼, 차트버튼
-    ImageView highlight_img, all_img;   //하이라이트 이미지뷰, 모두보기 이미지뷰
+    static ImageView highlight_img, all_img;   //하이라이트 이미지뷰, 모두보기 이미지뷰
     GridLayout glNadriAlbum;    //나드리앨범 그리드레이아웃
     static GridView  gvCustomAlbum; //마이앨범 그리드뷰
     static GridView gvYearAlbum;    //달력앨범 그리드뷰
@@ -33,6 +34,8 @@ public class AlbumMainActivity extends AppCompatActivity {
 
     static AlbumGvAdapter cAdapter; //마이앨범 어댑터
     static AlbumGvAdapter yAdapter; //달력앨범 어댑터
+
+    static TextView highlight_tv;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -62,6 +65,8 @@ public class AlbumMainActivity extends AppCompatActivity {
         nadriAlbum = (LinearLayout) findViewById(R.id.nadriAlbum);
         customAlbum = (LinearLayout) findViewById(R.id.customAlbum);
         dateAlbum = (LinearLayout) findViewById(R.id.dateAlbum);
+
+        highlight_tv = (TextView) findViewById(R.id.highlight_tv);
 
         //사진 라운드 처리
         highlight_img.setClipToOutline(true);

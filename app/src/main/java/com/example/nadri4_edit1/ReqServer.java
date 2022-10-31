@@ -5,6 +5,7 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 import android.view.View;
@@ -34,6 +35,10 @@ import java.util.ArrayList;
 
 public class ReqServer {
     public static String android_id;
+
+    //모두보기, 하이라이트 썸네일
+    static String allAlbumThumb = null;
+    static String highAlbumThumb = null;
 
     //앨범 정보를 담는 리스트
     static ArrayList<JSONObject> dateAlbumList = new ArrayList<>();
@@ -87,7 +92,12 @@ public class ReqServer {
                     monthAlbumList.clear();
 
                     //각 앨범 정보를 배열리스트에 넣기
-                    JSONArray resArr = response.getJSONArray("dateAlbums");
+                    JSONArray resArr = response.getJSONArray("thumb");
+                    for(int i = 0; i < resArr.length(); i++){
+                        allAlbumThumb = resArr.getJSONObject(i).getString("uri");
+                    }
+
+                    resArr = response.getJSONArray("dateAlbums");
                     for(int i = 0; i < resArr.length(); i++){
                         dateAlbumList.add(resArr.getJSONObject(i).getJSONObject("_id"));
                     }
@@ -115,6 +125,7 @@ public class ReqServer {
                         AlbumMainActivity.cAdapter.notifyDataSetChanged();
                         AlbumMainActivity.yAdapter.notifyDataSetChanged();
                         AlbumMainActivity.setAlbumMainViewVisibility();
+                        AlbumMainActivity.all_img.setImageURI(Uri.parse(allAlbumThumb));
                     }
 
                 } catch (JSONException e) {
@@ -438,6 +449,9 @@ public class ReqServer {
                         }
                     }
                     if(!highlightList.isEmpty()){   //하이라이트가 있으면
+                        //AlbumMainActivity.highlight_tv.setText(highlightTitle);
+                        AlbumMainActivity.highlight_img.setImageURI(Uri.parse(highlightList.get(0).getString("uri")));
+
                         //알림 설정
                         Intent intent = new Intent(context, CalendarMainActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

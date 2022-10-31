@@ -142,8 +142,7 @@
                         android:layout_height="110dp"
                         android:layout_gravity="top"
                         android:background="@drawable/round_square_background"
-                        android:scaleType="centerCrop"
-                        app:srcCompat="@drawable/gomurea4" />
+                        android:scaleType="centerCrop"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -170,13 +169,13 @@
                         android:layout_height="110dp"
                         android:layout_gravity="top"
                         android:background="@drawable/round_square_background"
-                        android:scaleType="centerCrop"
-                        app:srcCompat="@drawable/renoir07" />
+                        android:scaleType="centerCrop"/>
 
                     <TextView
+                        android:id="@+id/highlight_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="\?" />
+                        android:text="\하이라이트" />
 
                 </LinearLayout>
 
