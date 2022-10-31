@@ -28,6 +28,9 @@
             android:name=".MonthAlbumActivity"
             android:exported="true"/>
         <activity
+            android:name=".StatsActivity"
+            android:exported="true"/>
+        <activity
             android:name=".SearchMainActivity"
             android:exported="true"/>
         <activity
