@@ -70,164 +70,170 @@
         android:layout_marginRight="15dp"
         android:background="@color/black"/>
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="15dp">
-
+        android:layout_height="match_parent">
         <LinearLayout
-            android:id="@+id/nadriAlbum"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="15dp">
 
-            <TextView
-                android:id="@+id/tv_nadri"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="나드리 앨범" />
-
-            <GridLayout
-                android:id="@+id/glNadriAlbum"
+            <LinearLayout
+                android:id="@+id/nadriAlbum"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:columnCount="3"
-                android:rowCount="1">
+                android:orientation="vertical">
 
-                <LinearLayout
-                    android:id="@+id/create_album"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_columnWeight="1"
-                    android:layout_rowWeight="1"
-                    android:background="@drawable/round_square_background"
-                    android:orientation="vertical"
-                    android:layout_marginRight="12dp"
-                    android:paddingTop="8dp"
-                    android:paddingRight="8dp"
-                    android:paddingBottom="3dp"
-                    android:paddingLeft="8dp"
-                    android:gravity="center">
-                    <ImageView
-                        android:layout_width="1dp"
-                        android:layout_height="1dp"
-                        android:layout_gravity="top"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="30dp"
-                        android:text="+" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/all_alubm"
-                    android:layout_width="0dp"
+                <TextView
+                    android:id="@+id/tv_nadri"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:background="@drawable/round_square_background"
-                    android:orientation="vertical"
-                    android:layout_marginRight="12dp"
-                    android:paddingTop="8dp"
-                    android:paddingRight="8dp"
-                    android:paddingBottom="3dp"
-                    android:paddingLeft="8dp">
+                    android:text="나드리 앨범" />
 
-                    <ImageView
-                        android:id="@+id/all_img"
-                        android:layout_width="100dp"
-                        android:layout_height="110dp"
-                        android:layout_gravity="top"
-                        android:background="@drawable/round_square_background"
-                        android:scaleType="centerCrop"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="모두보기" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/highlight_album"
-                    android:layout_width="0dp"
+                <GridLayout
+                    android:id="@+id/glNadriAlbum"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:background="@drawable/round_square_background"
-                    android:orientation="vertical"
-                    android:paddingTop="8dp"
-                    android:paddingRight="8dp"
-                    android:paddingBottom="3dp"
-                    android:paddingLeft="8dp">
+                    android:layout_marginTop="10dp"
+                    android:columnCount="3"
+                    android:rowCount="1">
 
-                    <ImageView
-                        android:id="@+id/highlight_img"
-                        android:layout_width="100dp"
-                        android:layout_height="110dp"
-                        android:layout_gravity="top"
-                        android:background="@drawable/round_square_background"
-                        android:scaleType="centerCrop"/>
-
-                    <TextView
-                        android:id="@+id/highlight_tv"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:id="@+id/create_album"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="\하이라이트" />
+                        android:layout_columnWeight="1"
+                        android:background="@drawable/round_square_background"
+                        android:orientation="vertical"
+                        android:layout_marginRight="12dp"
+                        android:paddingTop="8dp"
+                        android:paddingRight="8dp"
+                        android:paddingBottom="3dp"
+                        android:paddingLeft="8dp">
 
-                </LinearLayout>
+                        <TextView
+                            android:layout_width="100dp"
+                            android:layout_height="110dp"
+                            android:layout_gravity="top"
+                            android:gravity="center"
+                            android:background="@drawable/round_square_background"
+                            android:text="+"
+                            android:textSize="26dp"/>
 
-            </GridLayout>
-        </LinearLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="마이앨범 만들기" />
 
-        <!--마이앨범-->
-        <LinearLayout
-            android:id="@+id/customAlbum"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:orientation="vertical">
+                    </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="마이앨범" />
+                    <LinearLayout
+                        android:id="@+id/all_alubm"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:background="@drawable/round_square_background"
+                        android:orientation="vertical"
+                        android:layout_marginRight="12dp"
+                        android:paddingTop="8dp"
+                        android:paddingRight="8dp"
+                        android:paddingBottom="3dp"
+                        android:paddingLeft="8dp">
 
-            <GridView
-                android:id="@+id/gvCustomAlbum"
+                        <ImageView
+                            android:id="@+id/all_img"
+                            android:layout_width="100dp"
+                            android:layout_height="110dp"
+                            android:layout_gravity="top"
+                            android:background="@drawable/round_square_background"
+                            android:scaleType="centerCrop"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="모두보기" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/highlight_album"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:background="@drawable/round_square_background"
+                        android:orientation="vertical"
+                        android:paddingTop="8dp"
+                        android:paddingRight="8dp"
+                        android:paddingBottom="3dp"
+                        android:paddingLeft="8dp">
+
+                        <ImageView
+                            android:id="@+id/highlight_img"
+                            android:layout_width="100dp"
+                            android:layout_height="110dp"
+                            android:layout_gravity="top"
+                            android:background="@drawable/round_square_background"
+                            android:scaleType="centerCrop"/>
+
+                        <TextView
+                            android:id="@+id/highlight_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="\하이라이트" />
+
+                    </LinearLayout>
+
+                </GridLayout>
+            </LinearLayout>
+
+            <!--마이앨범-->
+            <LinearLayout
+                android:id="@+id/customAlbum"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:horizontalSpacing="12dp"
-                android:numColumns="3"
-                android:verticalSpacing="12dp"></GridView>
-        </LinearLayout>
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
 
-        <!--달력앨범-->
-        <LinearLayout
-            android:id="@+id/dateAlbum"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="마이앨범" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="달력앨범" />
+                <GridView
+                    android:id="@+id/gvCustomAlbum"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:horizontalSpacing="12dp"
+                    android:numColumns="3"
+                    android:verticalSpacing="12dp"></GridView>
+            </LinearLayout>
 
-            <GridView
-                android:id="@+id/gvYearAlbum"
+            <!--달력앨범-->
+            <LinearLayout
+                android:id="@+id/dateAlbum"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:horizontalSpacing="12dp"
-                android:numColumns="3"
-                android:verticalSpacing="12dp"></GridView>
-        </LinearLayout>
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
 
-    </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="달력앨범" />
+
+                <GridView
+                    android:id="@+id/gvYearAlbum"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:horizontalSpacing="12dp"
+                    android:numColumns="3"
+                    android:verticalSpacing="12dp"></GridView>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>
