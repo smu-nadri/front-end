@@ -64,9 +64,10 @@ public class InitApplication extends Application {
 
         printWorkRequest();
 
-        //deleteFile("facelist.tmp");
+
 
         try {
+            //deleteFile("facelist.tmp");
             FileInputStream fis = openFileInput("facelist.tmp");
             ObjectInputStream ois = new ObjectInputStream(fis);
             ArrayList<FaceRecognize.Recognition> loadFaces = (ArrayList<FaceRecognize.Recognition>) ois.readObject();
