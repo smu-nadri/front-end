@@ -100,13 +100,7 @@ public class StatsActivity extends AppCompatActivity {
         fDataSet = new BarDataSet(fList, "_face");
         fData = new BarData();
 
-        initChart(YEAR, yChart, yDataSet, yData, yList);
-        initChart(MONTH, mChart, mDataSet, mData, mList);
-        initChart(DAY, dChart, dDataSet, dData, dList);
-        initChart(TAG, tChart, tDataSet, tData, tList);
-        initChart(LOCALITY, lChart, lDataSet, lData, lList);
-        initChart(THOROUGHFARE, tfChart, tfDataSet, tfData, tfList);
-        initChart(FACE, fChart, fDataSet, fData, fList);
+
 
         mTextView = findViewById(R.id.mTextView);
         mTextView.setOnClickListener(new View.OnClickListener() {
@@ -165,7 +159,6 @@ public class StatsActivity extends AppCompatActivity {
 
                     tfList.clear();
                     JSONArray tf = thoroughfareCnt.get(tfIdx).getJSONArray("thoroughfares");
-                    Log.d("HWA", "tf길이 : " + tf.length());
                     for(int i = 0; i < tf.length(); i++){
                         JSONObject t = tf.getJSONObject(i);
                         tfList.add(new BarEntry(i, t.getInt("count")));
@@ -179,27 +172,7 @@ public class StatsActivity extends AppCompatActivity {
         });
 
         reqGetStats(this);
-
-        /*
-        tChart.getDescription().setEnabled(false);    //"Description Chart" 지우기
-        tChart.getLegend().setEnabled(false); //하단에 라벨 설명 지우기
-        tChart.setEntryLabelColor(Color.BLACK);   //라벨 색상
-
-        tDataSet = new PieDataSet(tagCnt, "test2");
-        tDataSet.setColors(ColorTemplate.LIBERTY_COLORS);
-        tDataSet.setValueTextColor(Color.BLACK);
-        tDataSet.setValueTextSize(16f);
-
-        tagData = new PieData(tDataSet);
-        tagData.setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                String sValue = (int)value + "개";
-                return sValue;
-            }
-        });
-
-        tChart.setData(tagData);*/
+        
     }
 
     synchronized void initChart(int code, BarChart bChart, BarDataSet bDataSet, BarData bData, ArrayList<BarEntry> bList){
@@ -215,6 +188,8 @@ public class StatsActivity extends AppCompatActivity {
                 return sValue;
             }
         });
+
+        bChart.setData(bData);
 
         XAxis xAxis = bChart.getXAxis();  //x축 가져오기
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);  //위치
@@ -296,7 +271,6 @@ public class StatsActivity extends AppCompatActivity {
                 public String getFormattedValue(float value) {
                     try {
                         if(thoroughfareCnt.size() != 0) {
-                            Log.d("HWA", "어휴 " + tfIdx);
                             String sValue = thoroughfareCnt.get(tfIdx).getJSONArray("thoroughfares").getJSONObject((int) value).getString("name");
                             return sValue;
                         }
@@ -348,8 +322,6 @@ public class StatsActivity extends AppCompatActivity {
         rAxis.setDrawLabels(false);
         rAxis.setDrawAxisLine(false);
         rAxis.setDrawGridLines(false);
-
-        bChart.setData(bData);
     }
 
     synchronized public void reqGetStats(Context context){
@@ -374,8 +346,7 @@ public class StatsActivity extends AppCompatActivity {
                         yearCnt.add(resArr.getJSONObject(i));
                         yList.add(new BarEntry(year, count));
                     }
-                    //업데이트 함수
-                    updateChart(yDataSet, yData, yChart);
+
 
                     resArr = response.getJSONArray("monthCnt");
                     for(int i = 0; i< resArr.length(); i++){
@@ -387,7 +358,7 @@ public class StatsActivity extends AppCompatActivity {
                         String k = String.valueOf(i);
                         mList.add(new BarEntry(i, m.getInt(k)));
                     }
-                    updateChart(mDataSet, mData, mChart);
+
 
                     resArr = response.getJSONArray("dayCnt");
                     for(int i = 0; i< resArr.length(); i++){
@@ -399,7 +370,7 @@ public class StatsActivity extends AppCompatActivity {
                         String k = String.valueOf(i);
                         dList.add(new BarEntry(i, d.getInt(k)));
                     }
-                    updateChart(dDataSet, dData, dChart);
+
 
                     resArr = response.getJSONArray("tagCnt");
                     for(int i = 0; i< resArr.length(); i++){
@@ -407,7 +378,7 @@ public class StatsActivity extends AppCompatActivity {
                         tagCnt.add(resArr.getJSONObject(i));
                         tList.add(new BarEntry(i, count));
                     }
-                    updateChart(tDataSet, tData, tChart);
+
 
                     resArr = response.getJSONArray("localityCnt");
                     for(int i = 0; i< resArr.length(); i++){
@@ -415,7 +386,7 @@ public class StatsActivity extends AppCompatActivity {
                         localityCnt.add(resArr.getJSONObject(i));
                         lList.add(new BarEntry(i, count));
                     }
-                    updateChart(lDataSet, lData, lChart);
+
 
                     resArr = response.getJSONArray("thoroughfareCnt");
                     for(int i = 0; i< resArr.length(); i++){
@@ -427,7 +398,7 @@ public class StatsActivity extends AppCompatActivity {
                         JSONObject t = tf.getJSONObject(i);
                         tfList.add(new BarEntry(i, t.getInt("count")));
                     }
-                    updateChart(tfDataSet, tfData, tfChart);
+
 
                     resArr = response.getJSONArray("faceCnt");
                     for(int i = 0; i< resArr.length(); i++){
@@ -435,7 +406,23 @@ public class StatsActivity extends AppCompatActivity {
                         faceCnt.add(resArr.getJSONObject(i));
                         fList.add(new BarEntry(i, count));
                     }
+
+                    //업데이트 함수
+                    updateChart(yDataSet, yData, yChart);
+                    updateChart(mDataSet, mData, mChart);
+                    updateChart(dDataSet, dData, dChart);
+                    updateChart(tDataSet, tData, tChart);
+                    updateChart(lDataSet, lData, lChart);
+                    updateChart(tfDataSet, tfData, tfChart);
                     updateChart(fDataSet, fData, fChart);
+
+                    initChart(YEAR, yChart, yDataSet, yData, yList);
+                    initChart(MONTH, mChart, mDataSet, mData, mList);
+                    initChart(DAY, dChart, dDataSet, dData, dList);
+                    initChart(TAG, tChart, tDataSet, tData, tList);
+                    initChart(LOCALITY, lChart, lDataSet, lData, lList);
+                    initChart(THOROUGHFARE, tfChart, tfDataSet, tfData, tfList);
+                    initChart(FACE, fChart, fDataSet, fData, fList);
 
                 } catch (JSONException e) {
                     Log.e("GET", "reqGetStats onResponse JSONException : " + e);
