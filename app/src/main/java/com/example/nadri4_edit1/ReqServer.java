@@ -130,6 +130,7 @@ public class ReqServer {
                     customAlbumList.clear();
                     yearAlbumList.clear();
                     monthAlbumList.clear();
+                    allAlbumThumb = null;
 
                     //각 앨범 정보를 배열리스트에 넣기
                     JSONArray resArr = response.getJSONArray("thumb");
@@ -165,7 +166,7 @@ public class ReqServer {
                         AlbumMainActivity.cAdapter.notifyDataSetChanged();
                         AlbumMainActivity.yAdapter.notifyDataSetChanged();
                         AlbumMainActivity.setAlbumMainViewVisibility();
-                        AlbumMainActivity.all_img.setImageURI(Uri.parse(allAlbumThumb));
+                        if(allAlbumThumb != null) AlbumMainActivity.all_img.setImageURI(Uri.parse(allAlbumThumb));
                     }
 
                 } catch (JSONException e) {
