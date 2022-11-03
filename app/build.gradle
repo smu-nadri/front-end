@@ -32,9 +32,9 @@ android {
 }
 
 dependencies {
-    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'   //차트 관련
     def work_version = "2.7.1"
-    implementation "androidx.work:work-runtime:$work_version"   //WorkManager
+    implementation "androidx.work:work-runtime:$work_version"   //WorkManager 알람?알림? 관련
     implementation 'org.tensorflow:tensorflow-lite:2.4.0'       //TF-lite
     implementation 'androidx.viewpager2:viewpager2:1.0.0-alpha04'//뷰페이저
     implementation 'me.relex:circleindicator:2.1.6'              //뷰페이저 슬라이딩시 이미지 위치 표시 효과
