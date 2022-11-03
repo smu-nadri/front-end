@@ -156,7 +156,26 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             }
         }*/
 
-        //날짜 클릭 이벤트
+        /*holder.itemView.setOnTouchListener(new OnSwipeTouchListener(holder.itemView.getContext()) {
+            @Override
+            public void onSwipeLeft() {
+                CalendarUtil.selectedDate.add(Calendar.MONTH, -1);   //-1
+                CalendarMainActivity.setMonthView();
+                CalendarMainActivity.adapter.notifyDataSetChanged();
+                Log.d("NOP", "좌");
+
+            }
+
+            @Override
+            public void onSwipeRight() {
+                CalendarUtil.selectedDate.add(Calendar.MONTH, +1);   //+1
+                CalendarMainActivity.setMonthView();
+                CalendarMainActivity.adapter.notifyDataSetChanged();
+                Log.d("NOP", "우");
+            }
+        });*/
+
+        //날 짜  클 릭  이 벤 트
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

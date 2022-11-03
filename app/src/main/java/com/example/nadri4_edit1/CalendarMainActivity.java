@@ -7,14 +7,26 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.DatePicker;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -22,18 +34,22 @@ import java.util.Date;
 
 
 public class CalendarMainActivity extends AppCompatActivity {
+
+    GestureDetector detector;   //제스쳐 감지
+
+    LinearLayout btnPicker;
     static TextView currentYear;
     static TextView currentMonth;   //년, 월 텍스트뷰
     TextView btnPrev, btnNext;
 
-    ImageButton imgbtn_album, imgbtn_search_c;
+    ImageButton imgbtn_album, imgbtn_search_c, stats_button;
 
     static RecyclerView recyclerView;
+    static CalendarAdapter adapter;
 
     public static Context context;
 
     //Calendar calendar;
-
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -46,6 +62,7 @@ public class CalendarMainActivity extends AppCompatActivity {
         context = this; //컨텍스트 지정
 
         //초기화
+        btnPicker = (LinearLayout) findViewById(R.id.picker_btn);
         currentYear = (TextView) findViewById(R.id.tvCurrentYear);
         currentMonth = (TextView) findViewById(R.id.tvCurrentMonth);
         btnPrev = (TextView) findViewById(R.id.tvPrev);
@@ -53,7 +70,9 @@ public class CalendarMainActivity extends AppCompatActivity {
 
         imgbtn_album = (ImageButton) findViewById(R.id.album_button);
         imgbtn_search_c = (ImageButton) findViewById(R.id.c_search_button);
+        stats_button = (ImageButton) findViewById(R.id.stats_button);
 
+        //linearLayout = (LinearLayout) findViewById(R.id.linearCalendar);
         recyclerView = (RecyclerView) findViewById(R.id.rvCalender);
 
 
@@ -94,6 +113,16 @@ public class CalendarMainActivity extends AppCompatActivity {
             }
         });
 
+        //피커다이얼로그! 레이아웃버튼이벤트 -> YearMonthPickerDialog 호출
+        btnPicker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                YearMonthPickerDialog picker = new YearMonthPickerDialog();
+                picker.setListener(dateSetListener);
+                picker.show(getSupportFragmentManager(), "YearMonthPickerTest");
+            }
+        });
+
         //이미지버튼(앨범버튼) 이벤트 -> 앨범뷰로 이동
         imgbtn_album.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,7 +141,27 @@ public class CalendarMainActivity extends AppCompatActivity {
             }
         });
 
+        //이미지버튼(차트버튼) 이벤트 -> 차트뷰로 이동
+        stats_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), StatsActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        //처음 화면 셋팅
+        setMonthView();
+
     }   //onCreate()
+
+
+    DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
+        @Override
+        public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
+            Log.d("PICKER", "year = " + year + ", month = " + monthOfYear + ", day = " + dayOfMonth);
+        }
+    };
 
     @Override
     protected void onRestart() {
@@ -174,7 +223,7 @@ public class CalendarMainActivity extends AppCompatActivity {
         ArrayList<Date> dateList = daysInMonthArray();
 
         //어댑터 데이터 적용
-        CalendarAdapter adapter = new CalendarAdapter(dateList, context);
+        adapter = new CalendarAdapter(dateList, context);
 
         //레이아웃 설정(열 = 7)
         RecyclerView.LayoutManager manager = new GridLayoutManager(context, 7);
