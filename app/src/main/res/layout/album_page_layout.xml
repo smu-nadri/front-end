@@ -31,14 +31,6 @@
             android:layout_weight="1"/>
 
         <ImageButton
-            android:id="@+id/btnRemove"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:background="@color/colorBackground"
-            app:srcCompat="@drawable/trash_can"/>
-
-        <ImageButton
             android:id="@+id/btnGetImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -47,12 +39,46 @@
             app:srcCompat="@drawable/imageplus"/>
 
         <ImageButton
+            android:id="@+id/btnMarked"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:background="@color/colorBackground"
+            app:srcCompat="@drawable/checkbox_multiple_marked"/>
+
+        <ImageButton
+            android:id="@+id/btnBlank"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:background="@color/colorBackground"
+            app:srcCompat="@drawable/checkbox_multiple_blank"/>
+
+        <ImageButton
+            android:id="@+id/btnRemove"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:background="@color/colorBackground"
+            app:srcCompat="@drawable/trash_can"/>
+
+        <ImageButton
             android:id="@+id/btnSave"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="5dp"
             android:background="@color/colorBackground"
             app:srcCompat="@drawable/save"/>
+
+        <ImageButton
+            android:id="@+id/btnEdit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="5dp"
+            android:background="@color/colorBackground"
+            app:srcCompat="@drawable/pencil"/>
+
     </LinearLayout>
 
     <View
