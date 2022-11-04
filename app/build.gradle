@@ -53,4 +53,19 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+
+    // AWS Rekognition Face Recognition - Rekognition
+    implementation 'com.amazonaws:aws-android-sdk-rekognition:2.55.0'
+
+    // AWS S3 Bucket Storage - to save images and process recognition works.
+    // Also, it contains IAM. (Since user has to be authorised to access AWS.
+    implementation 'com.amazonaws:aws-android-sdk-s3:2.55.0'
+    implementation 'com.amazonaws:aws-android-sdk-mobile-client:2.13.5'
+    implementation 'com.amazonaws:aws-android-sdk-cognito:2.13.5'
+
+    // ObjectMapper - to print out parsed JSON in beautiful String.
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
+
+    // MLKit Face Detection - to crop face part of the image when available.
+    implementation 'com.google.mlkit:face-detection:16.1.5'
 }

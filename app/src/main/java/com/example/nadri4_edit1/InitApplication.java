@@ -22,12 +22,16 @@ import androidx.work.WorkQuery;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -42,6 +46,10 @@ public class InitApplication extends Application {
     public static final String DAILY_NOTIFICATION_CHANNEL_ID = "daily_channel_id";
     public static final String DAILY_NOTIFICATION_TAG = "daily_tag";
 
+    public static Map<String, String> faceMap = new HashMap<String, String>();
+
+    FileOutputStream fos;
+    private final String localFaceList = "LocalListofFace.tmp";
 
     @Override
     public void onCreate() {
@@ -58,9 +66,9 @@ public class InitApplication extends Application {
         createNotificationChannel(DAILY_NOTIFICATION_CHANNEL_ID, daily_name, daily_description);
         //deleteNotificationChannel(HIGHLIGHT_NOTIFICATION_CHANNEL_ID);
 
+        //deleteWorkRequest();
         createHighlightWorkRequest();
         createDailyWorkRequest();
-        //deleteWorkRequest();
 
         printWorkRequest();
 
@@ -78,10 +86,9 @@ public class InitApplication extends Application {
             int nextId = FaceRecognitionAPI.getRegistered().get(lastIdx).getId() + 1;
             FaceRecognitionAPI.setFaceId(nextId);
 
-        } catch (FileNotFoundException e){
+        } catch (FileNotFoundException | ArrayIndexOutOfBoundsException e){
             FaceRecognitionAPI.setFaceId(0);
-        }
-        catch (IOException | ClassNotFoundException e){
+        } catch (IOException | ClassNotFoundException e){
             Log.e("InitApplication", String.valueOf(e));
         }
     }
@@ -110,7 +117,7 @@ public class InitApplication extends Application {
         long delay = calculateDelay(HIGHLIGHT);
         //요청 만들기
         //하루 간격으로 마지막 15분 안에 실행, 딜레이는 처음에만 적용됨
-        PeriodicWorkRequest highlightWorkRequest = new PeriodicWorkRequest.Builder(HighlightWorker.class, 24, TimeUnit.HOURS,1, TimeUnit.HOURS)
+        PeriodicWorkRequest highlightWorkRequest = new PeriodicWorkRequest.Builder(HighlightWorker.class, 24, TimeUnit.HOURS)
                 .setInitialDelay(delay, TimeUnit.SECONDS)
                 .build();
 
@@ -123,7 +130,7 @@ public class InitApplication extends Application {
     private void createDailyWorkRequest(){
         long delay = calculateDelay(DAILY);
         //요청 만들기
-        PeriodicWorkRequest dailyWorkRequest = new PeriodicWorkRequest.Builder(DailyAlertsWorker.class, 24, TimeUnit.HOURS,1, TimeUnit.HOURS)
+        PeriodicWorkRequest dailyWorkRequest = new PeriodicWorkRequest.Builder(DailyAlertsWorker.class, 24, TimeUnit.HOURS)
                 .setInitialDelay(delay, TimeUnit.SECONDS)
                 .build();
 
@@ -175,6 +182,32 @@ public class InitApplication extends Application {
         }
         Log.d("HWA", "delay : " + delay);
         return delay;
+    }
+
+    void openFaceList(){
+        // To use local list of faces, the file saved in the local storage should be opened first.
+        try {
+            // Check if file exists.
+            File checkIfSaved = this.getFileStreamPath(localFaceList);
+            if(checkIfSaved == null || !checkIfSaved.exists()) {
+                fos = openFileOutput(localFaceList, Context.MODE_PRIVATE);
+                ObjectOutputStream oos = new ObjectOutputStream(fos);
+                oos.writeObject(faceMap);
+                oos.close();
+            }
+            FileInputStream alreadySaved = openFileInput(localFaceList);
+            ObjectInputStream openList = new ObjectInputStream(alreadySaved);
+            faceMap = (Map<String, String>) openList.readObject();
+            openList.close();
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Log.e("InitApplication", "File is not found." + e);
+        }
+        catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            Log.e("InitApplication", "Mola..." + e);
+        }
     }
 
 }

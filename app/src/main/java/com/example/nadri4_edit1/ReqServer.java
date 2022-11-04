@@ -52,7 +52,9 @@ public class ReqServer {
     //사진 정보를 담는 리스트
     static ArrayList<JSONObject> photoList = new ArrayList<>();
     static ArrayList<JSONObject> deletedList = new ArrayList<>();
-    static ArrayList<JSONObject> initFaceList = new ArrayList<>();
+
+    static
+    JSONObject updateFace = new JSONObject();
 
     //태그 정보를 담는 리스트
     static ArrayList<JSONObject> tagList = new ArrayList<JSONObject>();
@@ -169,7 +171,7 @@ public class ReqServer {
                         if(allAlbumThumb != null) AlbumMainActivity.all_img.setImageURI(Uri.parse(allAlbumThumb));
                     }
 
-                } catch (JSONException e) {
+                } catch (JSONException | SecurityException e) {
                     Log.e("GET", "reqGetAlbums onResponse 에러: " + e);
                 }
             }
@@ -188,7 +190,12 @@ public class ReqServer {
     //페이지 정보 요청하기
     public static void reqGetPages(Context context){
         //android_id 가져와서 ip 주소랑 합치기
-        String url = context.getString(R.string.testIpAddress) + "/album/"  + stitle + "/" + android_id;
+        String url = null;
+        try {
+            url = context.getString(R.string.testIpAddress) + "/album/"  + album.getString("title") + "/" + album.getString("type") + "/" + android_id;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         Log.d("GET", "reqGetPages Url: " + url);
 
         //요청 만들기
@@ -229,7 +236,7 @@ public class ReqServer {
     //작성한 페이지 보내기
     @SuppressLint("RestrictedApi")
     public static void reqPostPages(Context context){
-        String url = context.getString(R.string.testIpAddress) + "/album/" + stitle  + "/" + android_id;
+        String url = context.getString(R.string.testIpAddress) + "/album/" + android_id;
         Log.d("POST", "reqPostPages Url: " + url);
 
         //서버로 보낼 Json
@@ -246,13 +253,6 @@ public class ReqServer {
                 reqDeleteArr.put(deletedList.get(i));
             }
             reqJson.put("deletedList", reqDeleteArr);
-
-            //얼굴 리스트 reqJson에 넣기
-            JSONArray reqFaceArr = new JSONArray();
-            for(int i = 0; i < initFaceList.size(); i++) {
-                reqFaceArr.put(initFaceList.get(i));
-            }
-            reqJson.put("initFaceList", reqFaceArr);
 
             //추가 및 수정할 사진 정보를 담은 photoJson 만들고 리스트 reqJsonArr에 넣기
             for(int i = 0; i < photoList.size(); i++){
@@ -312,10 +312,9 @@ public class ReqServer {
                     //기존의 데이터 지우기
                     photoList.clear();
                     deletedList.clear();
-                    initFaceList.clear();
 
                     for(int i = 0; i < resJsonArr.length(); i++){
-                        photoList.add(resJsonArr.getJSONObject(i));
+                        photoList.add(resJsonArr.getJSONObject(i).put("isChecked", false)); //선택여부 설정 후 저장결과 리스트에 추가
                     }
 
                     Log.d("POST", "reqPostPages onResponse 응답: " + photoList);
@@ -511,7 +510,7 @@ public class ReqServer {
                         //포그라운드일 때
                         AlbumMainActivity.highlight_album.setVisibility(View.VISIBLE);
                     }
-                } catch (JSONException e) {
+                } catch (JSONException | SecurityException e) {
                     e.printStackTrace();
                 }
             }
@@ -525,5 +524,50 @@ public class ReqServer {
         //큐에 넣어 서버로 응답 전송
         RequestQueue requestQueue = Volley.newRequestQueue(context);
         requestQueue.add(jsonArrayRequest);
+    }
+
+    //작성한 페이지 보내기
+    @SuppressLint("RestrictedApi")
+    public static void reqUpdateFace(Context context){
+        String url = context.getString(R.string.testIpAddress) + "/album/face/" + android_id;
+        Log.d("POST", "reqPostPages Url: " + url);
+
+        //서버로 보낼 Json
+        JSONObject reqJson = new JSONObject();
+
+        try{
+            reqJson.put("face", updateFace);
+
+        } catch (Exception e) {
+            Log.e("POST", "reqPostPages Set reqJson 에러: " + e);
+            Toast.makeText(context.getApplicationContext(), "전송 실패", Toast.LENGTH_SHORT).show();
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, reqJson, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+                try {
+                    JSONArray resJsonArr = response.getJSONArray("resJson");
+                    //기존의 데이터 지우기
+                    updateFace.remove("face");
+
+                    Toast.makeText(context.getApplicationContext(), "전송 성공!", Toast.LENGTH_SHORT).show();
+
+                    ReqServer.reqGetPages(context.getApplicationContext());
+                } catch (JSONException e) {
+                    Log.e("POST", "POST onResponse JSONException :" + e);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("POST", "reqPostPages Response 에러: " + error);
+                Toast.makeText(context.getApplicationContext(), "전송 실패", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        requestQueue.add(jsonObjectRequest);
     }
 }

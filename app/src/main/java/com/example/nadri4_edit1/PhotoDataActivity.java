@@ -1,5 +1,8 @@
 package com.example.nadri4_edit1;
 
+import static com.example.nadri4_edit1.InitApplication.faceMap;
+
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -28,7 +31,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -47,6 +53,8 @@ public class PhotoDataActivity extends AppCompatActivity {
 
     ImageButton btnGetImage, btnSave;
     TextView tvPageDate;
+
+    private final String localFaceList = "LocalListofFace.tmp";
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -139,7 +147,7 @@ public class PhotoDataActivity extends AppCompatActivity {
 
                 for(int i = 0; i < faces.length(); i++){
                     JSONObject face = faces.getJSONObject(i);
-                    String label = face.getString("label");
+                    String name = face.getString("name");
                     final int idx = i;
                     String finalUri = uri;
 
@@ -150,123 +158,59 @@ public class PhotoDataActivity extends AppCompatActivity {
                     tv.setTextColor(Color.WHITE);
                     tv.setLayoutParams(params);
 
-                    try{    //이름이 초기화 되지않았을 때
-                        Integer unknown = Integer.parseInt(label);
-                        tv.setText("?");
-                        tv.setOnClickListener(new View.OnClickListener() {
-                            @RequiresApi(api = Build.VERSION_CODES.P)
-                            @Override
-                            public void onClick(View view) {    //이름태그를 클릭하면
-                                View dialogView = (View) View.inflate(PhotoDataActivity.this, R.layout.face_edit_dialog, null);
-                                AlertDialog.Builder dlg = new AlertDialog.Builder(PhotoDataActivity.this);
-                                ImageView faceImg = (ImageView) dialogView.findViewById(R.id.faceImg);
-                                EditText faceName = (EditText) dialogView.findViewById(R.id.faceName);
+                    tv.setText(name);
+                    tv.setOnClickListener(new View.OnClickListener() {
+                        @RequiresApi(api = Build.VERSION_CODES.P)
+                        @Override
+                        public void onClick(View view) {    //이름태그를 클릭하면
+                            View dialogView = (View) View.inflate(PhotoDataActivity.this, R.layout.face_edit_dialog, null);
+                            AlertDialog.Builder dlg = new AlertDialog.Builder(PhotoDataActivity.this);
+                            ImageView faceImg = (ImageView) dialogView.findViewById(R.id.faceImg);
+                            EditText faceName = (EditText) dialogView.findViewById(R.id.faceName);
 
-                                try {   //얼굴사진 잘라서 셋팅
-                                    Bitmap cropImg = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getContentResolver(), Uri.parse(finalUri)));
-                                    Rect faceBox = new Rect(face.getInt("left"), face.getInt("top"), face.getInt("right"), face.getInt("bottom"));
-                                    cropImg = Bitmap.createBitmap(cropImg, faceBox.left, faceBox.top, faceBox.width(), faceBox.height());
-                                    faceImg.setImageBitmap(cropImg);
-                                } catch (JSONException | IOException e) {
-                                    Log.e("HWA", "어라?" + e);
-                                }
-
-                                //대화상자 설정
-                                dlg.setTitle("이름 설정");
-                                dlg.setView(dialogView);
-                                dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() { //확인 버튼 누르면
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        try {
-                                            //이름 변경
-                                            String name = faceName.getText().toString();
-                                            face.put("label", name);
-                                            tv.setText(name);
-
-                                            //registered 업데이트
-                                            ArrayList<FaceRecognize.Recognition> registered = FaceRecognitionAPI.getRegistered();
-                                            for(int j = 0; j < registered.size(); j++){
-                                                if(registered.get(j).getLabel().equals(label)){
-                                                    registered.get(j).setLabel(name);
-                                                }
-                                            }
-
-                                            //현재 앨범에 동일한 얼굴이 있으면 업데이트
-                                            for(int j = 0; j < ReqServer.photoList.size(); j++){
-                                                if(ReqServer.photoList.get(j).has("faces")){
-                                                    JSONArray tmp = ReqServer.photoList.get(j).getJSONArray("faces");
-                                                    for(int k = 0; k < tmp.length(); k++){
-                                                        if(tmp.getJSONObject(k).getString("label").equals(label)){
-                                                            tmp.getJSONObject(k).put("label", name);
-                                                        }
-                                                    }
-                                                }
-                                            }
-
-                                            //다른 사진들도 변경하기 위해 서버로 변경할 이름 전송 (8, 이름)
-                                            ReqServer.initFaceList.add(new JSONObject().put(label, name));
-
-                                            //어댑터 업데이트!
-                                            AlbumPageActivity.adapter.notifyDataSetChanged();
-                                        } catch (JSONException e) {
-                                            Log.d("HWA", "아악 " + idx);
-                                        }
-                                    }
-                                });
-                                dlg.setNegativeButton("취소", null);
-                                dlg.show();
+                            try {   //얼굴사진 잘라서 셋팅
+                                Bitmap cropImg = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getContentResolver(), Uri.parse(finalUri)));
+                                cropImg = Bitmap.createBitmap(cropImg, face.getInt("left"), face.getInt("top"), face.getInt("width"), face.getInt("height"));
+                                faceImg.setImageBitmap(cropImg);
+                            } catch (JSONException | IOException e) {
+                                Log.e("HWA", "어라?" + e);
                             }
-                        });
-                    } catch (NumberFormatException e){  //이름이 초기화되어있을 때
-                        tv.setText(label);
-                        tv.setOnClickListener(new View.OnClickListener() {
-                            @RequiresApi(api = Build.VERSION_CODES.P)
-                            @Override
-                            public void onClick(View view) {    //이름태그를 클릭하면
-                                View dialogView = (View) View.inflate(PhotoDataActivity.this, R.layout.face_edit_dialog, null);
-                                AlertDialog.Builder dlg = new AlertDialog.Builder(PhotoDataActivity.this);
-                                ImageView faceImg = (ImageView) dialogView.findViewById(R.id.faceImg);
-                                EditText faceName = (EditText) dialogView.findViewById(R.id.faceName);
 
-                                try {   //얼굴사진 잘라서 셋팅
-                                    Bitmap cropImg = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getContentResolver(), Uri.parse(finalUri)));
-                                    Rect faceBox = new Rect(face.getInt("left"), face.getInt("top"),  face.getInt("right"), face.getInt("bottom"));
-                                    cropImg = Bitmap.createBitmap(cropImg, faceBox.left, faceBox.top, faceBox.width(), faceBox.height());
-                                    faceImg.setImageBitmap(cropImg);
-                                } catch (JSONException | IOException e) {
-                                    Log.e("HWA", "어라?" + e);
-                                }
+                            //대화상자 설정
+                            dlg.setTitle("이름 설정");
+                            dlg.setView(dialogView);
+                            dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() { //확인 버튼 누르면
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    try {
+                                        //이름 변경
+                                        String name = faceName.getText().toString();
+                                        face.put("name", name);
+                                        tv.setText(name);
 
-                                //대화상자 설정
-                                dlg.setTitle("이름 설정");
-                                dlg.setView(dialogView);
-                                dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() { //확인 버튼 누르면
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        try {
-                                            //이름 변경
-                                            String name = faceName.getText().toString();
-                                            face.put("label", name);
-                                            tv.setText(name);
+                                        String faceId = faces.getJSONObject(idx).getString("faceId");
 
-                                            //어댑터 업데이트!
-                                            AlbumPageActivity.adapter.notifyDataSetChanged();
-                                        } catch (JSONException e) {
-                                            Log.d("HWA", "아악 " + e);
-                                        }
+                                        enrollMap(faceId, name);
+
+                                        //다른 사진들도 변경하기 위해 서버로 변경할 이름 전송 (8, 이름)
+                                        ReqServer.updateFace = face;
+                                        ReqServer.reqUpdateFace(getApplicationContext());
+                                    } catch (JSONException e) {
+                                        Log.e("HWA", "아악 " + idx + " " + e);
                                     }
-                                });
-                                dlg.setNegativeButton("취소", null);
-                                dlg.show();
-                            }
-                        });
-                    }
+                                }
+                            });
+                            dlg.setNegativeButton("취소", null);
+                            dlg.show();
+                        }
+                    });
+
                     //화면에 이름태그 추가
                     photoLayout.addView(tv);
                 }
             }
         } catch (JSONException e) {
-            Log.e("검사 ", title + ", " + e);
+            Log.e("검사 ", title + ", " + e.toString());
         }
 
 
@@ -313,5 +257,28 @@ public class PhotoDataActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void setView(int day){
         tvPageDate.setText(dateFormat(CalendarUtil.selectedDate, day));
+    }
+
+    void enrollMap(String uploadDate, String namePerson){
+        // This app has list saved in local storage so every picture should be saved
+        // with key (uploadDate, and it will be the file's name)
+        // and name (namePerson).
+        faceMap.put(uploadDate, namePerson);
+        Log.d("FACEMAP", uploadDate +" "+ namePerson);
+        try {
+            FileOutputStream fos = openFileOutput(localFaceList, Context.MODE_PRIVATE);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(faceMap);
+            oos.close();
+
+        } catch (FileNotFoundException e) {
+            Log.e("HWA", e.toString());
+        } catch (IOException e) {
+            Log.e("HWA", e.toString());
+        }
+        for (String key: faceMap.keySet()) {
+            Log.d("FORMOON", key + " " + faceMap.get(key));
+
+        }
     }
 }

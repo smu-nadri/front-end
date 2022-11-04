@@ -2,6 +2,8 @@ package com.example.nadri4_edit1;
 
 import static androidx.exifinterface.media.ExifInterface.TAG_DATETIME;
 
+import static com.example.nadri4_edit1.InitApplication.faceMap;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ClipData;
@@ -18,6 +20,8 @@ import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.StrictMode;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -39,6 +43,36 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferNetworkLossHandler;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.rekognition.AmazonRekognition;
+import com.amazonaws.services.rekognition.AmazonRekognitionClient;
+import com.amazonaws.services.rekognition.model.CreateCollectionRequest;
+import com.amazonaws.services.rekognition.model.CreateCollectionResult;
+import com.amazonaws.services.rekognition.model.DeleteCollectionRequest;
+import com.amazonaws.services.rekognition.model.DeleteCollectionResult;
+import com.amazonaws.services.rekognition.model.DeleteFacesRequest;
+import com.amazonaws.services.rekognition.model.DeleteFacesResult;
+import com.amazonaws.services.rekognition.model.FaceMatch;
+import com.amazonaws.services.rekognition.model.FaceRecord;
+import com.amazonaws.services.rekognition.model.Image;
+import com.amazonaws.services.rekognition.model.IndexFacesRequest;
+import com.amazonaws.services.rekognition.model.IndexFacesResult;
+import com.amazonaws.services.rekognition.model.ListCollectionsRequest;
+import com.amazonaws.services.rekognition.model.ListCollectionsResult;
+import com.amazonaws.services.rekognition.model.QualityFilter;
+import com.amazonaws.services.rekognition.model.S3Object;
+import com.amazonaws.services.rekognition.model.SearchFacesByImageRequest;
+import com.amazonaws.services.rekognition.model.SearchFacesByImageResult;
+import com.amazonaws.services.rekognition.model.UnindexedFace;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.mlkit.vision.common.InputImage;
@@ -55,14 +89,21 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AlbumPageActivity extends AppCompatActivity {
 
@@ -70,7 +111,7 @@ public class AlbumPageActivity extends AppCompatActivity {
     static MultiImageAdapter adapter;
     ItemTouchHelper helper;
 
-    ImageButton btnGetImage, btnSave, btnRemove;
+    ImageButton btnGetImage, btnSave, btnRemove, btnEdit, btnMarked, btnBlank;
     TextView tvPageDate;
 
     ImageView photo_big;
@@ -83,6 +124,25 @@ public class AlbumPageActivity extends AppCompatActivity {
     FaceDetectorOptions faceDetectorOptions;
     FaceDetector detector;
     FaceRecognize recognizer;
+
+    String access_id = "AKIASLE2NOY6FVICSDHF";
+    String access_pw = "G5M6/OqSYVX4xp8agkl6gCETMrWrchbr1vSSn3CT";
+    AmazonRekognition rekognition = new AmazonRekognitionClient(new BasicAWSCredentials(access_id, access_pw));
+
+    private static final int REQUEST_CODE = 0;
+    private static final int JUST_UPLOAD = 1;
+    private static final int TO_SEARCH = 2;
+
+    Uri uri;
+    String namePerson;
+
+    private static final String collectionId = "ndr";
+    private static final String bucket = "capnadeuri";
+    Bitmap bitmap;
+
+    FileOutputStream fos;
+    private final String localFaceList = "LocalListofFace.tmp";
+
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -110,38 +170,45 @@ public class AlbumPageActivity extends AppCompatActivity {
 
         //화면 설정
         String title;   //제목 설정
-        if (iDay == -1){    //마이앨범이거나 월별앨범일 경우
-            if(getDateIntent.getBooleanExtra("customAlbum", false)){    //마이앨범
-                title = getDateIntent.getStringExtra("title");
-                ReqServer.stitle = title;
-                tvPageDate.setText(title);
-                tvPageDate.setEnabled(true);
-                if(getDateIntent.getBooleanExtra("getImage", false)){   //마이앨범 생성으로 넘어온 경우
-                    Intent intent = new Intent();
-                    intent.setType("image/*");
-                    intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                    intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-                    startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
+        try {
+            if (iDay == -1){    //마이앨범이거나 월별앨범일 경우
+                if(getDateIntent.getBooleanExtra("customAlbum", false)){    //마이앨범
+                    title = getDateIntent.getStringExtra("title");
+                    ReqServer.album.put("title", title);
+                    ReqServer.album.put("type", "customAlbum");
+                    tvPageDate.setText(title);
+                    tvPageDate.setEnabled(true);
+                    if(getDateIntent.getBooleanExtra("getImage", false)){   //마이앨범 생성으로 넘어온 경우
+                        Intent intent = new Intent();
+                        intent.setType("image/*");
+                        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                        intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+                        startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
+                    }
+                }
+                else {  //월별 앨범
+                    title = getDateIntent.getStringExtra("title");
+                    ReqServer.album.put("title", title);
+                    ReqServer.album.put("type", "dateAlbum");
+
+                    String[] split_title = title.split("-");
+                    tvPageDate.setText(split_title[0]+"년 "+split_title[1]+"월");
+                    tvPageDate.setEnabled(false);
                 }
             }
-            else {  //월별 앨범
-                title = getDateIntent.getStringExtra("title");
-                ReqServer.stitle = title;
+            else {  //캘린더에서 날짜를 선택한 경우
+                setView(iDay);
+                String tMonth, tDay;
+                if(CalendarUtil.selectedDate.get(Calendar.MONTH) + 1 < 10) tMonth = "0" + (CalendarUtil.selectedDate.get(Calendar.MONTH) + 1);
+                else tMonth = String.valueOf(CalendarUtil.selectedDate.get(Calendar.MONTH) + 1);
+                if(iDay < 10) tDay = "0" + iDay;
+                else tDay = String.valueOf(iDay);
 
-                String[] split_title = title.split("-");
-                tvPageDate.setText(split_title[0]+"년 "+split_title[1]+"월");
-                tvPageDate.setEnabled(false);
+                ReqServer.album.put("title", CalendarUtil.selectedDate.get(Calendar.YEAR) + "-" + tMonth + "-" + tDay);
+                ReqServer.album.put("type", "dateAlbum");
             }
-        }
-        else {  //캘린더에서 날짜를 선택한 경우
-            setView(iDay);
-            String tMonth, tDay;
-            if(CalendarUtil.selectedDate.get(Calendar.MONTH) + 1 < 10) tMonth = "0" + (CalendarUtil.selectedDate.get(Calendar.MONTH) + 1);
-            else tMonth = String.valueOf(CalendarUtil.selectedDate.get(Calendar.MONTH) + 1);
-            if(iDay < 10) tDay = "0" + iDay;
-            else tDay = String.valueOf(iDay);
-
-            ReqServer.stitle = CalendarUtil.selectedDate.get(Calendar.YEAR) + "-" + tMonth + "-" + tDay;
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
         //레이아웃 설정(열 = 2)
@@ -177,29 +244,27 @@ public class AlbumPageActivity extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(tvPageDate.getText().toString().isEmpty()){
+                if(adapter.getmData().size() == 0){
+                    Toast.makeText(getApplicationContext(), "사진을 선택해주세요.", Toast.LENGTH_SHORT).show();
+                }
+                else if(tvPageDate.getText().toString().isEmpty()){
                     Toast.makeText(getApplicationContext(), "제목을 입력해주세요.", Toast.LENGTH_SHORT).show();
                 }
                 else {
                     try {
                         if(getDateIntent.getBooleanExtra("customAlbum", false)) {
-                            ReqServer.stitle = tvPageDate.getText().toString();
                             ReqServer.album.put("title", tvPageDate.getText().toString());
                             ReqServer.album.put("type", "customAlbum");
                         }
                         ReqServer.reqPostPages(AlbumPageActivity.this);
-
-                        FileOutputStream fos = openFileOutput("facelist.tmp", Context.MODE_PRIVATE);
-                        ObjectOutputStream oos = new ObjectOutputStream(fos);
-                        oos.writeObject(FaceRecognitionAPI.getRegistered());
-                        oos.close();
-                    } catch (JSONException | IOException e) {
+                    } catch (JSONException e) {
                         Log.e("AlbumPageActivity", "btnSave JSONException: " + e);
                     }
                 }
             }
         });
 
+        //삭제 버튼
         btnRemove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -229,18 +294,15 @@ public class AlbumPageActivity extends AppCompatActivity {
                 .build();
         labeler = ImageLabeling.getClient(imageLabelerOptions);
 
-        faceDetectorOptions = new FaceDetectorOptions.Builder()
-                .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_ACCURATE)
-                .setContourMode(FaceDetectorOptions.LANDMARK_MODE_ALL)
-                .enableTracking()
-                .build();
-        detector = FaceDetection.getClient(faceDetectorOptions);
-        try {
-            //인식모델 만들기
-            recognizer = FaceRecognitionAPI.create(getAssets(), "mobile_face_net.tflite", 112);
-        } catch (IOException e) {
-            Log.e("AlbumPage", "Create recognizer error : " + e);
-        }
+
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        rekognition.setRegion(Region.getRegion(Regions.AP_NORTHEAST_2));
+        listCollections();
+        //deleteCollection(); //컬렉션 삭제
+        //deleteFile(localFaceList);  //MAP 저장한 거 삭제
     }
 
     //페이지 화면을 나갈 때 데이터 비워주기
@@ -291,7 +353,6 @@ public class AlbumPageActivity extends AppCompatActivity {
 
         }//이미지 선택함
     }
-
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private String dateFormat(Calendar calendar, int day){  //2022년 5월
@@ -415,79 +476,55 @@ public class AlbumPageActivity extends AppCompatActivity {
     protected void setUriFaces(JSONObject imageInfo, Uri imageUri){
         JSONArray facesIndex = new JSONArray();   //사진 한 장의 얼굴들
         try {
-            imageInfo.put("uri", imageUri); //uri 데이터 넣기
+            faceDetectorOptions = new FaceDetectorOptions.Builder()
+                    .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_ACCURATE)
+                    .enableTracking()
+                    .setMinFaceSize(0.15f)
+                    .setContourMode(FaceDetectorOptions.LANDMARK_MODE_ALL)
+                    .build();
+            detector = FaceDetection.getClient(faceDetectorOptions);
+            Log.e("HWA", "망할 : ");
 
             //태그 불러오기
             InputImage image = InputImage.fromFilePath(this, imageUri);    //uri -> InputImage 변환
+            Bitmap pickedImage = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
 
             detector.process(image).addOnSuccessListener(new OnSuccessListener<List<Face>>() {
                 @RequiresApi(api = Build.VERSION_CODES.P)
                 @Override
                 public void onSuccess(List<Face> faces) {
                     Log.d("HWA", "face 개수 : " + faces.size());
-
-                    for (Face face : faces) {
-                        try {
-                            int faceId = FaceRecognitionAPI.getFaceId();
-
-                            //바운딩 전처리
-                            Rect boundingBox = face.getBoundingBox();
-                            Integer cropSize = 0, cropLeft = 0, cropTop = 0;
-                            if(boundingBox.left > image.getWidth() || boundingBox.right < 1 || boundingBox.top > image.getHeight() || boundingBox.bottom < 1){
-                                continue;
-                            }
-                            Log.d("HWA", "testttt : " + boundingBox);
-                            if(boundingBox.left < 0){
-                                boundingBox.set(0, boundingBox.top, boundingBox.right, boundingBox.bottom);
-                            }
-                            if(boundingBox.right > image.getWidth()){
-                                boundingBox.set(boundingBox.left, boundingBox.top, image.getWidth(), boundingBox.bottom);
-                            }
-                            if(boundingBox.top < 0){
-                                boundingBox.set(boundingBox.left, 0, boundingBox.right, boundingBox.bottom);
-                            }
-                            if(boundingBox.bottom > image.getHeight()){
-                                boundingBox.set(boundingBox.left, boundingBox.top, boundingBox.right, image.getHeight());
-                            }
-                            if(boundingBox.width() > boundingBox.height()){
-                                cropSize = boundingBox.height();
-                                cropLeft = (boundingBox.left + (boundingBox.width() - cropSize) / 2);
-                                cropTop = boundingBox.top;
-                            }
-                            else {
-                                cropSize = boundingBox.width();
-                                cropLeft = boundingBox.left;
-                                cropTop = (boundingBox.top + (boundingBox.height() - cropSize) / 2);
-                            }
-                            Log.d("HWA", "test : " + boundingBox + " " + cropSize + " " + cropLeft + " " + cropTop);
-
-                            //얼굴 사진 크롭하기
-                            Bitmap imageBitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getContentResolver(), imageUri));
-                            Bitmap crop = Bitmap.createBitmap(imageBitmap, cropLeft, cropTop, cropSize, cropSize).copy(Bitmap.Config.ARGB_8888, true);
-
-                            //얼굴 기울기 조절
-                            Matrix matrix = new Matrix();
-                            matrix.postRotate(face.getHeadEulerAngleZ());
-                            Bitmap rotated = Bitmap.createBitmap(crop, 0, 0, cropSize, cropSize, matrix, false);
-                            int x = (int) (rotated.getWidth() - cropSize) / 2;
-                            int y = (int) (rotated.getHeight()- cropSize) / 2;
-                            rotated = Bitmap.createBitmap(rotated, x, y, cropSize, cropSize);
-
-                            Bitmap cropRotated = Bitmap.createScaledBitmap(rotated, 112, 112, true);
-
-                            FaceRecognize.Recognition result = recognizer.recognizeImage(cropRotated, faceId, boundingBox);
-                            //result.setUri(imageUri.toString());
-
-                            recognizer.register(result);
-                            FaceRecognitionAPI.setFaceId(faceId + 1);
-
-                            facesIndex.put(recognizer.toJsonObject(result));
-                        } catch (IOException e) {
-                            Log.d("HWA", "망할 : " + e);
-                        }
-                    }
-
                     try {
+
+                        for (Face face : faces) {
+                            JSONObject faceInfo = new JSONObject();
+                            //바운딩 전처리
+                            Rect bounds = face.getBoundingBox();
+                            int boundsX = bounds.centerX()-(bounds.width()/2);
+                            int boundsY = bounds.centerY()-(bounds.height()/2);
+                            int boundsW = bounds.width();
+                            int boundsH = bounds.height();
+
+                            if (boundsX + boundsW > pickedImage.getWidth()) {
+                                boundsW = pickedImage.getWidth() - boundsX;
+                            }
+                            if (boundsY + boundsH > pickedImage.getHeight()){
+                                boundsH = pickedImage.getHeight() - boundsY;
+                            }
+
+                            Bitmap resized = Bitmap.createBitmap(pickedImage, boundsX, boundsY, boundsW, boundsH);
+
+                            String date = timeStamp();
+                            Log.e("HWA", "망할 : 1");
+                            faceInfo.put("left", boundsX);
+                            faceInfo.put("top", boundsY);
+                            faceInfo.put("width", boundsW);
+                            faceInfo.put("height", boundsH);
+
+                            compressBitmap(resized, date, faceInfo);
+                            facesIndex.put(faceInfo);
+                        }
+
                         imageInfo.put("faces", facesIndex);
                         adapter.notifyDataSetChanged();
                     } catch (JSONException e) {
@@ -498,5 +535,290 @@ public class AlbumPageActivity extends AppCompatActivity {
         } catch (Exception e) {
             Log.e("AlbumPageActivity", "setUriTags Exception : " + e);
         }
+    }
+
+    void listCollections() {
+        // To list the collections.
+        // It won't work if there's any exisiting collection.
+        // We need only one collection named ndr.
+        rekognition.setRegion(Region.getRegion(Regions.AP_NORTHEAST_2));
+
+        System.out.println("Listing collections");
+        int limit = 10;
+        ListCollectionsResult listCollectionsResult = null;
+        String paginationToken = null;
+        do {
+            if (listCollectionsResult != null) {
+                paginationToken = listCollectionsResult.getNextToken();
+            }
+            ListCollectionsRequest listCollectionsRequest = new ListCollectionsRequest()
+                    .withMaxResults(limit)
+                    .withNextToken(paginationToken);
+            listCollectionsResult = rekognition.listCollections(listCollectionsRequest);
+
+            int cnt = 0;
+            List< String > collectionIds = listCollectionsResult.getCollectionIds();
+            for (String resultId: collectionIds) {
+                System.out.println("collectionId: " + resultId);
+                Log.d("JUN", "Result ID : " + resultId);
+                Log.d("JUN", "Collection ID : " + collectionId);
+                if (resultId.equals(collectionId)) {
+                    Log.d("JUN", "Collection is already existing.");
+                    cnt += 1;
+                }
+                Log.d("JUN", "cnt : " + cnt);
+            }
+            if (cnt != 0) {
+                Log.d("JUN", "No need to create a new collection.");
+            } else {
+                Log.d("JUN", "Wait a minute. I'm trying to create a collection called " + collectionId);
+                createCollection();
+            }
+
+        } while (listCollectionsResult != null && listCollectionsResult.getNextToken() !=
+                null);
+    }
+
+    void createCollection () {
+        // This creates collection, but if the collection with same name already exists,
+        // it would not work.
+        rekognition.setRegion(Region.getRegion(Regions.AP_NORTHEAST_2));
+
+        System.out.println("Creating Collection : " + collectionId);
+        CreateCollectionRequest request = new CreateCollectionRequest().withCollectionId(collectionId);
+
+        CreateCollectionResult result = rekognition.createCollection(request);
+
+        System.out.println("CollectioinArn : " + result.getCollectionArn());
+        System.out.println("Status Code : " + result.getStatusCode().toString());
+    }
+
+    String timeStamp(){
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddkkmmss");
+        String date = dateFormat.format(calendar.getTime());
+        Log.d("JUN", date);
+        return date;
+    }
+
+    void compressBitmap(Bitmap resized, String fileName, JSONObject faceInfo) {
+        // It saves bitmap to .jpeg file.
+        Log.e("HWA", "망할 : 2");
+
+        String MEDIA_PATH = getFilesDir().getPath() + "/.savepoint/";
+        File dir = new File(MEDIA_PATH);
+        OutputStream out = null;
+
+        try{
+            if (!dir.exists()) {
+                dir.mkdir();
+                Log.d("JUN", "No such folder exists.");
+            }
+            else {
+                Log.d("JUN", "It already exists.");
+            }
+
+            if (dir.exists()) Log.d("JUN", "Success!");
+            else Log.d("JUN", "Something's wrong.");
+        } catch (Exception e) {
+            Log.e("HWA", "망할 : 3");
+        }
+
+        try {
+            MEDIA_PATH = MEDIA_PATH + fileName + ".jpeg";
+            Log.d("JUN", MEDIA_PATH);
+
+            dir = new File(MEDIA_PATH);
+            dir.createNewFile();
+            out = new FileOutputStream(dir);
+
+            resized.compress(Bitmap.CompressFormat.JPEG, 100 , out);
+            uploadObject(MEDIA_PATH, fileName, namePerson, faceInfo);
+
+            out.close();
+        } catch (Exception e) {
+            Log.e("HWA", "망할 : 4 " + e);
+        }
+
+    }
+
+    void uploadObject(String filePath, String fileName, String namePerson, JSONObject faceInfo) {
+        // This is for uploading file to bucket, and it only works for adding faces.
+        Log.e("HWA", "망할 : 5");
+
+        File toUpload = new File(filePath);
+        AmazonS3Client s3Client = new AmazonS3Client(new BasicAWSCredentials(access_id, access_pw));
+        s3Client.setRegion(Region.getRegion(Regions.AP_NORTHEAST_2));
+
+        TransferUtility transferUtility = TransferUtility.builder().s3Client(s3Client).context(this.getApplicationContext()).build();
+        TransferNetworkLossHandler.getInstance(this.getApplicationContext());
+
+        TransferObserver uploadObserver = transferUtility.upload(bucket, fileName, toUpload);
+
+        uploadObserver.setTransferListener(new TransferListener() {
+            @Override
+            public void onStateChanged(int id, TransferState state) {
+                if(state == TransferState.COMPLETED) {
+                    Toast.makeText(getApplicationContext(), "Uploaded - " + fileName, Toast.LENGTH_SHORT).show();
+
+                    isCompared(fileName, faceInfo);
+                }
+            }
+
+            @Override
+            public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
+                int done = (int) (((double) bytesCurrent/bytesTotal) * 100.0);
+            }
+
+            @Override
+            public void onError(int id, Exception ex) {
+                Log.d("JUN", "Damnit!");
+            }
+        });
+    }
+
+    void addFace2Collection (String fileName, String nameFace, JSONObject faceInfo) {
+        // This works to add face to collection.
+        // It will only work when the user tries to add face and name.
+
+        Image image = new Image()
+                .withS3Object(new S3Object()
+                        .withBucket(bucket)
+                        .withName(fileName));
+        Log.d("JUN", bucket + " " + fileName);
+
+        IndexFacesRequest request = new IndexFacesRequest()
+                .withImage(image)
+                .withQualityFilter(QualityFilter.AUTO)
+                .withMaxFaces(1)
+                .withCollectionId(collectionId)
+                .withExternalImageId(fileName)
+                .withDetectionAttributes("DEFAULT");
+
+        Log.d("JUN", "After request... continuing.");
+
+        IndexFacesResult result = rekognition.indexFaces(request);
+
+        Log.d("JUN", "Results for " + fileName);
+        Log.d("JUN", "Faces indexed: ");
+
+        List<FaceRecord> faceRecords = result.getFaceRecords();
+
+        for(FaceRecord faceRecord: faceRecords) {
+            Log.d("JUN", "  Face ID: " + faceRecord.getFace().getFaceId());
+            try {
+                faceInfo.put("faceId", faceRecord.getFace().getFaceId());
+            } catch (JSONException e) {
+                Log.e("HWA", "망할 : 6 " + e);
+            }
+            Log.d("JUN", "  Location:" + faceRecord.getFaceDetail().getBoundingBox().toString());
+            enrollMap(faceRecord.getFace().getFaceId(), nameFace);
+        }
+
+        List<UnindexedFace> unindexedFaces = result.getUnindexedFaces();
+        Log.d("JUN", "Faces not indexed:");
+
+        for (UnindexedFace unindexedFace : unindexedFaces) {
+            Log.d("JUN", "  Location:" + unindexedFace.getFaceDetail().getBoundingBox().toString());
+            Log.d("JUN", "  Reasons:");
+
+            for (String reason : unindexedFace.getReasons()) {
+                Log.d("JUN", "   " + reason);
+            }
+        }
+//        listFace();
+    }
+
+    void isCompared(String fileName, JSONObject faceInfo) {
+        // This is to search faces.
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        Image image = new Image()
+                .withS3Object(new S3Object()
+                        .withBucket(bucket)
+                        .withName(fileName));
+
+
+        SearchFacesByImageRequest searchRequest = new SearchFacesByImageRequest()
+                .withCollectionId(collectionId)
+                .withImage(image)
+                .withFaceMatchThreshold(70F)
+                .withMaxFaces(2);
+
+        SearchFacesByImageResult searchResult = rekognition.searchFacesByImage(searchRequest);
+        List<FaceMatch> faceImageMatches = searchResult.getFaceMatches();
+        if(!faceImageMatches.isEmpty()) {
+            for (FaceMatch face : faceImageMatches) {
+                Log.d("SEARCH", face.getFace().getFaceId());
+                try {
+                    faceInfo.put("faceId", face.getFace().getFaceId());
+                } catch (JSONException e) {
+                    Log.e("JUN", "억까ㄴ..");
+                }
+                searchMap(face.getFace().getFaceId(), faceInfo);
+            }
+        }
+        else {
+            Toast.makeText(this, "No result to show!", Toast.LENGTH_SHORT).show();
+            Log.d("SEARCH", "No result to show!");
+            try {
+                faceInfo.put("name", "Unknown");
+            } catch (JSONException e) {
+                Log.e("JUN", "억까ㄴ..");
+            }
+            addFace2Collection (fileName, "Unknown", faceInfo);
+        }
+    }
+
+    void enrollMap(String uploadDate, String namePerson){
+        // This app has list saved in local storage so every picture should be saved
+        // with key (uploadDate, and it will be the file's name)
+        // and name (namePerson).
+        faceMap.put(uploadDate, namePerson);
+        Log.d("FACEMAP", uploadDate +" "+ namePerson);
+        try {
+            fos = openFileOutput(localFaceList, Context.MODE_PRIVATE);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(faceMap);
+            oos.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for (String key: faceMap.keySet()) {
+            Log.d("FORMOON", key + " " + faceMap.get(key));
+
+        }
+    }
+
+    void searchMap(String imageID, JSONObject imageInfo) {
+        // This code will search if there's any person enrolled to the faceMap.
+        // If so, it will show the name. Unless, it will show nothing.
+        for (String key: faceMap.keySet()) {
+            Log.d("KEYTMP", key + " " + imageID);
+            if (key.equals(imageID)) {
+                Log.d("Found", faceMap.get(key));
+                try {
+                    imageInfo.put("name", faceMap.get(key));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                //textView.setText(faceMap.get(key)); 오잉
+            }
+            else {
+                Log.d("Found", "No result to show!");
+            }
+        }
+
+    }
+
+
+    void deleteCollection() {
+        System.out.println("deleting...");
+        DeleteCollectionRequest request = new DeleteCollectionRequest().withCollectionId(collectionId);
+        DeleteCollectionResult result = rekognition.deleteCollection(request);
+        System.out.println(collectionId + " : " + result.getStatusCode().toString());
     }
 }
