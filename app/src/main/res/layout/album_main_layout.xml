@@ -9,8 +9,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="68dp"
-        android:orientation="horizontal"
-        android:padding="15dp">
+        android:padding="15dp"
+        android:orientation="horizontal">
 
         <ImageButton
             android:id="@+id/stats_button"
@@ -18,7 +18,7 @@
             android:layout_height="40dp"
             android:layout_marginRight="10dp"
             android:background="@color/colorBackground"
-            app:srcCompat="@drawable/chart_box" />
+            app:srcCompat="@drawable/chart_box"/>
 
         <!--현재-->
         <LinearLayout
@@ -42,18 +42,17 @@
         <View
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="1"/>
 
         <ImageButton
             android:id="@+id/calendar_button"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@color/colorBackground"
-            app:srcCompat="@drawable/calendar" />
-
+            app:srcCompat="@drawable/calendar"/>
         <View
             android:layout_width="10dp"
-            android:layout_height="0dp" />
+            android:layout_height="0dp"/>
 
         <ImageButton
             android:id="@+id/a_search_button"
@@ -73,10 +72,10 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="15dp">
 
@@ -208,7 +207,7 @@
                     android:layout_marginTop="10dp"
                     android:horizontalSpacing="12dp"
                     android:numColumns="3"
-                    android:verticalSpacing="12dp"></GridView>
+                    android:verticalSpacing="12dp"/>
             </LinearLayout>
 
             <!--달력앨범-->
@@ -231,7 +230,7 @@
                     android:layout_marginTop="10dp"
                     android:horizontalSpacing="12dp"
                     android:numColumns="3"
-                    android:verticalSpacing="12dp"></GridView>
+                    android:verticalSpacing="12dp"/>
             </LinearLayout>
 
         </LinearLayout>

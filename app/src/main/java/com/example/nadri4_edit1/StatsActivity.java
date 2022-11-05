@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -22,11 +23,14 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
 import org.json.JSONArray;
@@ -55,7 +59,8 @@ public class StatsActivity extends AppCompatActivity {
     public static ArrayList<JSONObject> thoroughfareCnt = new ArrayList<>();
     public static ArrayList<JSONObject> faceCnt = new ArrayList<>();
 
-    TextView mTextView, dTextView, tfTextView;
+    TextView mTextView, tfTextView; //dTextView,
+    LinearLayout tfTvBtn, mTvBtn;
     int mIdx = 0, dIdx = 0, tfIdx = 0;
 
     final int YEAR = 0;
@@ -103,7 +108,8 @@ public class StatsActivity extends AppCompatActivity {
 
 
         mTextView = findViewById(R.id.mTextView);
-        mTextView.setOnClickListener(new View.OnClickListener() {
+        mTvBtn = findViewById(R.id.mTvBtn);
+        mTvBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 try {
@@ -125,8 +131,8 @@ public class StatsActivity extends AppCompatActivity {
             }
         });
 
-        dTextView = findViewById(R.id.dTextView);
-        dTextView.setOnClickListener(new View.OnClickListener() {
+        //dTextView = findViewById(R.id.dTextView);
+        /*dTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 try {
@@ -148,8 +154,11 @@ public class StatsActivity extends AppCompatActivity {
             }
         });
 
+         */
+
         tfTextView = findViewById(R.id.tfTextView);
-        tfTextView.setOnClickListener(new View.OnClickListener() {
+        tfTvBtn = findViewById(R.id.tfTvBtn);
+        tfTvBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 try {
@@ -171,7 +180,25 @@ public class StatsActivity extends AppCompatActivity {
             }
         });
 
+        //차트 데이터 클릭 이벤트
+        /*lChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+
+            }
+
+            @Override
+            public void onNothingSelected() {
+
+            }
+        });
+
+         */
+
+
         reqGetStats(this);
+
+
         
     }
 
@@ -364,7 +391,7 @@ public class StatsActivity extends AppCompatActivity {
                     for(int i = 0; i< resArr.length(); i++){
                         dayCnt.add(resArr.getJSONObject(i));
                     }
-                    dTextView.setText(dayCnt.get(0).getString("year") + "년");
+                    //dTextView.setText(dayCnt.get(0).getString("year") + "년");
                     JSONObject d = dayCnt.get(0).getJSONObject("dayofweek");
                     for(int i = 1; i < 8; i++){
                         String k = String.valueOf(i);
@@ -448,4 +475,6 @@ public class StatsActivity extends AppCompatActivity {
         bChart.notifyDataSetChanged();
         bChart.invalidate();
     }
+
+
 }
