@@ -75,6 +75,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.gson.JsonArray;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.face.Face;
 import com.google.mlkit.vision.face.FaceDetection;
@@ -489,7 +490,7 @@ public class AlbumPageActivity extends AppCompatActivity {
     }
 
     protected void setUriFaces(JSONObject imageInfo, Uri imageUri){
-        JSONArray facesIndex = new JSONArray();   //사진 한 장의 얼굴들
+        JSONArray facesArr = new JSONArray();   //사진 한 장의 얼굴들
         try {
 
             //태그 불러오기
@@ -531,11 +532,11 @@ public class AlbumPageActivity extends AppCompatActivity {
                             faceInfo.put("height", boundsH);
 
                             Log.d("HWA", "순서 : 1 Faces for문");
-                            compressBitmap(resized, date, faceInfo);
-                            facesIndex.put(faceInfo);
+                            compressBitmap(resized, date, faceInfo, facesArr);
+                            facesArr.put(faceInfo);
                         }
 
-                        imageInfo.put("faces", facesIndex);
+                        imageInfo.put("faces", facesArr);
                         adapter.notifyDataSetChanged();
                     } catch (JSONException e) {
                         Log.d("HWA", "망할 : " + e);
@@ -611,7 +612,7 @@ public class AlbumPageActivity extends AppCompatActivity {
         return date;
     }
 
-    synchronized void compressBitmap(Bitmap resized, String fileName, JSONObject faceInfo) {
+    synchronized void compressBitmap(Bitmap resized, String fileName, JSONObject faceInfo, JSONArray facesArr) {
         // It saves bitmap to .jpeg file.
         Log.d("HWA", "순서 : 2 compressBitmap");
 
@@ -643,7 +644,7 @@ public class AlbumPageActivity extends AppCompatActivity {
             out = new FileOutputStream(dir);
 
             resized.compress(Bitmap.CompressFormat.JPEG, 100 , out);
-            uploadObject(MEDIA_PATH, fileName, namePerson, faceInfo);
+            uploadObject(MEDIA_PATH, fileName, namePerson, faceInfo, facesArr);
 
             out.close();
         } catch (Exception e) {
@@ -652,7 +653,7 @@ public class AlbumPageActivity extends AppCompatActivity {
 
     }
 
-    synchronized void uploadObject(String filePath, String fileName, String namePerson, JSONObject faceInfo) {
+    synchronized void uploadObject(String filePath, String fileName, String namePerson, JSONObject faceInfo, JSONArray facesArr) {
         // This is for uploading file to bucket, and it only works for adding faces.
         Log.d("HWA", "순서 : 3 uploadObject");
         File toUpload = new File(filePath);
@@ -671,7 +672,7 @@ public class AlbumPageActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Uploaded - " + fileName, Toast.LENGTH_SHORT).show();
                     Log.d("HWA", "순서 : 3 uploadObject upload");
 
-                    isCompared(fileName, faceInfo);
+                    isCompared(fileName, faceInfo, facesArr);
                 }
             }
 
@@ -687,7 +688,7 @@ public class AlbumPageActivity extends AppCompatActivity {
         });
     }
 
-    synchronized void addFace2Collection (String fileName, String nameFace, JSONObject faceInfo) {
+    synchronized void addFace2Collection (String fileName, String nameFace, JSONObject faceInfo, JSONArray facesArr) {
         // This works to add face to collection.
         // It will only work when the user tries to add face and name.
         Log.d("HWA", "순서 : 6 addFace2Collection");
@@ -718,8 +719,9 @@ public class AlbumPageActivity extends AppCompatActivity {
             Log.d("JUN", "  Face ID: " + faceRecord.getFace().getFaceId());
             try {
                 faceInfo.put("faceId", faceRecord.getFace().getFaceId());
+                facesArr.put(faceInfo);
             } catch (JSONException e) {
-                Log.e("HWA", "망할 : 6 " + e);
+                Log.e("HWA", "순서 : 6 에러" + e);
             }
             Log.d("JUN", "  Location:" + faceRecord.getFaceDetail().getBoundingBox().toString());
             enrollMap(faceRecord.getFace().getFaceId(), nameFace);
@@ -739,7 +741,7 @@ public class AlbumPageActivity extends AppCompatActivity {
 //        listFace();
     }
 
-    synchronized void isCompared(String fileName, JSONObject faceInfo) {
+    synchronized void isCompared(String fileName, JSONObject faceInfo, JSONArray facesArr) {
         try {
             Log.d("HWA", "순서 : 4 isCompared");
             // This is to search faces.
@@ -767,12 +769,13 @@ public class AlbumPageActivity extends AppCompatActivity {
                         faceInfo.put("faceId", face.getFace().getFaceId());
 
                         String name = faceMap.get(face.getFace().getFaceId());
-                        Log.e("HWA", "이름 : " + name);
+                        Log.e("HWA", "MAP에서 찾은 이름 : " + name);
                         if (name != null) {
                             faceInfo.put("name", name);
+                            facesArr.put(faceInfo);
                         }
                     } catch (JSONException e) {
-                        Log.e("JUN", "억까ㄴ..");
+                        Log.e("HWA", "순서 : 5 얼굴 있어 오류 " + e);
                     }
                     //searchMap(face.getFace().getFaceId(), faceInfo);
                 }
@@ -783,9 +786,9 @@ public class AlbumPageActivity extends AppCompatActivity {
                 try {
                     faceInfo.put("name", "Unknown");
                 } catch (JSONException e) {
-                    Log.e("JUN", "억까ㄴ..");
+                    Log.e("JUN", "순서 : 5 얼굴 없어 오류 " + e);
                 }
-                addFace2Collection(fileName, "Unknown", faceInfo);
+                addFace2Collection(fileName, "Unknown", faceInfo, facesArr);
             }
         } catch(Exception e){
             Log.e("HWA", "이게 무슨 에러람.. " + e);
