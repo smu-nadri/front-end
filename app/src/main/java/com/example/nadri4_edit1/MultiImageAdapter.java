@@ -228,9 +228,9 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
                 if(!isEdit){
                     Log.d("HWA", "편집모드 진입!");
                     isEdit = true;
-                    AlbumPageActivity.adapter.notifyDataSetChanged();
+                    AlbumPageActivity.btnEdit.setImageResource(R.drawable.edit_click);
                     AlbumPageActivity.editBtnLayout.setVisibility(View.VISIBLE);
-                    AlbumPageActivity.basicBtnLayout.setVisibility(View.INVISIBLE);
+                    AlbumPageActivity.adapter.notifyDataSetChanged();
                 }
                 return true;
             }

@@ -153,6 +153,9 @@ public class AlbumPageActivity extends AppCompatActivity {
     private final String localFaceList = "LocalListofFace.tmp";
 
 
+    public Intent getDateIntent;
+
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,7 +168,7 @@ public class AlbumPageActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         tvPageDate = (TextView) findViewById(R.id.tvPageDate);
 
-        menuBtnLayout = (FrameLayout) findViewById(R.id.menuBtnLayout);
+        //menuBtnLayout = (FrameLayout) findViewById(R.id.menuBtnLayout);
         basicBtnLayout = (LinearLayout) findViewById(R.id.basicBtnLayout);
         editBtnLayout = (LinearLayout) findViewById(R.id.editBtnLayout);
 
@@ -182,10 +185,10 @@ public class AlbumPageActivity extends AppCompatActivity {
         photo_fore = findViewById(R.id.photo_fore);
         photo_text = findViewById(R.id.photo_text);
 
-        //인텐트
-        Intent getDateIntent = getIntent();
-        int iDay = getDateIntent.getIntExtra("SelectedDATE",-1);
 
+        //인텐트
+        getDateIntent = getIntent();
+        int iDay = getDateIntent.getIntExtra("SelectedDATE",-1);
 
 
         //화면 설정
@@ -268,6 +271,7 @@ public class AlbumPageActivity extends AppCompatActivity {
             }
         });
 
+        /*
         //서버로 사진 정보 전송하기
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -291,6 +295,9 @@ public class AlbumPageActivity extends AppCompatActivity {
                 }
             }
         });
+
+         */
+
 
         //삭제 버튼
         btnRemove.setOnClickListener(new View.OnClickListener() {
@@ -332,19 +339,16 @@ public class AlbumPageActivity extends AppCompatActivity {
         btnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(basicBtnLayout.getVisibility() == View.VISIBLE){
+                if(editBtnLayout.getVisibility() == View.GONE){
                     editBtnLayout.setVisibility(View.VISIBLE);
-                    basicBtnLayout.setVisibility(View.INVISIBLE);
                     btnEdit.setImageResource(R.drawable.edit_click);
 
-                    // 롱클릭한것처럼 체크박스 보여야함
                     MultiImageAdapter.isEdit = true;
                     adapter.notifyDataSetChanged();
                     Log.d("CHECKBOX", "yes값 : " + MultiImageAdapter.isEdit);
                 }
                 else{
-                    basicBtnLayout.setVisibility(View.VISIBLE);
-                    editBtnLayout.setVisibility(View.INVISIBLE);
+                    editBtnLayout.setVisibility(View.GONE);
                     btnEdit.setImageResource(R.drawable.edit_unclick);
 
                     MultiImageAdapter.isEdit = false;
@@ -441,6 +445,24 @@ public class AlbumPageActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if(adapter.getmData().size() == 0){
+            Toast.makeText(getApplicationContext(), "사진을 선택해주세요.", Toast.LENGTH_SHORT).show();
+        }
+        else if(tvPageDate.getText().toString().isEmpty()){
+            Toast.makeText(getApplicationContext(), "제목을 입력해주세요.", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            try {
+                if(getDateIntent.getBooleanExtra("customAlbum", false)) {
+                    ReqServer.album.put("title", tvPageDate.getText().toString());
+                    ReqServer.album.put("type", "customAlbum");
+                }
+                ReqServer.reqPostPages(AlbumPageActivity.this);
+            } catch (JSONException e) {
+                Log.e("AlbumPageActivity", "btnSave JSONException: " + e);
+            }
+        }
+
         ReqServer.photoList.clear();
         ReqServer.album.remove("title");
         ReqServer.album.remove("thumbnail");

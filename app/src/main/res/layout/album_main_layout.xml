@@ -110,18 +110,20 @@
                         android:paddingLeft="8dp">
 
                         <TextView
-                            android:layout_width="100dp"
+                            android:layout_width="match_parent"
                             android:layout_height="110dp"
                             android:layout_gravity="top"
-                            android:gravity="center"
                             android:background="@drawable/round_square_background"
+                            android:gravity="center"
                             android:text="+"
-                            android:textSize="26dp"/>
+                            android:textSize="26dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="마이앨범 만들기" />
+                            android:layout_marginLeft="2dp"
+                            android:text="마이앨범 만들기"
+                            android:textSize="15dp"/>
 
                     </LinearLayout>
 
@@ -140,7 +142,7 @@
 
                         <ImageView
                             android:id="@+id/all_img"
-                            android:layout_width="100dp"
+                            android:layout_width="match_parent"
                             android:layout_height="110dp"
                             android:layout_gravity="top"
                             android:background="@drawable/round_square_background"
@@ -149,7 +151,9 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="모두보기" />
+                            android:layout_marginLeft="2dp"
+                            android:text="모두보기"
+                            android:textSize="15dp"/>
 
                     </LinearLayout>
 
@@ -167,7 +171,7 @@
 
                         <ImageView
                             android:id="@+id/highlight_img"
-                            android:layout_width="100dp"
+                            android:layout_width="match_parent"
                             android:layout_height="110dp"
                             android:layout_gravity="top"
                             android:background="@drawable/round_square_background"
@@ -177,7 +181,9 @@
                             android:id="@+id/highlight_tv"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="\하이라이트" />
+                            android:layout_marginLeft="2dp"
+                            android:text="\하이라이트"
+                            android:textSize="15dp" />
 
                     </LinearLayout>
 

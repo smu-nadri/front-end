@@ -31,18 +31,43 @@
             android:layout_weight="1"/>
 
 
-        <FrameLayout
+        <LinearLayout
             android:id="@+id/menuBtnLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center">
+
+            <LinearLayout
+            android:id="@+id/basicBtnLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/btnGetImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="13dp"
+                android:background="@color/colorBackground"
+                app:srcCompat="@drawable/image_add"/>
+
+            <ImageButton
+                android:id="@+id/btnSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:layout_marginRight="13dp"
+                android:background="@color/colorBackground"
+                app:srcCompat="@drawable/save"/>
+
+        </LinearLayout>
+
 
         <!-- 이미지버튼 묶음 -->
             <LinearLayout
                 android:id="@+id/editBtnLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="invisible">
+                android:visibility="gone">
 
                 <ImageButton
                     android:id="@+id/btnBlank"
@@ -71,30 +96,8 @@
                     app:srcCompat="@drawable/remove"/>
 
             </LinearLayout>
-            <LinearLayout
-                android:id="@+id/basicBtnLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+        </LinearLayout>
 
-                <ImageButton
-                    android:id="@+id/btnGetImage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="13dp"
-                    android:background="@color/colorBackground"
-                    app:srcCompat="@drawable/image_add"/>
-
-                <ImageButton
-                    android:id="@+id/btnSave"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="13dp"
-                    android:background="@color/colorBackground"
-                    app:srcCompat="@drawable/save"/>
-
-            </LinearLayout>
-
-        </FrameLayout>
 
         <!-- 메뉴버튼 추가하기! 메뉴버튼이랑 연필버튼 visible-gone으로 처리해야할 듯 -->
         <ImageButton

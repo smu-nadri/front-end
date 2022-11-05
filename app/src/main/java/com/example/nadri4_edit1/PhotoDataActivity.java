@@ -203,7 +203,7 @@ public class PhotoDataActivity extends AppCompatActivity {
                         @Override
                         public void onClick(View view) {    //이름태그를 클릭하면
                             View dialogView = (View) View.inflate(PhotoDataActivity.this, R.layout.face_edit_dialog, null);
-                            AlertDialog.Builder dlg = new AlertDialog.Builder(PhotoDataActivity.this);
+                            AlertDialog.Builder dlg = new AlertDialog.Builder(PhotoDataActivity.this, R.style.MyDialogTheme);
                             ImageView faceImg = (ImageView) dialogView.findViewById(R.id.faceImg);
                             EditText faceName = (EditText) dialogView.findViewById(R.id.faceName);
 
