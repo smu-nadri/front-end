@@ -213,13 +213,18 @@ public class StatsActivity extends AppCompatActivity {
     synchronized void initChart(int code, BarChart bChart, BarDataSet bDataSet, BarData bData, ArrayList<BarEntry> bList){
         bChart.getDescription().setEnabled(false);    //"Description Chart" 지우기
         bChart.getLegend().setEnabled(false); //레이블 설명 지우기
+        bChart.setScaleEnabled(false);
 
+        bDataSet.setColor(getResources().getColor(R.color.chart_bar));
+        bDataSet.setValueTextSize(10f);
+
+        bData.setValueTextSize(20f);
         bData.addDataSet(bDataSet);
-        bData.setBarWidth(0.2f);
+        bData.setBarWidth(0.3f);
         bData.setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
-                String sValue = (int)value + "개";
+                String sValue = String.valueOf((int)value);
                 return sValue;
             }
         });
@@ -231,6 +236,7 @@ public class StatsActivity extends AppCompatActivity {
         xAxis.setDrawGridLines(false);  //격자무늬 없애기
         xAxis.setLabelCount(bList.size());  //x축 개수
         xAxis.setGranularity(1f);
+        xAxis.setTextSize(10f);
         if(code == YEAR) {
             xAxis.setValueFormatter(new ValueFormatter() {
                 @Override
@@ -268,7 +274,7 @@ public class StatsActivity extends AppCompatActivity {
             });
         }
         else if(code == TAG){
-            bChart.setVisibleXRangeMaximum(10f);
+            bChart.setVisibleXRangeMaximum(8f);
             xAxis.setValueFormatter(new ValueFormatter() {
                 @Override
                 public String getFormattedValue(float value) {
@@ -317,7 +323,7 @@ public class StatsActivity extends AppCompatActivity {
             });
         }
         else if(code == FACE){
-            bChart.setVisibleXRangeMaximum(10f);
+            bChart.setVisibleXRangeMaximum(8f);
             xAxis.setValueFormatter(new ValueFormatter() {
                 @Override
                 public String getFormattedValue(float value) {
@@ -336,7 +342,7 @@ public class StatsActivity extends AppCompatActivity {
         }
 
         //왼쪽 축 값 설정
-        YAxis yAxis = bChart.getAxisLeft();
+        /*YAxis yAxis = bChart.getAxisLeft();
         yAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
         yAxis.setDrawAxisLine(false);
         yAxis.setDrawGridLines(false);
@@ -347,7 +353,11 @@ public class StatsActivity extends AppCompatActivity {
                 String sValue = String.valueOf((int)value);
                 return sValue;
             }
-        });
+        });*/
+        YAxis yAxis = bChart.getAxisLeft();
+        yAxis.setDrawLabels(false);
+        yAxis.setDrawAxisLine(false);
+        yAxis.setDrawGridLines(false);
 
         //오른쪽 축 값 삭제
         YAxis rAxis = bChart.getAxisRight();

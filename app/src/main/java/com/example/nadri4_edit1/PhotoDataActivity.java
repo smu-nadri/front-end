@@ -8,11 +8,15 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.ImageDecoder;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Display;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -49,7 +53,7 @@ public class PhotoDataActivity extends AppCompatActivity {
 
     FrameLayout photoLayout, facesLayout;
     ImageView photo_big;
-    LinearLayout photo_fore;
+    LinearLayout photo_fore, photo;
     TextView photo_text;
     TextView tvPageDate;
     ImageButton face_button;
@@ -64,6 +68,7 @@ public class PhotoDataActivity extends AppCompatActivity {
 
         //xml연결
         photoLayout = findViewById(R.id.photoLayout);
+        photo = findViewById(R.id.photo);
         facesLayout = findViewById(R.id.facesLayout);
         photo_big = findViewById(R.id.imgView);
         photo_fore = findViewById(R.id.photo_fore);
@@ -154,6 +159,23 @@ public class PhotoDataActivity extends AppCompatActivity {
                 }
             }
 
+            //사진 뷰 사이즈 가져오기
+            Display display = getWindowManager().getDefaultDisplay();
+            Point size = new Point();
+            display.getSize(size);
+            int x = size.x;
+            int y = size.y - 84;
+            float rate = 1;
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse(uri));
+            rate = x/bitmap.getWidth();
+            Log.e("HWA", "제발? " + rate);
+            if(rate > y/bitmap.getHeight()) {
+                rate = y / bitmap.getHeight();
+            }
+            if(rate == 0) rate = 1;
+            Log.e("HWA", "제발? " + rate);
+            int plusY = (int)(y - bitmap.getHeight() * rate)/2;
+
             if (photo_data_json.has("faces")) {
                 JSONArray faces = photo_data_json.getJSONArray("faces");
 
@@ -164,11 +186,16 @@ public class PhotoDataActivity extends AppCompatActivity {
                     String finalUri = uri;
 
                     TextView tv = new TextView(this);
-                    FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(100, 50);
-                    params.setMargins(0, i * 50, 0, 0);
-                    tv.setBackgroundColor(Color.BLACK);
+                    FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+                    params.setMargins((int) (face.getInt("left") * rate), (int)(face.getInt("top") * rate + plusY), 0, 0);
+                    tv.setBackgroundColor(getResources().getColor(R.color.blur_black));
                     tv.setTextColor(Color.WHITE);
+                    tv.setGravity(Gravity.CENTER);
+                    tv.setMinWidth(100);
+                    tv.setPadding(5, 5, 5, 5);
+                    tv.setTextSize(14);
                     tv.setLayoutParams(params);
+                    Log.d("HWA", (face.getInt("left")*rate)+" 하아 "+(face.getInt("top")*rate));
 
                     tv.setText(name);
                     tv.setOnClickListener(new View.OnClickListener() {
@@ -239,6 +266,10 @@ public class PhotoDataActivity extends AppCompatActivity {
             }
         } catch (JSONException e) {
             Log.e("PhotoDataActivity", title + ", " + e.toString());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
 
