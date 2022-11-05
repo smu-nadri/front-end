@@ -29,21 +29,13 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_weight="1"/>
-        <ImageButton
-            android:id="@+id/btnGetImage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:background="@color/colorBackground"
-            app:srcCompat="@drawable/imageplus"/>
 
         <ImageButton
-            android:id="@+id/btnSave"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
+            android:id="@+id/face_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:background="@color/colorBackground"
-            app:srcCompat="@drawable/save"/>
+            app:srcCompat="@drawable/calendar"/>
     </LinearLayout>
 
     <View
@@ -56,35 +48,43 @@
     <FrameLayout
         android:id="@+id/photoLayout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="3"
+        android:layout_height="match_parent"
         android:padding="15dp"
         android:gravity="center"
         android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/imgView"
+        <LinearLayout
+            android:id="@+id/photo"
             android:layout_width="match_parent"
-            android:layout_height="400dp"
-            android:layout_gravity="top"
-            app:srcCompat="@drawable/renoir07" />
-        <View
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/imgView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="top"/>
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/facesLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <LinearLayout
             android:id="@+id/photo_fore"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/blur_color"
-            android:visibility="invisible"/>
-        <TextView
-            android:id="@+id/photo_text"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="415dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginBottom="15dp"
-            android:text="사진 메타 정보"
-            android:visibility="invisible"/>
-
+            android:visibility="invisible">
+            <TextView
+                android:id="@+id/photo_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="사진 메타 정보"
+                android:layout_gravity="center"/>
+        </LinearLayout>
 
     </FrameLayout>
 

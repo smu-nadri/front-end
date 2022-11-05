@@ -37,35 +37,64 @@
         android:layout_marginRight="20dp"
         android:background="@color/black" />
 
-
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="20dp"
-        android:orientation="vertical">
+        android:fillViewport="true">
 
         <LinearLayout
-            android:id="@+id/tagListView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:padding="20dp"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="태그" />
-
-            <GridView
-                android:id="@+id/gvTagList"
+            <LinearLayout
+                android:id="@+id/faceListView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:horizontalSpacing="12dp"
-                android:numColumns="3"
-                android:verticalSpacing="12dp">
-            </GridView>
-        </LinearLayout>
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-    </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="사람" />
+
+                <GridView
+                    android:id="@+id/gvFaceList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:horizontalSpacing="12dp"
+                    android:numColumns="3"
+                    android:verticalSpacing="12dp">
+                </GridView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/tagListView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="태그" />
+
+                <GridView
+                    android:id="@+id/gvTagList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:horizontalSpacing="12dp"
+                    android:numColumns="3"
+                    android:verticalSpacing="12dp">
+                </GridView>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>
