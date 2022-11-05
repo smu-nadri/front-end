@@ -27,9 +27,11 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -112,7 +114,11 @@ public class AlbumPageActivity extends AppCompatActivity {
     static MultiImageAdapter adapter;
     ItemTouchHelper helper;
 
-    ImageButton btnGetImage, btnSave, btnRemove, btnEdit, btnMarked, btnBlank;
+    static FrameLayout menuBtnLayout;
+    static LinearLayout basicBtnLayout, editBtnLayout;
+    static Boolean isCheck = false;
+
+    static ImageButton btnMenu, btnEdit, btnGetImage, btnSave, btnRemove, btnMarked, btnBlank;
     TextView tvPageDate;
 
     ImageView photo_big;
@@ -155,10 +161,20 @@ public class AlbumPageActivity extends AppCompatActivity {
 
         //xml연결
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        btnGetImage = (ImageButton) findViewById(R.id.btnGetImage);
         tvPageDate = (TextView) findViewById(R.id.tvPageDate);
+
+        menuBtnLayout = (FrameLayout) findViewById(R.id.menuBtnLayout);
+        basicBtnLayout = (LinearLayout) findViewById(R.id.basicBtnLayout);
+        editBtnLayout = (LinearLayout) findViewById(R.id.editBtnLayout);
+
+        btnMenu = (ImageButton) findViewById(R.id.btnMenu);
+        btnEdit = (ImageButton) findViewById(R.id.btnEdit);
+        btnGetImage = (ImageButton) findViewById(R.id.btnGetImage);
         btnSave = (ImageButton) findViewById(R.id.btnSave);
+        btnBlank = (ImageButton) findViewById(R.id.btnBlank);   //체크버튼 전체 해제
+        btnMarked = (ImageButton) findViewById(R.id.btnMarked); //체크버튼 전체 선택
         btnRemove = (ImageButton) findViewById(R.id.btnRemove);
+
         //xml연결
         photo_big = findViewById(R.id.imgView);
         photo_fore = findViewById(R.id.photo_fore);
@@ -167,6 +183,7 @@ public class AlbumPageActivity extends AppCompatActivity {
         //인텐트
         Intent getDateIntent = getIntent();
         int iDay = getDateIntent.getIntExtra("SelectedDATE",-1);
+
 
 
         //화면 설정
@@ -298,6 +315,92 @@ public class AlbumPageActivity extends AppCompatActivity {
             }
         });
 
+        /*
+        btnMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                btnMenu.setVisibility(View.GONE);
+                btnEdit.setVisibility(View.VISIBLE);
+                basicBtnLayout.setVisibility(View.VISIBLE);
+            }
+        });
+
+         */
+
+        btnEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(basicBtnLayout.getVisibility() == View.VISIBLE){
+                    editBtnLayout.setVisibility(View.VISIBLE);
+                    basicBtnLayout.setVisibility(View.INVISIBLE);
+                    btnEdit.setImageResource(R.drawable.edit_click);
+
+                    // 롱클릭한것처럼 체크박스 보여야함
+                    MultiImageAdapter.isEdit = true;
+                    adapter.notifyDataSetChanged();
+                    Log.d("CHECKBOX", "yes값 : " + MultiImageAdapter.isEdit);
+                }
+                else{
+                    basicBtnLayout.setVisibility(View.VISIBLE);
+                    editBtnLayout.setVisibility(View.INVISIBLE);
+                    btnEdit.setImageResource(R.drawable.edit_unclick);
+
+                    MultiImageAdapter.isEdit = false;
+                    adapter.notifyDataSetChanged();
+                    Log.d("CHECKBOX", "no값 : " + MultiImageAdapter.isEdit);
+                }
+
+                if(btnMarked.getVisibility() == View.VISIBLE){
+                    btnBlank.setVisibility(View.VISIBLE);
+                    btnMarked.setVisibility(View.GONE);
+
+                    //체크박스 전체 해제
+                    MultiImageAdapter.isCheck = false;
+
+                }
+
+            }
+        });
+
+        btnBlank.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                btnMarked.setVisibility(View.VISIBLE);
+                btnBlank.setVisibility(View.GONE);
+
+                //체크박스 전체 선택
+                MultiImageAdapter.isCheck = true;
+                adapter.notifyDataSetChanged();
+
+            }
+        });
+        btnMarked.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                btnMarked.setVisibility(View.GONE);
+                btnBlank.setVisibility(View.VISIBLE);
+
+                //체크박스 전체 해제
+                MultiImageAdapter.isCheck = false;
+                adapter.notifyDataSetChanged();
+            }
+        });
+
+
+        // 페 이 지 액 티 비 티   아 이 템 이   비 어 있 을   때 의   버 튼   관 리
+        /*if(ReqServer.photoList.size() == 0){
+            btnEdit.setVisibility(View.GONE);
+            Log.d("size", "아이템사이즈" + ReqServer.photoList.size());
+        }
+        else {
+            btnEdit.setVisibility(View.VISIBLE);
+        }
+
+         */
+         
+
+
+
         imageLabelerOptions = new ImageLabelerOptions.Builder() //옵션 설정
                 .setConfidenceThreshold(0.6f)   //정확도 최솟값
                 .build();
@@ -329,6 +432,9 @@ public class AlbumPageActivity extends AppCompatActivity {
         ReqServer.album.remove("title");
         ReqServer.album.remove("thumbnail");
         ReqServer.album.remove("type");
+        MultiImageAdapter.isEdit = false;
+        MultiImageAdapter.isCheck = false;
+        //adapter.notifyDataSetChanged();
     }
 
     //앨범에서 액티비티로 돌아온 후 실행되는 메서드 = 앨범 레이아웃 생성!

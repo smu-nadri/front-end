@@ -30,54 +30,90 @@
             android:layout_height="0dp"
             android:layout_weight="1"/>
 
-        <ImageButton
-            android:id="@+id/btnGetImage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:background="@color/colorBackground"
-            app:srcCompat="@drawable/imageplus"/>
 
-        <ImageButton
-            android:id="@+id/btnMarked"
+        <FrameLayout
+            android:id="@+id/menuBtnLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:background="@color/colorBackground"
-            app:srcCompat="@drawable/checkbox_multiple_marked"/>
+            android:layout_gravity="center">
 
-        <ImageButton
-            android:id="@+id/btnBlank"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:background="@color/colorBackground"
-            app:srcCompat="@drawable/checkbox_multiple_blank"/>
+        <!-- 이미지버튼 묶음 -->
+            <LinearLayout
+                android:id="@+id/editBtnLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="invisible">
 
-        <ImageButton
-            android:id="@+id/btnRemove"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:background="@color/colorBackground"
-            app:srcCompat="@drawable/trash_can"/>
+                <ImageButton
+                    android:id="@+id/btnBlank"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="13dp"
+                    android:background="@color/colorBackground"
+                    app:srcCompat="@drawable/checkbox_multiple_blank"/>
 
+                <!--나중에 이미지소스만 변경하는걸로? 그냥 visible-gone으로 바꾸는게 나으려나-->
+                <ImageButton
+                    android:id="@+id/btnMarked"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="13dp"
+                    android:visibility="gone"
+                    android:background="@color/colorBackground"
+                    app:srcCompat="@drawable/checkbox_multiple_marked"/>
+
+                <ImageButton
+                    android:id="@+id/btnRemove"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:background="@color/colorBackground"
+                    app:srcCompat="@drawable/remove"/>
+
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/basicBtnLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageButton
+                    android:id="@+id/btnGetImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="13dp"
+                    android:background="@color/colorBackground"
+                    app:srcCompat="@drawable/image_add"/>
+
+                <ImageButton
+                    android:id="@+id/btnSave"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="13dp"
+                    android:background="@color/colorBackground"
+                    app:srcCompat="@drawable/save"/>
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <!-- 메뉴버튼 추가하기! 메뉴버튼이랑 연필버튼 visible-gone으로 처리해야할 듯 -->
         <ImageButton
-            android:id="@+id/btnSave"
+            android:id="@+id/btnMenu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center|right"
             android:layout_marginRight="5dp"
+            android:visibility="gone"
             android:background="@color/colorBackground"
-            app:srcCompat="@drawable/save"/>
-
+            app:srcCompat="@drawable/menu"/>
         <ImageButton
             android:id="@+id/btnEdit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
+            android:layout_gravity="center|right"
             android:layout_marginRight="5dp"
             android:background="@color/colorBackground"
-            app:srcCompat="@drawable/pencil"/>
+            app:srcCompat="@drawable/edit_unclick"/>
 
     </LinearLayout>
 
