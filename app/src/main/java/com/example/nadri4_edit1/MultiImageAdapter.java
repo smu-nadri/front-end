@@ -39,8 +39,11 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
     private ArrayList<JSONObject> mData = null;
     private Context mContext = null;
 
-    private boolean isEdit = false;
-    private TreeSet<Integer> checkList = new TreeSet<>();
+    public static boolean isEdit = false;
+    public static boolean isCheck = false;
+    //public static boolean isEmpty;
+
+    public static TreeSet<Integer> checkList = new TreeSet<>();
 
     public ArrayList<JSONObject> getmData() {
         return mData;
@@ -226,6 +229,8 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
                     Log.d("HWA", "편집모드 진입!");
                     isEdit = true;
                     AlbumPageActivity.adapter.notifyDataSetChanged();
+                    AlbumPageActivity.editBtnLayout.setVisibility(View.VISIBLE);
+                    AlbumPageActivity.basicBtnLayout.setVisibility(View.INVISIBLE);
                 }
                 return true;
             }
@@ -234,7 +239,7 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
         holder.item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(isEdit){
+                if(isEdit == true){
                     Log.d("HWA", "눌렀음! " + holder.getBindingAdapterPosition());
                     int i = holder.getBindingAdapterPosition();
                     try {
@@ -250,10 +255,18 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
                             holder.checkbox.setChecked(true);
                             checkList.remove(i);
                         }
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
+                /* //?
+                else if(isEdit == false){
+
+                    Log.d("CHECKBOX", "adapter값 : "+isEdit);
+                }
+
+                 */
                 else {  //임시!
                     Context context = view.getContext();
                     Intent photo_data = new Intent(context, PhotoDataActivity.class);
@@ -263,9 +276,32 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
             }
         });
 
+
+        int num=0;
+        try {
+            if (isCheck == true) {
+                for (num = 0; num < mData.size(); num++) {
+                    mData.get(num).put("isChecked", true);
+                    holder.checkbox.setChecked(true);
+                    Log.d("ischecking", "체크 전체 선택 - " + num);
+                }
+            } else {
+                for (num = 0; num < mData.size(); num++) {
+                    mData.get(num).put("isChecked", false);
+                    holder.checkbox.setChecked(false);
+                    Log.d("ischecking", "체크 전체 해제 - "+ num);
+                }
+            }
+        } catch (JSONException e){
+            e.printStackTrace();
+        }
+
         if(isEdit){
             Log.d("HWA", "편집모드입니다!");
             holder.checkbox.setVisibility(View.VISIBLE);
+        }
+        else{
+            holder.checkbox.setVisibility(View.INVISIBLE);
         }
 
         try {
