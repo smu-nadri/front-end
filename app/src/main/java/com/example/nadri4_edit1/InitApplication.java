@@ -62,9 +62,10 @@ public class InitApplication extends Application {
         CharSequence daily_name = "일일 기록 알림";
         String daily_description = "일일 기록을 위한 알림을 받습니다.";
 
+        //deleteNotificationChannel(HIGHLIGHT_NOTIFICATION_CHANNEL_ID);
+        //deleteNotificationChannel(DAILY_NOTIFICATION_CHANNEL_ID);
         createNotificationChannel(HIGHLIGHT_NOTIFICATION_CHANNEL_ID, highlight_name, highlight_description);
         createNotificationChannel(DAILY_NOTIFICATION_CHANNEL_ID, daily_name, daily_description);
-        //deleteNotificationChannel(HIGHLIGHT_NOTIFICATION_CHANNEL_ID);
 
         //deleteWorkRequest();
         createHighlightWorkRequest();
@@ -72,25 +73,7 @@ public class InitApplication extends Application {
 
         printWorkRequest();
 
-
-
-        try {
-            //deleteFile("facelist.tmp");
-            FileInputStream fis = openFileInput("facelist.tmp");
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            ArrayList<FaceRecognize.Recognition> loadFaces = (ArrayList<FaceRecognize.Recognition>) ois.readObject();
-            ois.close();
-
-            FaceRecognitionAPI.setRegistered(loadFaces);
-            int lastIdx = FaceRecognitionAPI.getRegistered().size() - 1;
-            int nextId = FaceRecognitionAPI.getRegistered().get(lastIdx).getId() + 1;
-            FaceRecognitionAPI.setFaceId(nextId);
-
-        } catch (FileNotFoundException | ArrayIndexOutOfBoundsException e){
-            FaceRecognitionAPI.setFaceId(0);
-        } catch (IOException | ClassNotFoundException e){
-            Log.e("InitApplication", String.valueOf(e));
-        }
+        openFaceList();
     }
 
     private void createNotificationChannel(String id, CharSequence name, String description) {

@@ -539,7 +539,7 @@ public class ReqServer {
             reqJson.put("face", updateFace);
 
         } catch (Exception e) {
-            Log.e("POST", "reqPostPages Set reqJson 에러: " + e);
+            Log.e("POST", "reqUpdateFace Set reqJson 에러: " + e);
             Toast.makeText(context.getApplicationContext(), "전송 실패", Toast.LENGTH_SHORT).show();
         }
 
@@ -562,7 +562,7 @@ public class ReqServer {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("POST", "reqPostPages Response 에러: " + error);
+                Log.e("POST", "reqUpdateFace Response 에러: " + error);
                 Toast.makeText(context.getApplicationContext(), "전송 실패", Toast.LENGTH_SHORT).show();
             }
         });

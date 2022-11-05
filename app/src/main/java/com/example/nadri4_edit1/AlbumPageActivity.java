@@ -178,12 +178,16 @@ public class AlbumPageActivity extends AppCompatActivity {
                     ReqServer.album.put("type", "customAlbum");
                     tvPageDate.setText(title);
                     tvPageDate.setEnabled(true);
+
                     if(getDateIntent.getBooleanExtra("getImage", false)){   //마이앨범 생성으로 넘어온 경우
                         Intent intent = new Intent();
                         intent.setType("image/*");
                         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                         intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
                         startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
+                    } else {
+                        //기존에 저장된 사진들 불러오기
+                        ReqServer.reqGetPages(AlbumPageActivity.this);
                     }
                 }
                 else {  //월별 앨범
@@ -194,6 +198,9 @@ public class AlbumPageActivity extends AppCompatActivity {
                     String[] split_title = title.split("-");
                     tvPageDate.setText(split_title[0]+"년 "+split_title[1]+"월");
                     tvPageDate.setEnabled(false);
+
+                    //기존에 저장된 사진들 불러오기
+                    ReqServer.reqGetPages(AlbumPageActivity.this);
                 }
             }
             else {  //캘린더에서 날짜를 선택한 경우
@@ -206,6 +213,9 @@ public class AlbumPageActivity extends AppCompatActivity {
 
                 ReqServer.album.put("title", CalendarUtil.selectedDate.get(Calendar.YEAR) + "-" + tMonth + "-" + tDay);
                 ReqServer.album.put("type", "dateAlbum");
+
+                //기존에 저장된 사진들 불러오기
+                ReqServer.reqGetPages(AlbumPageActivity.this);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -224,8 +234,6 @@ public class AlbumPageActivity extends AppCompatActivity {
         helper = new ItemTouchHelper(new ItemTouchHelperCallback(adapter));
         helper.attachToRecyclerView(recyclerView);
 
-        //기존에 저장된 사진들 불러오기
-        ReqServer.reqGetPages(AlbumPageActivity.this);
 
         //이미지 가져오기 버튼
         btnGetImage.setOnClickListener(new View.OnClickListener() {
@@ -294,6 +302,13 @@ public class AlbumPageActivity extends AppCompatActivity {
                 .build();
         labeler = ImageLabeling.getClient(imageLabelerOptions);
 
+        faceDetectorOptions = new FaceDetectorOptions.Builder()
+                .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_ACCURATE)
+                .enableTracking()
+                .setMinFaceSize(0.15f)
+                .setContourMode(FaceDetectorOptions.LANDMARK_MODE_ALL)
+                .build();
+        detector = FaceDetection.getClient(faceDetectorOptions);
 
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -476,14 +491,6 @@ public class AlbumPageActivity extends AppCompatActivity {
     protected void setUriFaces(JSONObject imageInfo, Uri imageUri){
         JSONArray facesIndex = new JSONArray();   //사진 한 장의 얼굴들
         try {
-            faceDetectorOptions = new FaceDetectorOptions.Builder()
-                    .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_ACCURATE)
-                    .enableTracking()
-                    .setMinFaceSize(0.15f)
-                    .setContourMode(FaceDetectorOptions.LANDMARK_MODE_ALL)
-                    .build();
-            detector = FaceDetection.getClient(faceDetectorOptions);
-            Log.e("HWA", "망할 : ");
 
             //태그 불러오기
             InputImage image = InputImage.fromFilePath(this, imageUri);    //uri -> InputImage 변환
@@ -500,11 +507,14 @@ public class AlbumPageActivity extends AppCompatActivity {
                             JSONObject faceInfo = new JSONObject();
                             //바운딩 전처리
                             Rect bounds = face.getBoundingBox();
-                            int boundsX = bounds.centerX()-(bounds.width()/2);
-                            int boundsY = bounds.centerY()-(bounds.height()/2);
+                            int boundsX = bounds.left;
+                            int boundsY = bounds.top;
                             int boundsW = bounds.width();
                             int boundsH = bounds.height();
-
+                            Log.d("HWA", boundsX + " " + boundsY + " " + boundsW + " " + boundsH);
+                            if (boundsX < 0 || boundsY < 0){
+                                continue;
+                            }
                             if (boundsX + boundsW > pickedImage.getWidth()) {
                                 boundsW = pickedImage.getWidth() - boundsX;
                             }
@@ -515,12 +525,12 @@ public class AlbumPageActivity extends AppCompatActivity {
                             Bitmap resized = Bitmap.createBitmap(pickedImage, boundsX, boundsY, boundsW, boundsH);
 
                             String date = timeStamp();
-                            Log.e("HWA", "망할 : 1");
                             faceInfo.put("left", boundsX);
                             faceInfo.put("top", boundsY);
                             faceInfo.put("width", boundsW);
                             faceInfo.put("height", boundsH);
 
+                            Log.d("HWA", "순서 : 1 Faces for문");
                             compressBitmap(resized, date, faceInfo);
                             facesIndex.put(faceInfo);
                         }
@@ -537,7 +547,7 @@ public class AlbumPageActivity extends AppCompatActivity {
         }
     }
 
-    void listCollections() {
+    synchronized void listCollections() {
         // To list the collections.
         // It won't work if there's any exisiting collection.
         // We need only one collection named ndr.
@@ -596,14 +606,14 @@ public class AlbumPageActivity extends AppCompatActivity {
     String timeStamp(){
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddkkmmss");
-        String date = dateFormat.format(calendar.getTime());
+        String date = String.valueOf(calendar.getTimeInMillis());
         Log.d("JUN", date);
         return date;
     }
 
-    void compressBitmap(Bitmap resized, String fileName, JSONObject faceInfo) {
+    synchronized void compressBitmap(Bitmap resized, String fileName, JSONObject faceInfo) {
         // It saves bitmap to .jpeg file.
-        Log.e("HWA", "망할 : 2");
+        Log.d("HWA", "순서 : 2 compressBitmap");
 
         String MEDIA_PATH = getFilesDir().getPath() + "/.savepoint/";
         File dir = new File(MEDIA_PATH);
@@ -621,7 +631,7 @@ public class AlbumPageActivity extends AppCompatActivity {
             if (dir.exists()) Log.d("JUN", "Success!");
             else Log.d("JUN", "Something's wrong.");
         } catch (Exception e) {
-            Log.e("HWA", "망할 : 3");
+            Log.e("HWA", "망할 : compressBitmap " + e);
         }
 
         try {
@@ -637,15 +647,14 @@ public class AlbumPageActivity extends AppCompatActivity {
 
             out.close();
         } catch (Exception e) {
-            Log.e("HWA", "망할 : 4 " + e);
+            Log.e("HWA", "compressBitmap Error : " + e);
         }
 
     }
 
-    void uploadObject(String filePath, String fileName, String namePerson, JSONObject faceInfo) {
+    synchronized void uploadObject(String filePath, String fileName, String namePerson, JSONObject faceInfo) {
         // This is for uploading file to bucket, and it only works for adding faces.
-        Log.e("HWA", "망할 : 5");
-
+        Log.d("HWA", "순서 : 3 uploadObject");
         File toUpload = new File(filePath);
         AmazonS3Client s3Client = new AmazonS3Client(new BasicAWSCredentials(access_id, access_pw));
         s3Client.setRegion(Region.getRegion(Regions.AP_NORTHEAST_2));
@@ -660,6 +669,7 @@ public class AlbumPageActivity extends AppCompatActivity {
             public void onStateChanged(int id, TransferState state) {
                 if(state == TransferState.COMPLETED) {
                     Toast.makeText(getApplicationContext(), "Uploaded - " + fileName, Toast.LENGTH_SHORT).show();
+                    Log.d("HWA", "순서 : 3 uploadObject upload");
 
                     isCompared(fileName, faceInfo);
                 }
@@ -672,15 +682,15 @@ public class AlbumPageActivity extends AppCompatActivity {
 
             @Override
             public void onError(int id, Exception ex) {
-                Log.d("JUN", "Damnit!");
+                Log.d("JUN", "Damnit!" + ex);
             }
         });
     }
 
-    void addFace2Collection (String fileName, String nameFace, JSONObject faceInfo) {
+    synchronized void addFace2Collection (String fileName, String nameFace, JSONObject faceInfo) {
         // This works to add face to collection.
         // It will only work when the user tries to add face and name.
-
+        Log.d("HWA", "순서 : 6 addFace2Collection");
         Image image = new Image()
                 .withS3Object(new S3Object()
                         .withBucket(bucket)
@@ -729,51 +739,64 @@ public class AlbumPageActivity extends AppCompatActivity {
 //        listFace();
     }
 
-    void isCompared(String fileName, JSONObject faceInfo) {
-        // This is to search faces.
-        ObjectMapper objectMapper = new ObjectMapper();
+    synchronized void isCompared(String fileName, JSONObject faceInfo) {
+        try {
+            Log.d("HWA", "순서 : 4 isCompared");
+            // This is to search faces.
+            ObjectMapper objectMapper = new ObjectMapper();
 
-        Image image = new Image()
-                .withS3Object(new S3Object()
-                        .withBucket(bucket)
-                        .withName(fileName));
+            Image image = new Image()
+                    .withS3Object(new S3Object()
+                            .withBucket(bucket)
+                            .withName(fileName));
 
 
-        SearchFacesByImageRequest searchRequest = new SearchFacesByImageRequest()
-                .withCollectionId(collectionId)
-                .withImage(image)
-                .withFaceMatchThreshold(70F)
-                .withMaxFaces(2);
+            SearchFacesByImageRequest searchRequest = new SearchFacesByImageRequest()
+                    .withCollectionId(collectionId)
+                    .withImage(image)
+                    .withFaceMatchThreshold(70F)
+                    .withMaxFaces(2);
 
-        SearchFacesByImageResult searchResult = rekognition.searchFacesByImage(searchRequest);
-        List<FaceMatch> faceImageMatches = searchResult.getFaceMatches();
-        if(!faceImageMatches.isEmpty()) {
-            for (FaceMatch face : faceImageMatches) {
-                Log.d("SEARCH", face.getFace().getFaceId());
+            SearchFacesByImageResult searchResult = rekognition.searchFacesByImage(searchRequest);
+            List<FaceMatch> faceImageMatches = searchResult.getFaceMatches();
+            if (!faceImageMatches.isEmpty()) {
+                Log.d("HWA", "순서 : 5 얼굴 있어!");
+                for (FaceMatch face : faceImageMatches) {
+                    Log.d("SEARCH", face.getFace().getFaceId());
+                    try {
+                        faceInfo.put("faceId", face.getFace().getFaceId());
+
+                        String name = faceMap.get(face.getFace().getFaceId());
+                        Log.e("HWA", "이름 : " + name);
+                        if (name != null) {
+                            faceInfo.put("name", name);
+                        }
+                    } catch (JSONException e) {
+                        Log.e("JUN", "억까ㄴ..");
+                    }
+                    //searchMap(face.getFace().getFaceId(), faceInfo);
+                }
+            } else {
+                Log.d("HWA", "순서 : 5 얼굴 없어!");
+                Toast.makeText(this, "No result to show!", Toast.LENGTH_SHORT).show();
+                Log.d("SEARCH", "No result to show!");
                 try {
-                    faceInfo.put("faceId", face.getFace().getFaceId());
+                    faceInfo.put("name", "Unknown");
                 } catch (JSONException e) {
                     Log.e("JUN", "억까ㄴ..");
                 }
-                searchMap(face.getFace().getFaceId(), faceInfo);
+                addFace2Collection(fileName, "Unknown", faceInfo);
             }
-        }
-        else {
-            Toast.makeText(this, "No result to show!", Toast.LENGTH_SHORT).show();
-            Log.d("SEARCH", "No result to show!");
-            try {
-                faceInfo.put("name", "Unknown");
-            } catch (JSONException e) {
-                Log.e("JUN", "억까ㄴ..");
-            }
-            addFace2Collection (fileName, "Unknown", faceInfo);
+        } catch(Exception e){
+            Log.e("HWA", "이게 무슨 에러람.. " + e);
         }
     }
 
-    void enrollMap(String uploadDate, String namePerson){
+    synchronized void enrollMap(String uploadDate, String namePerson){
         // This app has list saved in local storage so every picture should be saved
         // with key (uploadDate, and it will be the file's name)
         // and name (namePerson).
+        Log.d("HWA", "순서 : 7 enrollMap!");
         faceMap.put(uploadDate, namePerson);
         Log.d("FACEMAP", uploadDate +" "+ namePerson);
         try {
@@ -794,6 +817,7 @@ public class AlbumPageActivity extends AppCompatActivity {
     }
 
     void searchMap(String imageID, JSONObject imageInfo) {
+        Log.d("KEY", "뭐야?");
         // This code will search if there's any person enrolled to the faceMap.
         // If so, it will show the name. Unless, it will show nothing.
         for (String key: faceMap.keySet()) {
@@ -803,7 +827,7 @@ public class AlbumPageActivity extends AppCompatActivity {
                 try {
                     imageInfo.put("name", faceMap.get(key));
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    Log.e("JUN", "억까ㄴ..");
                 }
                 //textView.setText(faceMap.get(key)); 오잉
             }
@@ -816,6 +840,7 @@ public class AlbumPageActivity extends AppCompatActivity {
 
 
     void deleteCollection() {
+        Log.e("HWA", "삭제중");
         System.out.println("deleting...");
         DeleteCollectionRequest request = new DeleteCollectionRequest().withCollectionId(collectionId);
         DeleteCollectionResult result = rekognition.deleteCollection(request);
