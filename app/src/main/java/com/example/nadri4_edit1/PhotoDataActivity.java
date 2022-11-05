@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -46,13 +47,12 @@ import java.util.TimeZone;
 public class PhotoDataActivity extends AppCompatActivity {
     static MultiImageAdapter adapter;
 
-    FrameLayout photoLayout;
+    FrameLayout photoLayout, facesLayout;
     ImageView photo_big;
-    View photo_fore;
+    LinearLayout photo_fore;
     TextView photo_text;
-
-    ImageButton btnGetImage, btnSave;
     TextView tvPageDate;
+    ImageButton face_button;
 
     private final String localFaceList = "LocalListofFace.tmp";
 
@@ -64,19 +64,20 @@ public class PhotoDataActivity extends AppCompatActivity {
 
         //xml연결
         photoLayout = findViewById(R.id.photoLayout);
+        facesLayout = findViewById(R.id.facesLayout);
         photo_big = findViewById(R.id.imgView);
         photo_fore = findViewById(R.id.photo_fore);
         photo_text = findViewById(R.id.photo_text);
+        face_button = findViewById(R.id.face_button);
 
         //xml연결
-        btnGetImage = (ImageButton) findViewById(R.id.btnGetImage);
         tvPageDate = (TextView) findViewById(R.id.tvPageDate);
-        btnSave = (ImageButton) findViewById(R.id.btnSave);
 
 
         //인텐트 - 사진메타정보 통으로 가져옴
         Intent intent = getIntent();
         Integer photo_data = intent.getIntExtra("photo_data", -1);
+        boolean search = intent.getBooleanExtra("search", false);
 
         String title = null;
         String uri = null;
@@ -94,24 +95,33 @@ public class PhotoDataActivity extends AppCompatActivity {
             JSONObject photo_data_json = ReqServer.photoList.get(photo_data);
             photo_text.setText("사진 정보\n\n");
 
-            //달력앨범 타이틀 포맷 맞춰야함!!
-            if(photo_data_json.has("album")) {
-                title = photo_data_json.getJSONObject("album").getString("title");
+            if (ReqServer.album.has("title")) {
+                if (ReqServer.album.getString("type").equals("dateAlbum")) {
+                    title = ReqServer.album.getString("title");
+                    String[] split_title = title.split("-");
+                    if (split_title.length == 2)
+                        title = split_title[0] + "년 " + split_title[1] + "월";
+                    else if (split_title.length == 3)
+                        title = split_title[0] + "년 " + split_title[1] + "월 " + split_title[2] + "일";
+                } else if (ReqServer.album.getString("type").equals("customAlbum")) {
+                    title = ReqServer.album.getString("title");
+                } else if (ReqServer.album.getString("type").equals("search")) {
+                    title = ReqServer.album.getString("title");
+                }
                 tvPageDate.setText(title);
+                tvPageDate.setEnabled(false);
             }
 
             uri = photo_data_json.getString("uri");
-            //photo_big.setImageResource(Uri.parseUri(uri));
             Glide.with(this).load(Uri.parse(uri)).into(photo_big);
 
-            if(photo_data_json.has("datetime")) {
+            if (photo_data_json.has("datetime")) {
                 Object time = photo_data_json.get("datetime");
 
-                if(time.getClass() == String.class) {
+                if (time.getClass() == String.class) {
                     datetime = ((String) time).substring(0, 10) + " " + ((String) time).substring(11, 19);
                     photo_text.append(" - 날짜 : " + datetime + "\n");
-                }
-                else if(time.getClass() == Long.class) {
+                } else if (time.getClass() == Long.class) {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"));
                     calendar.setTimeInMillis((Long) time);
@@ -120,34 +130,34 @@ public class PhotoDataActivity extends AppCompatActivity {
                 }
             }
 
-            //한글(location-address)만 가져오도록 함
-            //location = photo_data_json.getString("location"); //-> 좌표까지 가져옴
-            if(photo_data_json.has("location")) {
+            if (photo_data_json.has("location")) {
                 location = photo_data_json.getJSONObject("location").getString("address");
                 photo_text.append(" - 위치 : " + location + "\n");
             }
 
-            //array로 저장돼있어서 어케 불러와야할지 모르겠음
             tags_arr = photo_data_json.getJSONArray("tags");
-                    //{ _id, tag_en, tag_ko1, tag_ko2 }
-            for(int i=0; i<tags_arr.length(); i++){
+            for (int i = 0; i < tags_arr.length(); i++) {
                 tags_str = tags_str + "#" + tags_arr.getJSONObject(i).getString("tag_ko1") + " ";
-                //인덱스 진짜 어케..
-            } //-> location처럼 해볼라했는데 안 되네..
+            }
             photo_text.append(" - 태그 : " + tags_str + "\n");
 
-            //DB의 comment에 저장된 내용이 하나도 없을 땐 오류나는듯?
-            //DB comment에 "#태그"는 저장하지 않도록 할 수 있나?(태그까지 comment로 저장돼서 출력할 때 중복됨) 아님 append할 때 처리해야하는디 어케하지
-            //comment의 개행을 잘 처리해야 깔끔할듯
-            if(photo_data_json.has("comment")) {
+            if (photo_data_json.has("comment")) {
                 comment = photo_data_json.getString("comment");
                 photo_text.append(" - 내용 : " + comment + "\n");
             }
 
-            if(photo_data_json.has("faces")) {
+            if (photo_data_json.has("albums")) {
+                JSONArray albums = photo_data_json.getJSONArray("albums");
+                photo_text.append(" - 앨범\n");
+                for (int i = 0; i < albums.length(); i++) {
+                    photo_text.append("      - " + albums.getJSONObject(i).getString("title") + "\n");
+                }
+            }
+
+            if (photo_data_json.has("faces")) {
                 JSONArray faces = photo_data_json.getJSONArray("faces");
 
-                for(int i = 0; i < faces.length(); i++){
+                for (int i = 0; i < faces.length(); i++) {
                     JSONObject face = faces.getJSONObject(i);
                     String name = face.getString("name");
                     final int idx = i;
@@ -155,7 +165,7 @@ public class PhotoDataActivity extends AppCompatActivity {
 
                     TextView tv = new TextView(this);
                     FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(100, 50);
-                    params.setMargins(0, i*50, 0, 0);
+                    params.setMargins(0, i * 50, 0, 0);
                     tv.setBackgroundColor(Color.BLACK);
                     tv.setTextColor(Color.WHITE);
                     tv.setLayoutParams(params);
@@ -169,6 +179,7 @@ public class PhotoDataActivity extends AppCompatActivity {
                             AlertDialog.Builder dlg = new AlertDialog.Builder(PhotoDataActivity.this);
                             ImageView faceImg = (ImageView) dialogView.findViewById(R.id.faceImg);
                             EditText faceName = (EditText) dialogView.findViewById(R.id.faceName);
+
 
                             try {   //얼굴사진 잘라서 셋팅
                                 Bitmap cropImg = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getContentResolver(), Uri.parse(finalUri)));
@@ -194,6 +205,21 @@ public class PhotoDataActivity extends AppCompatActivity {
 
                                         enrollMap(faceId, name);
 
+                                        for (int j = 0; j < ReqServer.photoList.size(); j++) {   //photoList에 있는 사진은 미리 이름 업데이트
+                                            JSONArray faces = ReqServer.photoList.get(j).getJSONArray("faces");
+                                            if (faces.length() > 0) {
+                                                for (int k = 0; k < faces.length(); k++) {
+                                                    if (faces.getJSONObject(k).getString("faceId").equals(faceId)) {
+                                                        faces.getJSONObject(k).put("name", name);
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        if (search)
+                                            SearchPageActivity.adapter.notifyDataSetChanged();
+                                        else AlbumPageActivity.adapter.notifyDataSetChanged();
+
                                         //다른 사진들도 변경하기 위해 서버로 변경할 이름 전송 (8, 이름)
                                         ReqServer.updateFace = face;
                                         ReqServer.reqUpdateFace(getApplicationContext());
@@ -208,58 +234,42 @@ public class PhotoDataActivity extends AppCompatActivity {
                     });
 
                     //화면에 이름태그 추가
-                    photoLayout.addView(tv);
+                    facesLayout.addView(tv);
                 }
             }
         } catch (JSONException e) {
-            Log.e("검사 ", title + ", " + e.toString());
+            Log.e("PhotoDataActivity", title + ", " + e.toString());
         }
-
-
-
-
-        //보여줄 사진 선택
-
-
-        //사진 정보 가져오기
-
 
 
         // 클릭하면 사진 정보 보여주기
         photo_big.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                if(photo_fore.getVisibility() == View.INVISIBLE){
-                    photo_fore.setVisibility(View.VISIBLE);
-                    photo_text.setVisibility(View.VISIBLE);
-                }
-                else{
-                    photo_fore.setVisibility(View.INVISIBLE);
-                    photo_text.setVisibility(View.INVISIBLE);
-                }
+                photo_fore.setVisibility(View.VISIBLE);
             }
         });
 
+        photo_fore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                photo_fore.setVisibility(View.GONE);
+            }
+        });
 
+        face_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(facesLayout.getVisibility() == View.VISIBLE) {
+                    facesLayout.setVisibility(View.GONE);
+                }
+                else {
+                    facesLayout.setVisibility(View.VISIBLE);
+                }
+            }
+        });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private String dateFormat(Calendar calendar, int day){  //2022년 5월
-
-        //년월 포맷
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH)+1;
-
-        String date = year + "년  " + month + "월  " + day + "일 ";
-
-        return date;
-    }
-    //제목 설정
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void setView(int day){
-        tvPageDate.setText(dateFormat(CalendarUtil.selectedDate, day));
-    }
 
     void enrollMap(String uploadDate, String namePerson){
         // This app has list saved in local storage so every picture should be saved

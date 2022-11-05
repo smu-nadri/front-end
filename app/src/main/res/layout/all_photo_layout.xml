@@ -71,7 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:horizontalSpacing="12dp"
-            android:numColumns="3"
+            android:numColumns="4"
             android:verticalSpacing="12dp">
         </GridView>
 

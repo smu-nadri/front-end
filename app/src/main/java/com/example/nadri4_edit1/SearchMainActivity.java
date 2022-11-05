@@ -2,8 +2,8 @@ package com.example.nadri4_edit1;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,7 +15,8 @@ import java.net.URLEncoder;
 public class SearchMainActivity extends AppCompatActivity {
 
     SearchView searchView;
-    static GridView gridView;
+
+    static GridView gvFaceList, gvTagList;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -23,7 +24,8 @@ public class SearchMainActivity extends AppCompatActivity {
         setContentView(R.layout.search_main_view);
 
         searchView = (SearchView) findViewById(R.id.searchView);
-        gridView = (GridView) findViewById(R.id.gvTagList);
+        gvTagList = (GridView) findViewById(R.id.gvTagList);
+        gvFaceList = (GridView) findViewById(R.id.gvFaceList);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -57,8 +59,12 @@ public class SearchMainActivity extends AppCompatActivity {
         ReqServer.reqGetTagList(this);
 
         //화면 설정
-        TagGvAdapter gAdapter = new TagGvAdapter(this);
-        gAdapter.setItem(ReqServer.tagList);
-        gridView.setAdapter(gAdapter);
+        TagGvAdapter tAdapter = new TagGvAdapter(this);
+        tAdapter.setItem(ReqServer.tagList);
+        gvTagList.setAdapter(tAdapter);
+
+        TagGvAdapter fAdapter = new TagGvAdapter(this);
+        fAdapter.setItem(ReqServer.faceList);
+        gvFaceList.setAdapter(fAdapter);
     }
 }

@@ -12,42 +12,54 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.json.JSONException;
+
 public class SearchPageActivity extends AppCompatActivity {
 
     TextView tvTitle;
-    ImageButton btnGetImage, btnSave;
     static RecyclerView recyclerView;
-    static MultiImageAdapter adapter;
+    static SearchPageAdapter adapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.album_page_layout);
+        setContentView(R.layout.search_page_view);
 
         tvTitle = (TextView) findViewById(R.id.tvPageDate);
-        btnGetImage = (ImageButton) findViewById(R.id.btnGetImage);
-        btnSave = (ImageButton) findViewById(R.id.btnSave);
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        recyclerView = (RecyclerView) findViewById(R.id.searchRv);
 
         Intent intent = getIntent();
+        String type = intent.getStringExtra("type");
         String title = intent.getStringExtra("title");
-        Integer tagIndex = intent.getIntExtra("tagIndex", -1);
+        String target = intent.getStringExtra("target");
 
         //제목 설정
         tvTitle.setText(title);
+        try {
+            ReqServer.album.put("title", title);
+            ReqServer.album.put("type", "searchAlbum");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-        //버튼 지우기
-        btnGetImage.setVisibility(View.GONE);
-        btnSave.setVisibility(View.GONE);
 
         //해당 태그가 달린 사진들 불러오기
-        ReqServer.reqGetTagPage(this, tagIndex);
+        ReqServer.reqGetTagPage(this, type, target);
 
         //화면 설정
         RecyclerView.LayoutManager manager = new GridLayoutManager(getApplicationContext(), 2);
         recyclerView.setLayoutManager(manager);
 
-        adapter = new MultiImageAdapter(ReqServer.photoList, recyclerView.getContext());
+        adapter = new SearchPageAdapter(ReqServer.photoList, recyclerView.getContext());
         recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ReqServer.photoList.clear();
+        ReqServer.album.remove("title");
+        ReqServer.album.remove("thumbnail");
+        ReqServer.album.remove("type");
     }
 }

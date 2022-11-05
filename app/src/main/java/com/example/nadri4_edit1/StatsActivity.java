@@ -324,16 +324,13 @@ public class StatsActivity extends AppCompatActivity {
                     String sValue = "";
                     try {
                         if(faceCnt.size() != 0) {
-                            sValue = faceCnt.get((int) value).getString("label");
-                            Integer.parseInt(sValue);
-                            return "?";
+                            sValue = faceCnt.get((int) value).getString("name");
+                            return sValue;
                         }
-                    } catch (NumberFormatException e) { //초기화된 얼굴일 경우
-                        return sValue;
-                    } catch (Exception e) {
+                    } catch (JSONException e) { //초기화된 얼굴일 경우
                         Log.e("HWA", e + "");
                     }
-                    return "";
+                    return sValue;
                 }
             });
         }
@@ -387,11 +384,13 @@ public class StatsActivity extends AppCompatActivity {
                     for(int i = 0; i< resArr.length(); i++){
                         monthCnt.add(resArr.getJSONObject(i));
                     }
-                    mTextView.setText(monthCnt.get(0).getString("year") + "년");
-                    JSONObject m = monthCnt.get(0).getJSONObject("month");
-                    for(int i = 1; i < 13; i++){
-                        String k = String.valueOf(i);
-                        mList.add(new BarEntry(i, m.getInt(k)));
+                    if(monthCnt.size() != 0) {
+                        mTextView.setText(monthCnt.get(0).getString("year") + "년");
+                        JSONObject m = monthCnt.get(0).getJSONObject("month");
+                        for (int i = 1; i < 13; i++) {
+                            String k = String.valueOf(i);
+                            mList.add(new BarEntry(i, m.getInt(k)));
+                        }
                     }
 
 
@@ -399,11 +398,13 @@ public class StatsActivity extends AppCompatActivity {
                     for(int i = 0; i< resArr.length(); i++){
                         dayCnt.add(resArr.getJSONObject(i));
                     }
-                    //dTextView.setText(dayCnt.get(0).getString("year") + "년");
-                    JSONObject d = dayCnt.get(0).getJSONObject("dayofweek");
-                    for(int i = 1; i < 8; i++){
-                        String k = String.valueOf(i);
-                        dList.add(new BarEntry(i, d.getInt(k)));
+                    if(dayCnt.size() != 0) {
+                        //dTextView.setText(dayCnt.get(0).getString("year") + "년");
+                        JSONObject d = dayCnt.get(0).getJSONObject("dayofweek");
+                        for (int i = 1; i < 8; i++) {
+                            String k = String.valueOf(i);
+                            dList.add(new BarEntry(i, d.getInt(k)));
+                        }
                     }
 
 
@@ -427,11 +428,13 @@ public class StatsActivity extends AppCompatActivity {
                     for(int i = 0; i< resArr.length(); i++){
                         thoroughfareCnt.add(resArr.getJSONObject(i));
                     }
-                    tfTextView.setText(thoroughfareCnt.get(0).getString("locality"));
-                    JSONArray tf = thoroughfareCnt.get(0).getJSONArray("thoroughfares");
-                    for(int i = 0; i < tf.length(); i++){
-                        JSONObject t = tf.getJSONObject(i);
-                        tfList.add(new BarEntry(i, t.getInt("count")));
+                    if(thoroughfareCnt.size() != 0) {
+                        tfTextView.setText(thoroughfareCnt.get(0).getString("locality"));
+                        JSONArray tf = thoroughfareCnt.get(0).getJSONArray("thoroughfares");
+                        for (int i = 0; i < tf.length(); i++) {
+                            JSONObject t = tf.getJSONObject(i);
+                            tfList.add(new BarEntry(i, t.getInt("count")));
+                        }
                     }
 
 
@@ -461,8 +464,6 @@ public class StatsActivity extends AppCompatActivity {
 
                 } catch (JSONException e) {
                     Log.e("GET", "reqGetStats onResponse JSONException : " + e);
-                }  catch (Exception e) {
-                    Log.e("GET", "reqGetStats onResponse Exception : " + e);
                 }
             }
         }, new Response.ErrorListener() {

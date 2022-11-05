@@ -24,13 +24,13 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.PieEntry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 public class ReqServer {
@@ -58,6 +58,7 @@ public class ReqServer {
 
     //태그 정보를 담는 리스트
     static ArrayList<JSONObject> tagList = new ArrayList<JSONObject>();
+    static ArrayList<JSONObject> faceList = new ArrayList<JSONObject>();
 
     //검색 결과를 담는 리스트
     static ArrayList<JSONObject> sAlbumList = new ArrayList<>();
@@ -192,8 +193,8 @@ public class ReqServer {
         //android_id 가져와서 ip 주소랑 합치기
         String url = null;
         try {
-            url = context.getString(R.string.testIpAddress) + "/album/"  + album.getString("title") + "/" + album.getString("type") + "/" + android_id;
-        } catch (JSONException e) {
+            url = context.getString(R.string.testIpAddress) + "/album/"  + URLEncoder.encode(album.getString("title"),"utf-8") + "/" + album.getString("type") + "/" + android_id;
+        } catch (JSONException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         Log.d("GET", "reqGetPages Url: " + url);
@@ -353,10 +354,18 @@ public class ReqServer {
                     for(int i = 0; i < resArr.length(); i++){
                         tagList.add(resArr.getJSONObject(i).getJSONObject("tag"));
                     }
-
                     TagGvAdapter gAdapter = new TagGvAdapter(context);
                     gAdapter.setItem(ReqServer.tagList);
-                    SearchMainActivity.gridView.setAdapter(gAdapter);
+                    SearchMainActivity.gvTagList.setAdapter(gAdapter);
+
+                    resArr = response.getJSONArray("faceList");
+                    faceList.clear();
+                    for(int i = 0; i < resArr.length(); i++){
+                        faceList.add(resArr.getJSONObject(i).getJSONObject("face"));
+                    }
+                    TagGvAdapter fAdapter = new TagGvAdapter(context);
+                    fAdapter.setItem(ReqServer.faceList);
+                    SearchMainActivity.gvFaceList.setAdapter(fAdapter);
 
                 } catch (JSONException e) {
                     Log.e("GET", "reqGetTagList onResponse 에러: " + e);
@@ -375,9 +384,9 @@ public class ReqServer {
     }
 
     //태그 페이지 정보 요청하기
-    public static void reqGetTagPage(Context context, Integer tagIndex){
+    public static void reqGetTagPage(Context context, String type, String target){
         //android_id 가져와서 ip 주소랑 합치기
-        String url = context.getString(R.string.testIpAddress) + "/search/" + tagIndex + "/" + android_id;
+        String url = context.getString(R.string.testIpAddress) + "/search/" + type + "/" + target + "/" + android_id;
         Log.d("GET", "reqGetTagPage Url: " + url);
 
         //요청 만들기
@@ -395,8 +404,7 @@ public class ReqServer {
                     }
                 }
 
-                SearchPageActivity.adapter = new MultiImageAdapter(photoList, SearchPageActivity.recyclerView.getContext());
-                SearchPageActivity.recyclerView.setAdapter(SearchPageActivity.adapter);
+                SearchPageActivity.adapter.notifyDataSetChanged();
             }
         }, new Response.ErrorListener() {
             @Override
