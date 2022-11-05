@@ -139,8 +139,10 @@ public class PhotoDataActivity extends AppCompatActivity {
             //DB의 comment에 저장된 내용이 하나도 없을 땐 오류나는듯?
             //DB comment에 "#태그"는 저장하지 않도록 할 수 있나?(태그까지 comment로 저장돼서 출력할 때 중복됨) 아님 append할 때 처리해야하는디 어케하지
             //comment의 개행을 잘 처리해야 깔끔할듯
-            comment = photo_data_json.getString("comment");
-            photo_text.append(" - 내용 : "+comment+"\n");
+            if(photo_data_json.has("comment")) {
+                comment = photo_data_json.getString("comment");
+                photo_text.append(" - 내용 : " + comment + "\n");
+            }
 
             if(photo_data_json.has("faces")) {
                 JSONArray faces = photo_data_json.getJSONArray("faces");
