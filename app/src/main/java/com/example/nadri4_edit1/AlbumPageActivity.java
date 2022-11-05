@@ -24,6 +24,8 @@ import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -387,16 +389,27 @@ public class AlbumPageActivity extends AppCompatActivity {
         });
 
 
-        // 페 이 지 액 티 비 티   아 이 템 이   비 어 있 을   때 의   버 튼   관 리
-        /*if(ReqServer.photoList.size() == 0){
-            btnEdit.setVisibility(View.GONE);
-            Log.d("size", "아이템사이즈" + ReqServer.photoList.size());
-        }
-        else {
-            btnEdit.setVisibility(View.VISIBLE);
-        }
 
-         */
+        tvPageDate.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                try {
+                    ReqServer.album.put("title", editable.toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
          
 
 
@@ -639,7 +652,6 @@ public class AlbumPageActivity extends AppCompatActivity {
 
                             Log.d("HWA", "순서 : 1 Faces for문");
                             compressBitmap(resized, date, faceInfo, facesArr);
-                            facesArr.put(faceInfo);
                         }
 
                         imageInfo.put("faces", facesArr);

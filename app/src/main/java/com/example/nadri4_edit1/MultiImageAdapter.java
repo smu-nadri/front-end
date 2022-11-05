@@ -152,7 +152,7 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
                 Context context = view.getContext();
                 Intent photo_data = new Intent(context, PhotoDataActivity.class);
                 photo_data.putExtra("photo_data", holder.getBindingAdapterPosition());
-                ((AlbumPageActivity)context).startActivity(photo_data);
+                context.startActivity(photo_data);
 
                 //-------------
                 /*ImageView photo_big = holder.itemView.findViewById(R.id.photo_big);
@@ -271,7 +271,7 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
                     Context context = view.getContext();
                     Intent photo_data = new Intent(context, PhotoDataActivity.class);
                     photo_data.putExtra("photo_data", holder.getBindingAdapterPosition());
-                    ((AlbumPageActivity)context).startActivity(photo_data);
+                    context.startActivity(photo_data);
                 }
             }
         });

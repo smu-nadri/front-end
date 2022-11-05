@@ -214,6 +214,14 @@ public class ReqServer {
                     }
                 }
 
+                if(ReqServer.photoList.size() == 0){
+                    AlbumPageActivity.btnEdit.setVisibility(View.GONE);
+                    Log.d("size", "아이템사이즈" + ReqServer.photoList.size());
+                }
+                else {
+                    AlbumPageActivity.btnEdit.setVisibility(View.VISIBLE);
+                }
+
                 //레이아웃 적용
                 RecyclerView.LayoutManager manager = new GridLayoutManager(AlbumPageActivity.recyclerView.getContext(), 2);
                 AlbumPageActivity.recyclerView.setLayoutManager(manager);
