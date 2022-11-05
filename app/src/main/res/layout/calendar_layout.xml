@@ -79,7 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="left"
             android:padding="10dp"
-            android:text="  &lt;  "
+            android:text="  &lt;         "
             android:textSize="30dp"/>
 
         <View
@@ -91,6 +91,7 @@
             android:id="@+id/picker_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_marginLeft="15dp"
             android:orientation="vertical">
             <TextView
@@ -126,7 +127,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="right"
             android:padding="10dp"
-            android:text="  &gt;  "
+            android:text="         &gt;  "
             android:textSize="30dp" />
 
     </LinearLayout>

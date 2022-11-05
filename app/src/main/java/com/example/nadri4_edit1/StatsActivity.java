@@ -114,17 +114,25 @@ public class StatsActivity extends AppCompatActivity {
             public void onClick(View view) {
                 try {
                     mIdx = (mIdx+1) % monthCnt.size();
+                    dIdx = (dIdx+1) % dayCnt.size();
                     String y = monthCnt.get(mIdx).getString("year") + "년";
                     mTextView.setText(y);
 
                     mList.clear();
+                    dList.clear();
                     JSONObject m = monthCnt.get(mIdx).getJSONObject("month");
+                    JSONObject d = dayCnt.get(dIdx).getJSONObject("dayofweek");
                     for(int i = 1; i < 13; i++){
                         String k = String.valueOf(i);
                         mList.add(new BarEntry(i, m.getInt(k)));
                     }
+                    for(int i = 1; i < 8; i++){
+                        String k = String.valueOf(i);
+                        dList.add(new BarEntry(i, d.getInt(k)));
+                    }
 
                     updateChart(mDataSet, mData, mChart);
+                    updateChart(dDataSet, dData, dChart);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
