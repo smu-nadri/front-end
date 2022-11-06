@@ -502,13 +502,6 @@ public class AlbumPageActivity extends AppCompatActivity {
         MultiImageAdapter.isEdit = false;
         MultiImageAdapter.isCheck = false;
 
-        try
-        {
-            sleep(1000);
-        } catch (InterruptedException e)
-        {
-            Log.e("AlbumPageActivity", "Sleep 에러 " + e);
-        }
         //adapter.notifyDataSetChanged();
     }
 
