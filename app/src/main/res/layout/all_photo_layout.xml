@@ -13,11 +13,11 @@
 
         <ImageButton
             android:id="@+id/stats_button"
-            android:layout_width="40dp"
+            android:layout_width="30dp"
             android:layout_height="40dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginRight="5dp"
             android:background="@color/colorBackground"
-            app:srcCompat="@drawable/chart_box"/>
+            app:srcCompat="@drawable/chart"/>
 
         <!--현재-->
         <LinearLayout
@@ -48,7 +48,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@color/colorBackground"
-            app:srcCompat="@drawable/magnify" />
+            app:srcCompat="@drawable/search" />
 
     </LinearLayout>
 

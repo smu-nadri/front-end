@@ -158,7 +158,8 @@ public class AlbumPageActivity extends AppCompatActivity {
     private final String localFaceList = "LocalListofFace.tmp";
 
 
-    public Intent getDateIntent;
+    public static Intent getDateIntent;
+    public int iDay;
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -193,13 +194,14 @@ public class AlbumPageActivity extends AppCompatActivity {
 
         //인텐트
         getDateIntent = getIntent();
-        int iDay = getDateIntent.getIntExtra("SelectedDATE",-1);
+        iDay = getDateIntent.getIntExtra("SelectedDATE",-1);
 
 
         //화면 설정
         String title;   //제목 설정
         try {
             if (iDay == -1){    //마이앨범이거나 월별앨범일 경우
+
                 if(getDateIntent.getBooleanExtra("customAlbum", false)){    //마이앨범
                     title = getDateIntent.getStringExtra("title");
                     ReqServer.album.put("title", title);
@@ -229,6 +231,7 @@ public class AlbumPageActivity extends AppCompatActivity {
 
                     //기존에 저장된 사진들 불러오기
                     ReqServer.reqGetPages(AlbumPageActivity.this);
+
                 }
             }
             else {  //캘린더에서 날짜를 선택한 경우
@@ -258,9 +261,11 @@ public class AlbumPageActivity extends AppCompatActivity {
         //어댑터 적용
         setAdapterUpdated();
 
-        //터치헬퍼 적용
-        helper = new ItemTouchHelper(new ItemTouchHelperCallback(adapter));
-        helper.attachToRecyclerView(recyclerView);
+        //터치헬퍼 적용 - 월별앨범이 아닐 때만(월별앨범에서 아이템이동 안 되게)
+        if(getDateIntent.getBooleanExtra("customAlbum", false)){
+            helper = new ItemTouchHelper(new ItemTouchHelperCallback(adapter));
+            helper.attachToRecyclerView(recyclerView);
+        }
 
 
         //이미지 가져오기 버튼
@@ -459,9 +464,11 @@ public class AlbumPageActivity extends AppCompatActivity {
         }
         else {
             backPressedTime = tempTime;
-            Toast.makeText(this, "한번 더 누르면 종료합니다다", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "한번 더 누르면 종료합니다!", Toast.LENGTH_SHORT).show();
         }
     }
+
+
 
     //페이지 화면을 나갈 때 데이터 비워주기
     @Override

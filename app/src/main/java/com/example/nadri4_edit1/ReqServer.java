@@ -217,13 +217,22 @@ public class ReqServer {
                     }
                 }
 
+                //앨범 페이지에 사진아이템 없으면 Edit연필버튼 없고 사진추가버튼만 보임
                 if(ReqServer.photoList.size() == 0){
                     AlbumPageActivity.btnEdit.setVisibility(View.GONE);
-                    Log.d("size", "아이템사이즈" + ReqServer.photoList.size());
+                    AlbumPageActivity.btnGetImage.setVisibility(View.VISIBLE);
                 }
                 else {
-                    AlbumPageActivity.btnGetImage.setVisibility(View.GONE);
-                    AlbumPageActivity.btnEdit.setVisibility(View.VISIBLE);
+                    if(AlbumPageActivity.getDateIntent.getBooleanExtra("customAlbum", false)){
+                        //연필버튼 없애기 - 월별앨범에서는 편집 불가
+                        AlbumPageActivity.btnEdit.setVisibility(View.VISIBLE);
+                        AlbumPageActivity.btnGetImage.setVisibility(View.GONE);
+                    }
+                    else{
+                        AlbumPageActivity.btnEdit.setVisibility(View.GONE);
+                        AlbumPageActivity.btnGetImage.setVisibility(View.GONE);
+
+                    }
                 }
 
                 //레이아웃 적용

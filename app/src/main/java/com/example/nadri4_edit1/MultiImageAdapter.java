@@ -41,7 +41,6 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
 
     public static boolean isEdit = false;
     public static boolean isCheck = false;
-    //public static boolean isEmpty;
 
     public static TreeSet<Integer> checkList = new TreeSet<>();
 
@@ -137,6 +136,7 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
         }
 
 
+
         //클릭 이벤트
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -225,15 +225,19 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
         holder.item.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                if(!isEdit){
-                    Log.d("HWA", "편집모드 진입!");
-                    isEdit = true;
-                    AlbumPageActivity.btnEdit.setImageResource(R.drawable.edit_click);
-                    AlbumPageActivity.editBtnLayout.setVisibility(View.VISIBLE);
-                    AlbumPageActivity.btnGetImage.setVisibility(View.VISIBLE);
-                    AlbumPageActivity.adapter.notifyDataSetChanged();
+                //월별앨범에선 아이템 편집 안 되게 하기~
+                if(AlbumPageActivity.getDateIntent.getBooleanExtra("customAlbum", false)){
+                    if(!isEdit){
+                        Log.d("HWA", "편집모드 진입!");
+                        isEdit = true;
+                        AlbumPageActivity.btnEdit.setImageResource(R.drawable.edit_click);
+                        AlbumPageActivity.editBtnLayout.setVisibility(View.VISIBLE);
+                        AlbumPageActivity.btnGetImage.setVisibility(View.VISIBLE);
+                        AlbumPageActivity.adapter.notifyDataSetChanged();
+                    }
                 }
                 return true;
+
             }
         });
 

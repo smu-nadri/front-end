@@ -24,19 +24,11 @@
             android:hint="하이라이트"
             android:textSize="23dp"
             android:textStyle="bold"/>
-        <!-- TextView 사이에 넣어주므로써 간격을 넖혀 우측정렬이 될 수 있게 만든다 -->
+        <!-- TextView 사이에 넣어주므로써 간격을 넖혀 우측정렬이 될 수 있게 만든다
         <View
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_weight="1"/>
-
-        <ImageButton
-            android:id="@+id/btnMenu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
-            android:background="@color/colorBackground"
-            app:srcCompat="@drawable/menu"/>
+            android:layout_weight="1"/>-->
     </LinearLayout>
 
     <View
