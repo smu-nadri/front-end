@@ -62,7 +62,6 @@ public class ReqServer {
     static ArrayList<JSONObject> faceList = new ArrayList<JSONObject>();
 
     //검색 결과를 담는 리스트
-    static ArrayList<JSONObject> sAlbumList = new ArrayList<>();
     static ArrayList<JSONObject> sPhotoList = new ArrayList<>();
 
     //해당 앨범 제목의 페이지 가져오기 위한 변수
@@ -196,8 +195,8 @@ public class ReqServer {
         //android_id 가져와서 ip 주소랑 합치기
         String url = null;
         try {
-            url = context.getString(R.string.testIpAddress) + "/album/"  + URLEncoder.encode(album.getString("title"),"utf-8") + "/" + album.getString("type") + "/" + android_id;
-        } catch (JSONException | UnsupportedEncodingException e) {
+            url = context.getString(R.string.testIpAddress) + "/album/"  + album.getString("title") + "/" + album.getString("type") + "/" + android_id;
+        } catch (JSONException e) {
             e.printStackTrace();
         }
         Log.d("GET", "reqGetPages Url: " + url);
@@ -451,15 +450,7 @@ public class ReqServer {
             public void onResponse(JSONObject response) {
                 Log.d("GET", "reqGetQuery Response: " + response);
                 try {
-                    JSONArray resArr = response.getJSONArray("albumResult");
-                    sAlbumList.clear();
-                    SearchResultActivity.resultAlbum.setVisibility(View.GONE);  //없으면 표시 안하기
-                    for(int i = 0; i < resArr.length(); i++){
-                        sAlbumList.add(resArr.getJSONObject(i));
-                        SearchResultActivity.resultAlbum.setVisibility(View.VISIBLE);   //있으면 표시
-                    }
-
-                    resArr = response.getJSONArray("photoResult");
+                    JSONArray resArr = response.getJSONArray("photoResult");
                     sPhotoList.clear();
                     SearchResultActivity.resultPhoto.setVisibility(View.GONE);  //없으면 표시 안하기
                     for(int i = 0; i < resArr.length(); i++){
@@ -468,10 +459,6 @@ public class ReqServer {
                     }
 
                     //화면 설정
-                    AlbumGvAdapter aAdapter = new AlbumGvAdapter(context);
-                    aAdapter.setItem(ReqServer.sAlbumList);
-                    SearchResultActivity.gvResultAlbum.setAdapter(aAdapter);
-
                     PhotoGvAdapter gAdapter = new PhotoGvAdapter(context);
                     gAdapter.setItem(ReqServer.sPhotoList);
                     SearchResultActivity.gvResultPhoto.setAdapter(gAdapter);

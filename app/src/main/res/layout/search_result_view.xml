@@ -44,38 +44,10 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/resultAlbum"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginBottom="20dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="앨범" />
-
-            <GridView
-                android:id="@+id/gvResultAlbum"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:horizontalSpacing="12dp"
-                android:numColumns="3"
-                android:verticalSpacing="12dp">
-            </GridView>
-        </LinearLayout>
-
-        <LinearLayout
             android:id="@+id/resultPhoto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="사진" />
 
             <GridView
                 android:id="@+id/gvResultPhoto"

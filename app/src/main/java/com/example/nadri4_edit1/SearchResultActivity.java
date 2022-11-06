@@ -16,8 +16,8 @@ import java.net.URLEncoder;
 public class SearchResultActivity extends AppCompatActivity {
 
     SearchView searchView;
-    static GridView gvResultAlbum, gvResultPhoto;
-    static LinearLayout resultAlbum, resultPhoto;
+    static GridView gvResultPhoto;
+    static LinearLayout resultPhoto;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -25,9 +25,7 @@ public class SearchResultActivity extends AppCompatActivity {
         setContentView(R.layout.search_result_view);
 
         searchView = (SearchView) findViewById(R.id.searchView);
-        gvResultAlbum = (GridView) findViewById(R.id.gvResultAlbum);
         gvResultPhoto = (GridView) findViewById(R.id.gvResultPhoto);
-        resultAlbum = (LinearLayout) findViewById(R.id.resultAlbum);
         resultPhoto = (LinearLayout) findViewById(R.id.resultPhoto);
 
         Intent intent = getIntent();
@@ -53,20 +51,11 @@ public class SearchResultActivity extends AppCompatActivity {
             }
         });
 
-        if(ReqServer.sAlbumList.isEmpty())
-            resultAlbum.setVisibility(View.GONE);
-        else
-            resultAlbum.setVisibility(View.VISIBLE);
-
         if(ReqServer.sPhotoList.isEmpty())
             resultPhoto.setVisibility(View.GONE);
         else
             resultPhoto.setVisibility(View.VISIBLE);
 
-        //앨범 결과 화면 설정
-        AlbumGvAdapter aAdapter = new AlbumGvAdapter(this);
-        aAdapter.setItem(ReqServer.sAlbumList);
-        gvResultAlbum.setAdapter(aAdapter);
 
         //사진 결과 화면 설정
         PhotoGvAdapter pAdapter = new PhotoGvAdapter(this);
