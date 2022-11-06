@@ -230,6 +230,7 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
                     isEdit = true;
                     AlbumPageActivity.btnEdit.setImageResource(R.drawable.edit_click);
                     AlbumPageActivity.editBtnLayout.setVisibility(View.VISIBLE);
+                    AlbumPageActivity.btnGetImage.setVisibility(View.VISIBLE);
                     AlbumPageActivity.adapter.notifyDataSetChanged();
                 }
                 return true;

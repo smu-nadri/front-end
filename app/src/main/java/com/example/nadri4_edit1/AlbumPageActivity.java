@@ -118,6 +118,9 @@ public class AlbumPageActivity extends AppCompatActivity {
     static MultiImageAdapter adapter;
     ItemTouchHelper helper;
 
+    private final long FINISH_INTERVAL_TIME = 2000;
+    private long backPressedTime = 0;
+
     static FrameLayout menuBtnLayout;
     static LinearLayout basicBtnLayout, editBtnLayout;
     static Boolean isCheck = false;
@@ -342,19 +345,19 @@ public class AlbumPageActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(editBtnLayout.getVisibility() == View.GONE){
+                    btnGetImage.setVisibility(View.VISIBLE);
                     editBtnLayout.setVisibility(View.VISIBLE);
                     btnEdit.setImageResource(R.drawable.edit_click);
 
                     MultiImageAdapter.isEdit = true;
-                    adapter.notifyDataSetChanged();
                     Log.d("CHECKBOX", "yes값 : " + MultiImageAdapter.isEdit);
                 }
                 else{
+                    btnGetImage.setVisibility(View.GONE);
                     editBtnLayout.setVisibility(View.GONE);
                     btnEdit.setImageResource(R.drawable.edit_unclick);
 
                     MultiImageAdapter.isEdit = false;
-                    adapter.notifyDataSetChanged();
                     Log.d("CHECKBOX", "no값 : " + MultiImageAdapter.isEdit);
                 }
 
@@ -364,8 +367,8 @@ public class AlbumPageActivity extends AppCompatActivity {
 
                     //체크박스 전체 해제
                     MultiImageAdapter.isCheck = false;
-
                 }
+                adapter.notifyDataSetChanged();
 
             }
         });
@@ -416,7 +419,7 @@ public class AlbumPageActivity extends AppCompatActivity {
                 }
             }
         });
-         
+
 
 
 
@@ -441,6 +444,23 @@ public class AlbumPageActivity extends AppCompatActivity {
         listCollections();
         //deleteCollection(); //컬렉션 삭제
         //deleteFile(localFaceList);  //MAP 저장한 거 삭제
+    }
+
+
+    //back button 이벤트
+    @Override
+    public void onBackPressed() {
+        long tempTime = System.currentTimeMillis();
+        long intervalTime = tempTime - backPressedTime;
+
+        if(0<=intervalTime && FINISH_INTERVAL_TIME>=intervalTime){
+            finish();
+            Log.d("GOO", "피니쉬,,");
+        }
+        else {
+            backPressedTime = tempTime;
+            Toast.makeText(this, "한번 더 누르면 종료합니다다", Toast.LENGTH_SHORT).show();
+        }
     }
 
     //페이지 화면을 나갈 때 데이터 비워주기

@@ -220,6 +220,7 @@ public class ReqServer {
                     Log.d("size", "아이템사이즈" + ReqServer.photoList.size());
                 }
                 else {
+                    AlbumPageActivity.btnGetImage.setVisibility(View.GONE);
                     AlbumPageActivity.btnEdit.setVisibility(View.VISIBLE);
                 }
 
