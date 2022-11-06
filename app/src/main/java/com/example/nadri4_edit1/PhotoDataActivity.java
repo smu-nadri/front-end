@@ -167,14 +167,14 @@ public class PhotoDataActivity extends AppCompatActivity {
             int y = size.y - 84;
             float rate = 1;
             Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse(uri));
-            rate = x/bitmap.getWidth();
-            Log.e("HWA", "제발? " + rate);
-            if(rate > y/bitmap.getHeight()) {
-                rate = y / bitmap.getHeight();
+            float bx = bitmap.getWidth();
+            float by = bitmap.getHeight();
+            rate = x/bx;
+            if(rate > y/by) {
+                rate = y / by;
             }
-            if(rate == 0) rate = 1;
-            Log.e("HWA", "제발? " + rate);
             int plusY = (int)(y - bitmap.getHeight() * rate)/2;
+            Log.e("HWA", "크기 " + x + " " + bitmap.getWidth() + " " + y + " " + bitmap.getHeight());
 
             if (photo_data_json.has("faces")) {
                 JSONArray faces = photo_data_json.getJSONArray("faces");

@@ -164,7 +164,9 @@ public class ReqServer {
 
                     //화면 설정
                     if(mainCode == 0){
-                        CalendarMainActivity.adapter.notifyDataSetChanged();
+                        if(CalendarMainActivity.adapter != null){
+                            CalendarMainActivity.adapter.notifyDataSetChanged();
+                        }
                     }
                     else if(mainCode == 1){
                         AlbumMainActivity.cAdapter.notifyDataSetChanged();
@@ -173,7 +175,7 @@ public class ReqServer {
                         if(allAlbumThumb != null) AlbumMainActivity.all_img.setImageURI(Uri.parse(allAlbumThumb));
                     }
 
-                } catch (JSONException | SecurityException e) {
+                } catch (JSONException | SecurityException | NullPointerException e) {
                     Log.e("GET", "reqGetAlbums onResponse 에러: " + e);
                 }
             }
