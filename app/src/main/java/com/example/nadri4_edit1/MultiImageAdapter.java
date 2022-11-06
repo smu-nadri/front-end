@@ -179,26 +179,6 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
             }
         });
 
-        //코멘트 셋팅하기
-        JSONObject imageObject = mData.get(holder.getBindingAdapterPosition());
-        try {
-            if(imageObject.has("comment")) {    //코멘트가 있으면
-                holder.comment.setText(imageObject.getString("comment"));
-            }
-            else {
-                if(imageObject.has("tags")){    //코멘트가 없고 태그가 있으면
-                    JSONArray tags = new JSONArray(imageObject.getString("tags"));
-                    String comment = "";
-                    for(int i = 0; i < tags.length(); i++){
-                        comment += "#" + tags.getJSONObject(i).getString("tag_ko1") + " ";
-                    }
-                    holder.comment.setText(comment);
-                }
-            }
-        } catch (JSONException e) {
-            Log.e("MultiImageAdapter", "onBindViewHolder Get Set Comment Error: " + e);
-        }
-
         holder.comment.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -218,9 +198,28 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
                 } catch (Exception e) {
                     Log.e("MultiImageAdapter", "Put Comment Error: " + e);
                 }
-                ;
             }
         });
+
+        //코멘트 셋팅하기
+        JSONObject imageObject = mData.get(holder.getBindingAdapterPosition());
+        try {
+            if(imageObject.has("comment")) {    //코멘트가 있으면
+                holder.comment.setText(imageObject.getString("comment"));
+            }
+            else {
+                if(imageObject.has("tags")){    //코멘트가 없고 태그가 있으면
+                    JSONArray tags = new JSONArray(imageObject.getString("tags"));
+                    String comment = "";
+                    for(int i = 0; i < tags.length(); i++){
+                        comment += "#" + tags.getJSONObject(i).getString("tag_ko1") + " ";
+                    }
+                    holder.comment.setText(comment);
+                }
+            }
+        } catch (JSONException e) {
+            Log.e("MultiImageAdapter", "onBindViewHolder Get Set Comment Error: " + e);
+        }
 
         holder.item.setOnLongClickListener(new View.OnLongClickListener() {
             @Override

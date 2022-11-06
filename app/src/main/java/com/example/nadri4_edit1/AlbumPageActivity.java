@@ -474,10 +474,7 @@ public class AlbumPageActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(adapter.getmData().size() == 0){
-            Toast.makeText(getApplicationContext(), "사진을 선택해주세요.", Toast.LENGTH_SHORT).show();
-        }
-        else if(tvPageDate.getText().toString().isEmpty()){
+        if(tvPageDate.getText().toString().isEmpty()){
             Toast.makeText(getApplicationContext(), "제목을 입력해주세요.", Toast.LENGTH_SHORT).show();
         }
         else {
@@ -488,7 +485,7 @@ public class AlbumPageActivity extends AppCompatActivity {
                     ReqServer.reqPostPages(AlbumPageActivity.this, 1);
                 }
                 else {
-                    ReqServer.reqPostPages(AlbumPageActivity.this, 0);
+                    if(iDay != -1) ReqServer.reqPostPages(AlbumPageActivity.this, 0);
                 }
             } catch (JSONException e) {
                 Log.e("AlbumPageActivity", "btnSave JSONException: " + e);
@@ -645,16 +642,16 @@ public class AlbumPageActivity extends AppCompatActivity {
                             }
                             imageInfo.put("tags", tagsIndex);   //태그들 넣기
                         }
-                        setAdapterUpdated(); //어댑터 설정
+                        adapter.notifyDataSetChanged(); //어댑터 설정
                     } catch(Exception e) {
-                        setAdapterUpdated();
+                        adapter.notifyDataSetChanged();
                     }
                 }
             }).addOnFailureListener(new OnFailureListener() { //중간에 에러나면 uri만 넣기
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     ReqServer.photoList.add(imageInfo);
-                    setAdapterUpdated();
+                    adapter.notifyDataSetChanged();
                 }
             });
 
