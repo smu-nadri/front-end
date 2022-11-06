@@ -78,7 +78,7 @@ public class AlbumMainActivity extends AppCompatActivity {
 
         //앨범 목록 가져오기
         ReqServer.reqGetAlbums(AlbumMainActivity.this, 1);
-        ReqServer.reqGetHighlight(this);    //하이라이트 테스트
+        //ReqServer.reqGetHighlight(this);    //하이라이트 테스트
 
         all_album.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,12 +142,7 @@ public class AlbumMainActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.d("HWA", "오잉???");
-        ReqServer.reqGetAlbums(getApplicationContext(), 1);
-    }
+
 
     protected static void setAlbumMainView() {
         cAdapter = new AlbumGvAdapter(context);

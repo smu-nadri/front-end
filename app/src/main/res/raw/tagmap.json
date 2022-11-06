@@ -63,7 +63,8 @@
 },{
   "_id": "16",
   "tag_en": "Sitting",
-  "tag_ko1": "앉다"
+  "tag_ko1": "앉은 자세",
+  "tag_ko2": "자세"
 },{
   "_id": "17",
   "tag_en": "Beard",
@@ -108,7 +109,8 @@
   "_id": "27",
   "tag_en": "Twig",
   "tag_ko1": "나뭇가지",
-  "tag_ko2": "잔가지"
+  "tag_ko2": "나무",
+  "tag_ko3": "잔가지"
 },{
   "_id": "28",
   "tag_en": "Petal",
@@ -464,7 +466,8 @@
   "tag_ko1": "혜성"
 },{
   "_id": "107",
-  "tag_en": "Mortarboard"
+  "tag_en": "Mortarboard",
+  "tag_ko1": "학사"
 },{
   "_id": "108",
   "tag_en": "Track",
@@ -504,7 +507,7 @@
 },{
   "_id": "117",
   "tag_en": "Cuisine",
-  "tag_ko1": "요리법"
+  "tag_ko1": "요리"
 },{
   "_id": "118",
   "tag_en": "Cat",
@@ -763,7 +766,8 @@
 },{
   "_id": "180",
   "tag_en": "Trunk",
-  "tag_ko1": "나무기둥"
+  "tag_ko1": "나무기둥",
+  "tag_ko2": "나무"
 },{
   "_id": "181",
   "tag_en": "Coffee",
@@ -784,7 +788,8 @@
 },{
   "_id": "185",
   "tag_en": "Standing",
-  "tag_ko1": "서있는"
+  "tag_ko1": "서있는 자세",
+  "tag_ko2": "자세"
 },{
   "_id": "186",
   "tag_en": "Fiction",
@@ -1373,7 +1378,7 @@
 },{
   "_id": "329",
   "tag_en": "Heart",
-  "tag_ko1": "가슴",
+  "tag_ko1": "하트",
   "tag_ko2": "심장"
 },{
   "_id": "330",
