@@ -17,6 +17,7 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -163,7 +164,7 @@ public class ReqServer {
 
                     //화면 설정
                     if(mainCode == 0){
-                        CalendarMainActivity.setMonthView();
+                        CalendarMainActivity.adapter.notifyDataSetChanged();
                     }
                     else if(mainCode == 1){
                         AlbumMainActivity.cAdapter.notifyDataSetChanged();
@@ -244,7 +245,7 @@ public class ReqServer {
 
     //작성한 페이지 보내기
     @SuppressLint("RestrictedApi")
-    public static void reqPostPages(Context context){
+    public static void reqPostPages(Context context, int code){
         String url = context.getString(R.string.testIpAddress) + "/album/" + android_id;
         Log.d("POST", "reqPostPages Url: " + url);
 
@@ -322,12 +323,11 @@ public class ReqServer {
                     photoList.clear();
                     deletedList.clear();
 
-                    for(int i = 0; i < resJsonArr.length(); i++){
-                        photoList.add(resJsonArr.getJSONObject(i).put("isChecked", false)); //선택여부 설정 후 저장결과 리스트에 추가
-                    }
-
-                    Log.d("POST", "reqPostPages onResponse 응답: " + photoList);
+                    Log.d("POST", "reqPostPages onResponse 응답: " + resJsonArr);
                     Toast.makeText(context.getApplicationContext(), "전송 성공!", Toast.LENGTH_SHORT).show();
+
+                    ReqServer.reqGetAlbums(context, code);//여기여기 달력앨범일때도 셋팅해줘..
+
                 } catch (JSONException e) {
                     Log.e("POST", "POST onResponse JSONException :" + e);
                 }
@@ -339,6 +339,8 @@ public class ReqServer {
                 Toast.makeText(context.getApplicationContext(), "전송 실패", Toast.LENGTH_SHORT).show();
             }
         });
+
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(10000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         RequestQueue requestQueue = Volley.newRequestQueue(context);
         requestQueue.add(jsonObjectRequest);

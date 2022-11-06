@@ -1,5 +1,6 @@
 package com.example.nadri4_edit1;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import org.json.JSONException;
 
@@ -42,6 +44,8 @@ public class AlbumMainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.album_main_layout);
+
+        ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, MODE_PRIVATE);
 
         context = this;
 
@@ -141,7 +145,8 @@ public class AlbumMainActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
-        ReqServer.reqGetAlbums(this, 1);
+        Log.d("HWA", "오잉???");
+        ReqServer.reqGetAlbums(getApplicationContext(), 1);
     }
 
     protected static void setAlbumMainView() {

@@ -57,8 +57,6 @@ public class CalendarMainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.calendar_layout);
 
-        ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, MODE_PRIVATE);
-
         context = this; //컨텍스트 지정
 
         //초기화

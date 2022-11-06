@@ -4,6 +4,8 @@ import static androidx.exifinterface.media.ExifInterface.TAG_DATETIME;
 
 import static com.example.nadri4_edit1.InitApplication.faceMap;
 
+import static java.lang.Thread.sleep;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ClipData;
@@ -456,8 +458,11 @@ public class AlbumPageActivity extends AppCompatActivity {
                 if(getDateIntent.getBooleanExtra("customAlbum", false)) {
                     ReqServer.album.put("title", tvPageDate.getText().toString());
                     ReqServer.album.put("type", "customAlbum");
+                    ReqServer.reqPostPages(AlbumPageActivity.this, 1);
                 }
-                ReqServer.reqPostPages(AlbumPageActivity.this);
+                else {
+                    ReqServer.reqPostPages(AlbumPageActivity.this, 0);
+                }
             } catch (JSONException e) {
                 Log.e("AlbumPageActivity", "btnSave JSONException: " + e);
             }
@@ -469,6 +474,14 @@ public class AlbumPageActivity extends AppCompatActivity {
         ReqServer.album.remove("type");
         MultiImageAdapter.isEdit = false;
         MultiImageAdapter.isCheck = false;
+
+        try
+        {
+            sleep(1000);
+        } catch (InterruptedException e)
+        {
+            Log.e("AlbumPageActivity", "Sleep 에러 " + e);
+        }
         //adapter.notifyDataSetChanged();
     }
 
