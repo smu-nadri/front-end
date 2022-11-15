@@ -281,24 +281,6 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
         });
 
 
-        int num=0;
-        try {
-            if (isCheck == true) {
-                for (num = 0; num < mData.size(); num++) {
-                    mData.get(num).put("isChecked", true);
-                    holder.checkbox.setChecked(true);
-                    Log.d("ischecking", "체크 전체 선택 - " + num);
-                }
-            } else {
-                for (num = 0; num < mData.size(); num++) {
-                    mData.get(num).put("isChecked", false);
-                    holder.checkbox.setChecked(false);
-                    Log.d("ischecking", "체크 전체 해제 - "+ num);
-                }
-            }
-        } catch (JSONException e){
-            e.printStackTrace();
-        }
 
         if(isEdit){
             Log.d("HWA", "편집모드입니다!");

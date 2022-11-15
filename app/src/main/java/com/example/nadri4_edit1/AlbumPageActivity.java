@@ -317,7 +317,7 @@ public class AlbumPageActivity extends AppCompatActivity {
                     ArrayList<JSONObject> mData = adapter.getmData();
                     int i = 0;
                     while (mData.size() != 0 && i < mData.size()) {
-                        Log.d("HWA", "삭제버튼 " + i + " : "+ mData.size() + " :" + mData.get(i));
+                        Log.d("HWA", "삭제버튼 " + i + " : " + mData.get(i).getBoolean("isChecked"));
                         if (mData.get(i).getBoolean("isChecked")) {
                             if (mData.get(i).has("_id")) {
                                 ReqServer.deletedList.add(mData.get(i));
@@ -372,6 +372,15 @@ public class AlbumPageActivity extends AppCompatActivity {
 
                     //체크박스 전체 해제
                     MultiImageAdapter.isCheck = false;
+                    int num=0;
+                    try {
+                        for (num = 0; num < adapter.getmData().size(); num++) {
+                            adapter.getmData().get(num).put("isChecked", false);
+                            Log.d("ischecking", "체크 전체 해제 - "+ num);
+                        }
+                    } catch (JSONException e){
+                        e.printStackTrace();
+                    }
                 }
                 adapter.notifyDataSetChanged();
 
@@ -386,6 +395,15 @@ public class AlbumPageActivity extends AppCompatActivity {
 
                 //체크박스 전체 선택
                 MultiImageAdapter.isCheck = true;
+                int num=0;
+                try {
+                    for (num = 0; num < adapter.getmData().size(); num++) {
+                        adapter.getmData().get(num).put("isChecked", true);
+                        Log.d("ischecking", "체크 전체 선택 - " + num);
+                    }
+                } catch (JSONException e){
+                    e.printStackTrace();
+                }
                 adapter.notifyDataSetChanged();
 
             }
@@ -398,6 +416,15 @@ public class AlbumPageActivity extends AppCompatActivity {
 
                 //체크박스 전체 해제
                 MultiImageAdapter.isCheck = false;
+                int num=0;
+                try {
+                    for (num = 0; num < adapter.getmData().size(); num++) {
+                        adapter.getmData().get(num).put("isChecked", false);
+                        Log.d("ischecking", "체크 전체 해제 - "+ num);
+                    }
+                } catch (JSONException e){
+                    e.printStackTrace();
+                }
                 adapter.notifyDataSetChanged();
             }
         });
