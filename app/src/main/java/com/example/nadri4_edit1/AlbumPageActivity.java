@@ -159,7 +159,7 @@ public class AlbumPageActivity extends AppCompatActivity {
 
 
     public static Intent getDateIntent;
-    public int iDay;
+    public static int iDay;
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -262,7 +262,7 @@ public class AlbumPageActivity extends AppCompatActivity {
         setAdapterUpdated();
 
         //터치헬퍼 적용 - 월별앨범이 아닐 때만(월별앨범에서 아이템이동 안 되게)
-        if(getDateIntent.getBooleanExtra("customAlbum", false)){
+        if(iDay != -1 || getDateIntent.getBooleanExtra("customAlbum", false)){  //달력앨범이거나 마이앨범
             helper = new ItemTouchHelper(new ItemTouchHelperCallback(adapter));
             helper.attachToRecyclerView(recyclerView);
         }

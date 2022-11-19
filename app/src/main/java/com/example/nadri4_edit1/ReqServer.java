@@ -222,21 +222,18 @@ public class ReqServer {
                     AlbumPageActivity.btnGetImage.setVisibility(View.VISIBLE);
                 }
                 else {
-                    if(AlbumPageActivity.getDateIntent.getBooleanExtra("customAlbum", false)){
-                        //연필버튼 없애기 - 월별앨범에서는 편집 불가
+                    //연필버튼 없애기 - 월별앨범에서는 편집 불가
+                    if(AlbumPageActivity.iDay != -1 || AlbumPageActivity.getDateIntent.getBooleanExtra("customAlbum", false)){
+                        //달력앨범이거나 마이앨범
                         AlbumPageActivity.btnEdit.setVisibility(View.VISIBLE);
                         AlbumPageActivity.btnGetImage.setVisibility(View.GONE);
                     }
-                    else{
+                    else{   //월별앨범
                         AlbumPageActivity.btnEdit.setVisibility(View.GONE);
                         AlbumPageActivity.btnGetImage.setVisibility(View.GONE);
 
                     }
                 }
-
-                //레이아웃 적용
-                RecyclerView.LayoutManager manager = new GridLayoutManager(AlbumPageActivity.recyclerView.getContext(), 2);
-                AlbumPageActivity.recyclerView.setLayoutManager(manager);
 
                 //어댑터 적용
                 AlbumPageActivity.adapter = new MultiImageAdapter(photoList, AlbumPageActivity.recyclerView.getContext());
