@@ -64,7 +64,7 @@ public class SearchPageAdapter extends RecyclerView.Adapter<SearchPageAdapter.Vi
             comment = itemView.findViewById(R.id.edtComment);
             item = itemView.findViewById(R.id.pageItem);
 
-            comment.setEnabled(false);
+            comment.setFocusableInTouchMode(false);
         }
     }
 
@@ -90,13 +90,11 @@ public class SearchPageAdapter extends RecyclerView.Adapter<SearchPageAdapter.Vi
         Uri imageUri = null;
         try {
             imageUri = Uri.parse(mData.get(position).getString("uri"));
-            InputStream inputStream = mContext.getContentResolver().openInputStream(imageUri);
-            ExifInterface exif = new ExifInterface(inputStream);
 
             Glide.with(mContext).load(imageUri).thumbnail(0.1f).into(holder.image);
 
         } catch (Exception e) {
-            Log.e("MultiImageAdapter", "onBindViewHolder Get Uri Thumbnail Error: " + e);
+            Log.e("SearchPageAdapter", "onBindViewHolder Get Uri Thumbnail Error: " + e);
         }
 
 
@@ -130,7 +128,7 @@ public class SearchPageAdapter extends RecyclerView.Adapter<SearchPageAdapter.Vi
                 }
             }
         } catch (JSONException e) {
-            Log.e("MultiImageAdapter", "onBindViewHolder Get Set Comment Error: " + e);
+            Log.e("SearchPageAdapter", "onBindViewHolder Get Set Comment Error: " + e);
         }
 
         holder.item.setOnClickListener(new View.OnClickListener() {

@@ -25,12 +25,12 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.View
     //private static final String TAG = "SliderAdapter";
     private Context context;
     //private String[] Items = new String[5];
-    private ArrayList<JSONObject> Items = new ArrayList<JSONObject>();
+    private ArrayList<String> Items = new ArrayList<String>();
     //int[] images;
     //ArrayList<String> Items = new ArrayList<String>();
     //private List<String> Items;
 
-    public HighlightAdapter(Context context, ArrayList<JSONObject> Items) {
+    public HighlightAdapter(Context context, ArrayList<String> Items) {
         this.context = context;
         //this.highlightImage = highlightImage;
         this.Items = Items;
@@ -71,9 +71,10 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.View
             //mImageView = itemView.findViewById(R.id.highlight_item);
         }
 
-        public void bindSliderImage(JSONObject image){
+        public void bindSliderImage(String image){
             try {
-                Uri imageURI = Uri.parse(image.getString("uri"));
+                JSONObject json = new JSONObject(image);
+                Uri imageURI = Uri.parse(json.getString("uri"));
                 Glide.with(itemView)    //with()안에 context말고 itemView 써줘야 함..ㅠㅠ ViewHolder 안에서 쓸 경우엔 ㅠㅠ..
                         .load(imageURI)
                         .into(pagerText);

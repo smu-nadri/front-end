@@ -1,5 +1,6 @@
 package com.example.nadri4_edit1;
 
+import static androidx.exifinterface.media.ExifInterface.LONGITUDE_EAST;
 import static androidx.exifinterface.media.ExifInterface.TAG_DATETIME;
 
 import static com.example.nadri4_edit1.InitApplication.faceMap;
@@ -92,6 +93,7 @@ import com.google.mlkit.vision.label.ImageLabeler;
 import com.google.mlkit.vision.label.ImageLabeling;
 import com.google.mlkit.vision.label.defaults.ImageLabelerOptions;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -108,9 +110,15 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
+
+import gun0912.tedimagepicker.builder.TedImagePicker;
+import gun0912.tedimagepicker.builder.listener.OnMultiSelectedListener;
 
 public class AlbumPageActivity extends AppCompatActivity {
 
@@ -210,11 +218,22 @@ public class AlbumPageActivity extends AppCompatActivity {
                     tvPageDate.setEnabled(true);
 
                     if(getDateIntent.getBooleanExtra("getImage", false)){   //마이앨범 생성으로 넘어온 경우
-                        Intent intent = new Intent();
-                        intent.setType("image/*");
-                        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                        intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-                        startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
+                        btnGetImage.setVisibility(View.GONE);
+
+                        TedImagePicker.with(AlbumPageActivity.this).max(10, "사진은 최대 10장 선택 가능합니다!")
+                                .startMultiImage(new OnMultiSelectedListener() {
+                                    @Override
+                                    public void onSelected(@NotNull List<? extends Uri> uriList) {
+                                        for(int i=0; i< uriList.size(); i++){
+                                            Uri imageUri = uriList.get(i);  //선택한 이미지들의 uri를 가져온다.
+
+                                            JSONObject imageInfo = new JSONObject();    //사진 한 장의 uri와 태그들을 담을 변수
+                                            setUriExif(imageInfo, imageUri);
+                                            setUriTags(imageInfo, imageUri);
+                                            setUriFaces(imageInfo, imageUri);
+                                        }
+                                    }
+                                });
                     } else {
                         //기존에 저장된 사진들 불러오기
                         ReqServer.reqGetPages(AlbumPageActivity.this);
@@ -272,12 +291,23 @@ public class AlbumPageActivity extends AppCompatActivity {
         btnGetImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                TedImagePicker.with(AlbumPageActivity.this).max(10, "사진은 최대 10장 선택 가능합니다!")
+                        .startMultiImage(uriList -> {
+                            for(int i=0; i< uriList.size(); i++){
+                                Uri imageUri = uriList.get(i);  //선택한 이미지들의 uri를 가져온다.
 
+                                JSONObject imageInfo = new JSONObject();    //사진 한 장의 uri와 태그들을 담을 변수
+                                setUriExif(imageInfo, imageUri);
+                                setUriTags(imageInfo, imageUri);
+                                setUriFaces(imageInfo, imageUri);
+                            }
+                        });
+                /*
                 Intent intent = new Intent();
                 intent.setType("image/*");
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);*/
             }
         });
 
@@ -594,24 +624,45 @@ public class AlbumPageActivity extends AppCompatActivity {
         recyclerView.setAdapter(AlbumPageActivity.adapter);
     }
 
+    private boolean existsColumn(String column, Cursor cursor){
+        int token = cursor.getColumnIndex(column);
+        if(token == -1) return false;
+        else return true;
+
+    }
+
     @SuppressLint("RestrictedApi")
     private void setUriExif(JSONObject imageInfo, Uri imageUri){
         try {
             imageInfo.put("uri", imageUri); //uri 데이터 넣기
             imageInfo.put("isChecked", false);
 
-            InputStream inputStream = AlbumPageActivity.this.getContentResolver().openInputStream(imageUri);
-            ExifInterface exif = new ExifInterface(inputStream);
+            Cursor cursor = getContentResolver().query(imageUri, null, null, null, null);
+            cursor.moveToFirst();
+            String path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA));
+            ExifInterface exif = new ExifInterface(path);
 
             //날짜 정보
-            Long datetime = exif.getDateTime();
-            if(datetime == null){
-                Cursor cursor = getContentResolver().query(imageUri, null, null, null, null);
-                cursor.moveToFirst();
-                int date_taken = cursor.getColumnIndexOrThrow("last_modified");
-                datetime = cursor.getLong(date_taken);
+            Long datetime = 0L;
+            if(existsColumn(MediaStore.Images.Media.DATE_TAKEN, cursor)){
+                int date_taken = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_TAKEN);
+                datetime = cursor.getLong(date_taken);  //DATE_TAKEN은 밀리초단위로 저장됨
             }
+            if(datetime == 0) {
+                if (existsColumn(MediaStore.Images.Media.DATE_ADDED, cursor)) {
+                    Log.e("HWA", datetime + " " + cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_MODIFIED)) + " " + cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)) + " " + cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_TAKEN)));
+                    int date_taken = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED);
+                    datetime = cursor.getLong(date_taken) * 1000L;  //DATE_ADDED는 초단위로 저장됨
+                }
+            }
+            Log.e("HWA", "으악1 " + datetime);
+            TimeZone timeZone = TimeZone.getDefault();
+            Calendar calendar = GregorianCalendar.getInstance(timeZone);
+            long offsetInMillis = timeZone.getOffset(calendar.getTimeInMillis());
+
+            datetime += offsetInMillis;
             imageInfo.put("datetime", datetime);
+            Log.e("HWA", "으악2 " + datetime);
 
             //위치 정보
             double latLong[] = exif.getLatLong();
@@ -622,6 +673,7 @@ public class AlbumPageActivity extends AppCompatActivity {
                 location.put("lat", latLong[0]);
                 location.put("long", latLong[1]);
                 if (!addressList.isEmpty()) {
+                    Log.e("HWA", "주소: " + addressList.get(0));
                     location.put("address", addressList.get(0).getAddressLine(0));
                     location.put("admin", addressList.get(0).getAdminArea());
                     location.put("locality", addressList.get(0).getLocality());
@@ -630,8 +682,11 @@ public class AlbumPageActivity extends AppCompatActivity {
                 imageInfo.put("location", location);
             }
 
+            cursor.close();
+
             ReqServer.photoList.add(imageInfo); //어뎁터에 들어갈 리스트에 사진 정보 넣기
             setAdapterUpdated();
+
         } catch (IOException | JSONException e){
             Log.e("AlbumPageActivity", "Exif Error:" + e);
 
@@ -668,6 +723,12 @@ public class AlbumPageActivity extends AppCompatActivity {
                                 else tagsIndex.put(tagMap.getJSONObject(label.getIndex()));
                             }
                             imageInfo.put("tags", tagsIndex);   //태그들 넣기
+
+                            String comment = "";
+                            for(int i = 0; i < tagsIndex.length(); i++){
+                                comment += "#" + tagsIndex.getJSONObject(i).getString("tag_ko1") + " ";
+                            }
+                            imageInfo.put("comment", comment);
                         }
                         adapter.notifyDataSetChanged(); //어댑터 설정
                     } catch(Exception e) {
@@ -866,7 +927,7 @@ public class AlbumPageActivity extends AppCompatActivity {
             @Override
             public void onStateChanged(int id, TransferState state) {
                 if(state == TransferState.COMPLETED) {
-                    Toast.makeText(getApplicationContext(), "Uploaded - " + fileName, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "얼굴 감지 " + fileName, Toast.LENGTH_SHORT).show();
                     Log.d("HWA", "순서 : 3 uploadObject upload");
 
                     isCompared(fileName, faceInfo, facesArr);
@@ -969,8 +1030,12 @@ public class AlbumPageActivity extends AppCompatActivity {
                         Log.e("HWA", "MAP에서 찾은 이름 : " + name);
                         if (name != null) {
                             faceInfo.put("name", name);
-                            facesArr.put(faceInfo);
                         }
+                        else{
+                            faceInfo.put("name", "Unknown");
+                            enrollMap(face.getFace().getFaceId(), "Unknown");
+                        }
+                        facesArr.put(faceInfo);
                     } catch (JSONException e) {
                         Log.e("HWA", "순서 : 5 얼굴 있어 오류 " + e);
                     }
@@ -978,7 +1043,7 @@ public class AlbumPageActivity extends AppCompatActivity {
                 }
             } else {
                 Log.d("HWA", "순서 : 5 얼굴 없어!");
-                Toast.makeText(this, "No result to show!", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "No result to show!", Toast.LENGTH_SHORT).show();
                 Log.d("SEARCH", "No result to show!");
                 try {
                     faceInfo.put("name", "Unknown");

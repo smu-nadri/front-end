@@ -11,15 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="68dp"
         android:padding="15dp"
-        android:orientation="horizontal">
-
-        <ImageButton
-            android:id="@+id/stats_button"
-            android:layout_width="30dp"
-            android:layout_height="40dp"
-            android:layout_marginRight="5dp"
-            android:background="@color/colorBackground"
-            app:srcCompat="@drawable/chart"/>
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
         <!--현재-->
         <LinearLayout
@@ -50,7 +43,12 @@
             android:layout_height="40dp"
             android:background="@color/colorBackground"
             app:srcCompat="@drawable/albums" />
-
+        <ImageButton
+            android:id="@+id/stats_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@color/colorBackground"
+            app:srcCompat="@drawable/chart"/>
         <ImageButton
             android:id="@+id/c_search_button"
             android:layout_width="40dp"

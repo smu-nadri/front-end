@@ -1,23 +1,20 @@
 package com.example.nadri4_edit1;
 
 import android.app.Application;
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.provider.Settings;
 import android.util.Log;
 
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 import androidx.work.WorkQuery;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -68,12 +65,49 @@ public class InitApplication extends Application {
         createNotificationChannel(DAILY_NOTIFICATION_CHANNEL_ID, daily_name, daily_description);
 
         //deleteWorkRequest();
-        createHighlightWorkRequest();
-        createDailyWorkRequest();
+        createNoticeWorkRequest();
+        //createHighlightWorkRequest();
+        //createDailyWorkRequest();
 
         printWorkRequest();
 
         openFaceList();
+
+        try {
+            //deleteFile("highlightList.tmp");
+            //deleteFile("highlightTitle.tmp");
+            File checkIfSaved = this.getFileStreamPath("highlightList.tmp");
+            if(checkIfSaved == null || !checkIfSaved.exists()) {
+                FileOutputStream fos = openFileOutput("highlightList.tmp", Context.MODE_PRIVATE);
+                ObjectOutputStream oos = new ObjectOutputStream(fos);
+                oos.writeObject(ReqServer.highlightList);
+                oos.close();
+            }
+            FileInputStream alreadySaved = openFileInput("highlightList.tmp");
+            ObjectInputStream openList = new ObjectInputStream(alreadySaved);
+            ReqServer.highlightList = (ArrayList<String>) openList.readObject();
+            openList.close();
+
+            checkIfSaved = this.getFileStreamPath("highlightTitle.tmp");
+            if(checkIfSaved == null || !checkIfSaved.exists()) {
+                FileOutputStream fos = openFileOutput("highlightTitle.tmp", Context.MODE_PRIVATE);
+                ObjectOutputStream oos = new ObjectOutputStream(fos);
+                oos.writeObject(ReqServer.highlightTitle);
+                oos.close();
+            }
+            alreadySaved = openFileInput("highlightTitle.tmp");
+            openList = new ObjectInputStream(alreadySaved);
+            ReqServer.highlightTitle = (String) openList.readObject();
+            openList.close();
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Log.e("InitApplication", "File is not found." + e);
+        }
+        catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            Log.e("InitApplication", "Mola..." + e);
+        }
     }
 
     private void createNotificationChannel(String id, CharSequence name, String description) {
@@ -94,6 +128,14 @@ public class InitApplication extends Application {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationManager.deleteNotificationChannel(channelId);
         }
+    }
+
+    private void createNoticeWorkRequest(){
+        PeriodicWorkRequest noticeWorkRequest = new PeriodicWorkRequest.Builder(NoticeWorker.class, 24, TimeUnit.HOURS) //flex 설정하자
+                .build();
+
+        WorkManager workManager = WorkManager.getInstance(this);
+        workManager.enqueueUniquePeriodicWork("NOTIFICATION", ExistingPeriodicWorkPolicy.KEEP, noticeWorkRequest);
     }
 
     private void createHighlightWorkRequest(){
@@ -153,9 +195,11 @@ public class InitApplication extends Application {
         Calendar noticeTime = Calendar.getInstance();
         if(mode == HIGHLIGHT) {
             noticeTime.set(Calendar.HOUR_OF_DAY, 10);
+            noticeTime.set(Calendar.MINUTE, 0);
         }
         else if(mode == DAILY){
             noticeTime.set(Calendar.HOUR_OF_DAY, 22);
+            noticeTime.set(Calendar.MINUTE, 0);
         }
         Calendar todayTime = Calendar.getInstance();
         long delay = (noticeTime.getTimeInMillis() - todayTime.getTimeInMillis())/1000;

@@ -16,6 +16,7 @@ public class SearchMainActivity extends AppCompatActivity {
 
     SearchView searchView;
 
+    static LinearLayout faceListView, tagListView;
     static GridView gvFaceList, gvTagList;
 
     @Override
@@ -24,6 +25,8 @@ public class SearchMainActivity extends AppCompatActivity {
         setContentView(R.layout.search_main_view);
 
         searchView = (SearchView) findViewById(R.id.searchView);
+        faceListView = (LinearLayout) findViewById(R.id.faceListView);
+        tagListView = (LinearLayout) findViewById(R.id.tagListView);
         gvTagList = (GridView) findViewById(R.id.gvTagList);
         gvFaceList = (GridView) findViewById(R.id.gvFaceList);
 

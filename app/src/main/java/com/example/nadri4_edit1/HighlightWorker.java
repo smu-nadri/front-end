@@ -9,8 +9,11 @@ import androidx.work.WorkerParameters;
 
 public class HighlightWorker extends Worker {
 
+    Context mContext;
+
     public HighlightWorker(Context context, WorkerParameters params){
         super(context, params);
+        mContext = context;
     }
 
     @NonNull
@@ -18,7 +21,7 @@ public class HighlightWorker extends Worker {
     public Result doWork() {
         try {
             //서버 호출
-            ReqServer.reqGetHighlight(getApplicationContext());
+            ReqServer.reqGetHighlight(mContext);
             Log.d("HWA", "work test success : " + Result.success());
             return Result.success();
         } catch (Exception e){

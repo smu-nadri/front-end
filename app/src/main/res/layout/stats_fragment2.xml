@@ -26,6 +26,7 @@
             android:layout_height="wrap_content"
             android:padding="4dp"
             android:text="위치"
+            android:textStyle="bold"
             android:textSize="20dp"/>
         <View
             android:layout_width="0dp"

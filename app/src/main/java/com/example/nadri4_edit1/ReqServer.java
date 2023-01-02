@@ -16,23 +16,34 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class ReqServer {
     public static String android_id;
@@ -72,7 +83,7 @@ public class ReqServer {
 
     //하이라이트 사진을 담는 리스트
     public static String highlightTitle = new String();
-    public  static ArrayList<JSONObject> highlightList = new ArrayList<>();
+    public  static ArrayList<String> highlightList = new ArrayList<>();
 
     Context c;
 
@@ -185,6 +196,8 @@ public class ReqServer {
                 Toast.makeText(context.getApplicationContext(), "응답 실패", Toast.LENGTH_SHORT).show();
             }
         });
+
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(10000, 2, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         RequestQueue requestQueue = Volley.newRequestQueue(context);
         requestQueue.add(jsonObjectRequest);
@@ -372,6 +385,8 @@ public class ReqServer {
                     for(int i = 0; i < resArr.length(); i++){
                         tagList.add(resArr.getJSONObject(i).getJSONObject("tag"));
                     }
+                    if(tagList.isEmpty()) SearchMainActivity.tagListView.setVisibility(View.GONE);
+                    else SearchMainActivity.tagListView.setVisibility(View.VISIBLE);
                     TagGvAdapter gAdapter = new TagGvAdapter(context);
                     gAdapter.setItem(ReqServer.tagList);
                     SearchMainActivity.gvTagList.setAdapter(gAdapter);
@@ -381,6 +396,8 @@ public class ReqServer {
                     for(int i = 0; i < resArr.length(); i++){
                         faceList.add(resArr.getJSONObject(i).getJSONObject("face"));
                     }
+                    if(faceList.isEmpty()) SearchMainActivity.faceListView.setVisibility(View.GONE);
+                    else SearchMainActivity.faceListView.setVisibility(View.VISIBLE);
                     TagGvAdapter fAdapter = new TagGvAdapter(context);
                     fAdapter.setItem(ReqServer.faceList);
                     SearchMainActivity.gvFaceList.setAdapter(fAdapter);
@@ -497,17 +514,28 @@ public class ReqServer {
                     for(int i = 0; i< resArr.length(); i++){
                         try {
                             Log.d("GET", "reqGetHighlight Response: " + String.valueOf(resArr.getJSONObject(i)));
-                            highlightList.add(resArr.getJSONObject(i));
+                            highlightList.add(resArr.getString(i));
                         } catch (JSONException e) {
                             Log.e("GET", "reqGetHighlight onResponse JSONException : " + e);
                         }
                     }
+
+                    FileOutputStream fos = context.openFileOutput("highlightTitle.tmp", Context.MODE_PRIVATE);
+                    ObjectOutputStream oos = new ObjectOutputStream(fos);
+                    oos.writeObject(ReqServer.highlightTitle);
+                    oos.close();
+
+                    fos = context.openFileOutput("highlightList.tmp", Context.MODE_PRIVATE);
+                    oos = new ObjectOutputStream(fos);
+                    oos.writeObject(ReqServer.highlightList);
+                    oos.close();
+
                     if(!highlightList.isEmpty()){   //하이라이트가 있으면
                         //AlbumMainActivity.highlight_tv.setText(highlightTitle);
-                        AlbumMainActivity.highlight_img.setImageURI(Uri.parse(highlightList.get(0).getString("uri")));
+                        //AlbumMainActivity.highlight_img.setImageURI(Uri.parse(highlightList.get(0).getString("uri")));
 
                         //알림 설정
-                        Intent intent = new Intent(context, CalendarMainActivity.class);
+                        Intent intent = new Intent(context, AlbumMainActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, InitApplication.HIGHLIGHT_NOTIFICATION_CHANNEL_ID)
@@ -523,17 +551,27 @@ public class ReqServer {
 
                         //포그라운드일 때
                         AlbumMainActivity.highlight_album.setVisibility(View.VISIBLE);
+                        try {
+                            JSONObject json = new JSONObject(ReqServer.highlightList.get(0));
+                            Uri hUri = Uri.parse(json.getString("uri"));
+                            Glide.with(context).load(hUri).thumbnail(0.1f).into(AlbumMainActivity.highlight_img);
+                        } catch (JSONException e) {
+                            Log.e("AlbumMainActivity", "Highlight Uri Load: " + e);
+                        }
                     }
-                } catch (JSONException | SecurityException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+
                 Log.e("GET", "reqGetHighlight Response 에러: " + error);
             }
         });
+
+        jsonArrayRequest.setRetryPolicy(new DefaultRetryPolicy(10000, 2, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         //큐에 넣어 서버로 응답 전송
         RequestQueue requestQueue = Volley.newRequestQueue(context);

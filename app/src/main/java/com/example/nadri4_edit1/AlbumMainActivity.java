@@ -3,6 +3,7 @@ package com.example.nadri4_edit1;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,9 +20,10 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import org.json.JSONException;
+import com.bumptech.glide.Glide;
 
-import java.util.Calendar;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class AlbumMainActivity extends AppCompatActivity {
 
@@ -45,20 +47,20 @@ public class AlbumMainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.album_main_layout);
 
-        ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, MODE_PRIVATE);
+
+        ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION}, MODE_PRIVATE);
 
         context = this;
 
         //xml변수 연결
         create_album = (LinearLayout) findViewById(R.id.create_album);
-        all_album = (LinearLayout) findViewById(R.id.all_alubm);
+        all_album = (LinearLayout) findViewById(R.id.all_album);
         highlight_album = (LinearLayout) findViewById(R.id.highlight_album);
 
         all_img = (ImageView) findViewById(R.id.all_img);
         highlight_img = (ImageView) findViewById(R.id.highlight_img);
 
         gvCustomAlbum = (GridView) findViewById(R.id.gvCustomAlbum);
-
         gvYearAlbum = (GridView) findViewById(R.id.gvYearAlbum);
         glNadriAlbum = (GridLayout) findViewById(R.id.glNadriAlbum);
 
@@ -78,7 +80,17 @@ public class AlbumMainActivity extends AppCompatActivity {
 
         //앨범 목록 가져오기
         ReqServer.reqGetAlbums(AlbumMainActivity.this, 1);
-        //ReqServer.reqGetHighlight(this);    //하이라이트 테스트
+        ReqServer.reqGetHighlight(this);    //하이라이트 테스트
+
+        if(!ReqServer.highlightList.isEmpty()) {   //하이라이트가 있으면
+            try {
+                JSONObject json = new JSONObject(ReqServer.highlightList.get(0));
+                Uri hUri = Uri.parse(json.getString("uri"));
+                Glide.with(context).load(hUri).into(highlight_img);
+            } catch (JSONException e) {
+                Log.e("AlbumMainActivity", "Highlight Uri Load: " + e);
+            }
+        }
 
         all_album.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -148,6 +160,10 @@ public class AlbumMainActivity extends AppCompatActivity {
         cAdapter = new AlbumGvAdapter(context);
         cAdapter.setItem(ReqServer.customAlbumList);
         gvCustomAlbum.setAdapter(cAdapter);
+        gvCustomAlbum.setScrollContainer(false);
+        int expandSpec = View.MeasureSpec.makeMeasureSpec(View.MEASURED_SIZE_MASK, View.MeasureSpec.AT_MOST);
+        gvCustomAlbum.measure(0, expandSpec);
+        gvCustomAlbum.getLayoutParams().height = gvCustomAlbum.getMeasuredHeight();
 
         yAdapter = new AlbumGvAdapter(context);
         yAdapter.setItem(ReqServer.yearAlbumList);

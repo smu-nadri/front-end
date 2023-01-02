@@ -11,14 +11,14 @@
         android:layout_width="match_parent"
         android:layout_height="68dp"
         android:orientation="horizontal"
-        android:padding="15dp">
+        android:padding="15dp"
+        android:gravity="center_vertical">
 
         <EditText
             android:id="@+id/tvPageDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="5dp"
+            android:layout_marginLeft="3dp"
             android:background="@null"
             android:textColor="@color/gray"
             android:hint="앨범 제목"
@@ -35,31 +35,30 @@
             android:id="@+id/menuBtnLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center">
+            android:layout_gravity="center|right">
 
-            <LinearLayout
-            android:id="@+id/basicBtnLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <ImageButton
-                android:id="@+id/btnGetImage"
+                <LinearLayout
+                android:id="@+id/basicBtnLayout"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="13dp"
-                android:background="@color/colorBackground"
-                app:srcCompat="@drawable/image_add"/>
+                android:layout_height="wrap_content">
 
-            <ImageButton
-                android:id="@+id/btnSave"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:layout_marginRight="13dp"
-                android:background="@color/colorBackground"
-                app:srcCompat="@drawable/save"/>
+                    <ImageButton
+                        android:id="@+id/btnGetImage"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@color/colorBackground"
+                        app:srcCompat="@drawable/image_add"/>
 
-        </LinearLayout>
+                    <ImageButton
+                        android:id="@+id/btnSave"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:layout_marginRight="13dp"
+                        android:background="@color/colorBackground"
+                        app:srcCompat="@drawable/save"/>
+
+            </LinearLayout>
 
 
         <!-- 이미지버튼 묶음 -->
@@ -71,27 +70,24 @@
 
                 <ImageButton
                     android:id="@+id/btnBlank"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="13dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:background="@color/colorBackground"
-                    app:srcCompat="@drawable/checkbox_multiple_blank"/>
+                    app:srcCompat="@drawable/checkbox_multiple_blank" />
 
                 <!--나중에 이미지소스만 변경하는걸로? 그냥 visible-gone으로 바꾸는게 나으려나-->
                 <ImageButton
                     android:id="@+id/btnMarked"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="13dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:visibility="gone"
                     android:background="@color/colorBackground"
                     app:srcCompat="@drawable/checkbox_multiple_marked"/>
 
                 <ImageButton
                     android:id="@+id/btnRemove"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:background="@color/colorBackground"
                     app:srcCompat="@drawable/remove"/>
 
@@ -111,10 +107,10 @@
             app:srcCompat="@drawable/menu"/>
         <ImageButton
             android:id="@+id/btnEdit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_gravity="center|right"
-            android:layout_marginRight="5dp"
+            android:layout_marginRight="3dp"
             android:background="@color/colorBackground"
             app:srcCompat="@drawable/edit_unclick"/>
 

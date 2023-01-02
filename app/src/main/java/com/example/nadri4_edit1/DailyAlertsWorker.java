@@ -19,7 +19,7 @@ public class DailyAlertsWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        Intent intent = new Intent(getApplicationContext(), CalendarMainActivity.class);
+        Intent intent = new Intent(getApplicationContext(), AlbumMainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), InitApplication.DAILY_NOTIFICATION_CHANNEL_ID)

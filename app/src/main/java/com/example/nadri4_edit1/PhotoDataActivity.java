@@ -45,6 +45,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -127,10 +128,16 @@ public class PhotoDataActivity extends AppCompatActivity {
                     datetime = ((String) time).substring(0, 10) + " " + ((String) time).substring(11, 19);
                     photo_text.append(" - 날짜 : " + datetime + "\n");
                 } else if (time.getClass() == Long.class) {
+                    TimeZone timeZone = TimeZone.getDefault();
+                    Calendar cal = GregorianCalendar.getInstance(timeZone);
+                    long offsetInMillis = timeZone.getOffset(cal.getTimeInMillis());
+
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"));
-                    calendar.setTimeInMillis((Long) time);
+                    dateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
+                    Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"), Locale.KOREA);
+                    calendar.setTimeInMillis((Long) time - offsetInMillis);
                     datetime = dateFormat.format(calendar.getTime());
+
                     photo_text.append(" - 날짜 : " + datetime + "\n");
                 }
             }

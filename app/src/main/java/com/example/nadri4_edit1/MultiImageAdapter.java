@@ -126,8 +126,6 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
         Uri imageUri = null;
         try {
             imageUri = Uri.parse(mData.get(position).getString("uri"));
-            InputStream inputStream = mContext.getContentResolver().openInputStream(imageUri);
-            ExifInterface exif = new ExifInterface(inputStream);
 
             Glide.with(mContext).load(imageUri).thumbnail(0.1f).into(holder.image);
 
@@ -219,6 +217,13 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
             }
         } catch (JSONException e) {
             Log.e("MultiImageAdapter", "onBindViewHolder Get Set Comment Error: " + e);
+        }
+
+        if(isEdit){
+            holder.comment.setFocusableInTouchMode(true);
+        }
+        else{
+            holder.comment.setFocusableInTouchMode(false);
         }
 
         holder.item.setOnLongClickListener(new View.OnLongClickListener() {
