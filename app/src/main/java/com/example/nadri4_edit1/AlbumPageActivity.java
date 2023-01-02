@@ -147,8 +147,8 @@ public class AlbumPageActivity extends AppCompatActivity {
     FaceDetector detector;
     FaceRecognize recognizer;
 
-    String access_id = "AKIASLE2NOY6FVICSDHF";
-    String access_pw = "G5M6/OqSYVX4xp8agkl6gCETMrWrchbr1vSSn3CT";
+    String access_id = "access_id";
+    String access_pw = "access_pw";
     AmazonRekognition rekognition = new AmazonRekognitionClient(new BasicAWSCredentials(access_id, access_pw));
 
     private static final int REQUEST_CODE = 0;
